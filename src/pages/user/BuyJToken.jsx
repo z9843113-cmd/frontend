@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/BottomNav';
 import RequestStatusModal from '../../components/RequestStatusModal';
-import { jTokenPurchaseAPI, walletAPI, uploadToCloudinary, publicAPI, userAPI } from '../../services/api';
+import { jTokenPurchaseAPI, walletAPI, uploadToCloudinary, userAPI } from '../../services/api';
 import { FaArrowLeft, FaClock, FaCoins, FaCopy, FaCreditCard, FaUniversity, FaCheck, FaTimes } from 'react-icons/fa';
 
 const BuyJToken = () => {
@@ -21,9 +21,7 @@ const BuyJToken = () => {
   const [screenshot, setScreenshot] = useState('');
   const [screenshotPreview, setScreenshotPreview] = useState('');
   const [uploading, setUploading] = useState(false);
-  const [selectedMethod, setSelectedMethod] = useState('');
   const [selectedUpi, setSelectedUpi] = useState('');
-  const [upiApps, setUpiApps] = useState([]);
   const [userUpiAccounts, setUserUpiAccounts] = useState([]);
   const [pendingRequest, setPendingRequest] = useState(null);
 
@@ -60,14 +58,6 @@ const BuyJToken = () => {
           u => u.status === 'active' || u.status === 'verified'
         );
         
-        // Show all JToken-enabled apps for selection
-        const allApps = upiRes?.data || upiRes || [];
-        const jtokenApps = allApps.filter(app => 
-          app.isforjtoken === true || app.isforjtoken === 'true' ||
-          app.isForJToken === true || app.isForJToken === 'true'
-        );
-        
-        setUpiApps(jtokenApps);
         setUserUpiAccounts(userUpiAccounts);
       } catch (err) {
         console.error('Load error:', err);
@@ -263,24 +253,7 @@ const BuyJToken = () => {
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">
-                  {userUpiAccounts.map((upi) => {
-                    const appId = upi.appid || upi.appId;
-                    const upiId = (upi.upiid || upi.upiId || '').toLowerCase();
-                    let appName = '';
-                    if (appId === 'mobikwik' || appId === 'mobiwik' || upiId.includes('mobwik') || upiId.includes('mobiwik')) appName = 'MobiKwik';
-                    else if (appId === 'freecharge' || appId === 'freerecharge' || upiId.includes('freerecharge')) appName = 'FreeCharge';
-                    else if (appId === 'paytm' || upiId.includes('paytm')) appName = 'Paytm';
-                    else if (appId === 'phonepe' || upiId.includes('phonepe')) appName = 'PhonePe';
-                    else if (appId === 'google-pay' || upiId.includes('gpay') || upiId.includes('google')) appName = 'Google Pay';
-                    else if (appId === 'bhim' || upiId.includes('bhim')) appName = 'BHIM';
-                    else if (appId === 'amazon-pay' || upiId.includes('amazon')) appName = 'Amazon Pay';
-                    else if (upiId.includes('okaxis')) appName = 'Axis Bank';
-                    else if (upiId.includes('yesbank')) appName = 'Yes Bank';
-                    else if (upiId.includes('sbi')) appName = 'SBI';
-                    else if (upiId.includes('icici')) appName = 'ICICI';
-                    else if (upiId.includes('hdfc')) appName = 'HDFC';
-                    else appName = appId || 'UPI App';
-                    return (
+                  {userUpiAccounts.map((upi) => (
                     <button
                       key={upi.id}
                       onClick={() => setSelectedUpi(upi.id)}
@@ -290,9 +263,9 @@ const BuyJToken = () => {
                           : 'bg-[#0a0a0a] border border-[#2a2a2a] text-gray-400'
                       }`}
                     >
-                      {upi.upiid || upi.upiId} <span className="text-[#D4AF37] text-xs">({appName})</span>
+                      {upi.upiid || upi.upiId} {upi.appName && <span className="text-[#D4AF37] text-xs">({upi.appName})</span>}
                     </button>
-                  )})}
+                  ))}
                 </div>
               )}
             </div>
