@@ -108,13 +108,18 @@ const BuyJToken = () => {
       setMessage('Please select your UPI account');
       return;
     }
-    if (!selectedMethod) {
-      setMessage('Please select payment app');
+    
+    // Auto-set method from selected UPI's appid
+    const selectedUpiData = userUpiAccounts.find(u => u.id === selectedUpi);
+    const appId = selectedUpiData?.appid || selectedUpiData?.appId;
+    if (!appId) {
+      setMessage('Please select a verified UPI account');
       return;
     }
+    
     setSubmitting(true);
     try {
-      const res = await jTokenPurchaseAPI.create({ amount: parseFloat(amount), method: selectedMethod, upiId: selectedUpi });
+      const res = await jTokenPurchaseAPI.create({ amount: parseFloat(amount), method: appId, upiId: selectedUpi });
       const newRequest = res?.data?.request || res?.request || res?.data || res;
       setRequest(newRequest);
       setPendingRequest({ id: newRequest.id, type: 'JTOKEN', title: 'J Token Purchase' });
@@ -260,7 +265,21 @@ const BuyJToken = () => {
                 <div className="flex flex-wrap gap-2">
                   {userUpiAccounts.map((upi) => {
                     const appId = upi.appid || upi.appId;
-                    const appName = appId ? upiApps?.find(a => a.id === appId)?.name : null;
+                    const upiId = (upi.upiid || upi.upiId || '').toLowerCase();
+                    let appName = '';
+                    if (appId === 'mobikwik' || appId === 'mobiwik' || upiId.includes('mobwik') || upiId.includes('mobiwik')) appName = 'MobiKwik';
+                    else if (appId === 'freecharge' || appId === 'freerecharge' || upiId.includes('freerecharge')) appName = 'FreeCharge';
+                    else if (appId === 'paytm' || upiId.includes('paytm')) appName = 'Paytm';
+                    else if (appId === 'phonepe' || upiId.includes('phonepe')) appName = 'PhonePe';
+                    else if (appId === 'google-pay' || upiId.includes('gpay') || upiId.includes('google')) appName = 'Google Pay';
+                    else if (appId === 'bhim' || upiId.includes('bhim')) appName = 'BHIM';
+                    else if (appId === 'amazon-pay' || upiId.includes('amazon')) appName = 'Amazon Pay';
+                    else if (upiId.includes('okaxis')) appName = 'Axis Bank';
+                    else if (upiId.includes('yesbank')) appName = 'Yes Bank';
+                    else if (upiId.includes('sbi')) appName = 'SBI';
+                    else if (upiId.includes('icici')) appName = 'ICICI';
+                    else if (upiId.includes('hdfc')) appName = 'HDFC';
+                    else appName = appId || 'UPI App';
                     return (
                     <button
                       key={upi.id}
@@ -271,35 +290,9 @@ const BuyJToken = () => {
                           : 'bg-[#0a0a0a] border border-[#2a2a2a] text-gray-400'
                       }`}
                     >
-                      {upi.upiid || upi.upiId} {appName && <span className="text-[#D4AF37] text-xs">({appName})</span>}
+                      {upi.upiid || upi.upiId} <span className="text-[#D4AF37] text-xs">({appName})</span>
                     </button>
                   )})}
-                </div>
-              )}
-            </div>
-
-            {/* Select Payment App */}
-            <div className="mb-4">
-              <p className="text-gray-400 text-sm mb-2">Select Payment App</p>
-              {upiApps.length === 0 ? (
-                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
-                  <p className="text-red-400 text-sm">No payment method available. Please contact support.</p>
-                </div>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {upiApps.map((app) => (
-                    <button
-                      key={app.id}
-                      onClick={() => setSelectedMethod(app.id)}
-                      className={`px-4 py-2 rounded-xl font-semibold text-sm ${
-                        selectedMethod === app.id
-                          ? 'bg-[#D4AF37] text-black'
-                          : 'bg-[#0a0a0a] border border-[#2a2a2a] text-gray-400'
-                      }`}
-                    >
-                      {app.name || app.id}
-                    </button>
-                  ))}
                 </div>
               )}
             </div>
@@ -315,7 +308,7 @@ const BuyJToken = () => {
               />
             </div>
 
-            <button onClick={handleCreate} disabled={submitting || !selectedMethod || !amount} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">
+            <button onClick={handleCreate} disabled={submitting || !selectedUpi || !amount} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">
               {submitting ? 'Creating...' : 'Create Request'}
             </button>
           </div>
