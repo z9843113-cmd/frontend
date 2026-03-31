@@ -405,16 +405,19 @@ const BuyJToken = () => {
               )}
               
               {request.adminnote && (
-                <div className="bg-gradient-to-r from-[#D4AF37]/10 to-transparent rounded-xl p-3 border-l-2 border-[#D4AF37]">
-                  <p className="text-[#D4AF37] text-xs font-medium">📝 Note:</p>
-                  <p className="text-white text-sm mt-1">{request.adminnote}</p>
+                <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-xl p-4 border border-[#D4AF37]/30">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse"></span>
+                    <p className="text-gray-300 text-sm font-semibold">Note from Admin</p>
+                  </div>
+                  <p className="text-white text-sm bg-[#141414] rounded-lg p-3">{request.adminnote}</p>
                 </div>
               )}
               
               {request.bankdetails && (
                 <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-xl p-4 border border-[#2a2a2a]">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="w-2 h-2 rounded-full bg-[#D4AF37]"></span>
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                     <p className="text-gray-300 text-sm font-semibold">Bank Transfer Details</p>
                   </div>
                   <div className="space-y-2">
