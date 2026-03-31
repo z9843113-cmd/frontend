@@ -209,7 +209,8 @@ const adminAPI = {
   rejectUpiVerification: (verificationId, reason) => authFetch(`${API_BASE}/admin/upi-verification/${verificationId}/reject`, { method: 'POST', body: JSON.stringify({ reason: reason || '' }) }),
   getExchangeRequests: (params) => authFetch(`${API_BASE}/admin/exchange-requests?${new URLSearchParams(params || {})}`),
   approveExchangeRequest: (requestId) => authFetch(`${API_BASE}/admin/exchange-request/${requestId}/approve`, { method: 'POST' }),
-  rejectExchangeRequest: (requestId, data) => authFetch(`${API_BASE}/admin/exchange-request/${requestId}/reject`, { method: 'POST', body: JSON.stringify(data || {}) })
+  rejectExchangeRequest: (requestId, data) => authFetch(`${API_BASE}/admin/exchange-request/${requestId}/reject`, { method: 'POST', body: JSON.stringify(data || {}) }),
+  cleanupDatabase: (data) => authFetch(`${API_BASE}/admin/cleanup`, { method: 'POST', body: JSON.stringify(data) })
 };
 
 export { authAPI, userAPI, walletAPI, depositAPI, withdrawalAPI, referralAPI, jTokenPurchaseAPI, publicAPI, adminAPI, uploadToCloudinary };
