@@ -228,8 +228,6 @@ const AdminUsers = () => {
                         </div>
                       ))}
                     </div>
-                      )})}
-                    </div>
                   ) : (
                     <p className="text-gray-500 text-center py-4">No UPI accounts linked</p>
                   )}
@@ -261,17 +259,6 @@ const AdminUsers = () => {
                           </div>
                         </div>
                       ))}
-                    </div>
-                            <span className={`px-2 py-1 rounded-lg text-xs ${
-                              v.status === 'APPROVED' || v.status === 'VERIFIED' ? 'bg-green-500/20 text-green-400' : 
-                              v.status === 'PENDING' || v.status === 'OTP_REQUESTED' || v.status === 'OTP_SUBMITTED' ? 'bg-yellow-500/20 text-yellow-400' : 
-                              'bg-red-500/20 text-red-400'
-                            }`}>
-                              {v.status || 'PENDING'}
-                            </span>
-                          </div>
-                        </div>
-                      )})}
                     </div>
                   ) : (
                     <p className="text-gray-500 text-center py-4">No pending verifications</p>

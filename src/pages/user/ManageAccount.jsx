@@ -375,7 +375,6 @@ const ManageAccount = () => {
                   {upiAccounts.map((upi) => {
                     const getAppName = (upiAccount) => {
                       const appId = upiAccount.appid || upiAccount.appId;
-                    const appId = upiAccount.appid || upiAccount.appId;
                       const upiId = (upiAccount.upiid || upiAccount.upiId || '').toLowerCase();
                       if (appId) {
                         const found = upiApps?.find(app => 
