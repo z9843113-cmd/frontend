@@ -101,7 +101,7 @@ const RequestStatusModal = ({ isOpen, onClose, type, requestId, title }) => {
         {status === 'PENDING' && (
           <>
             <p className="mb-4 text-sm text-gray-400">
-              Admin will approve your request soon...
+              Wait for order, Payment details will be receive soon.
             </p>
             <div className="flex items-center justify-center gap-2">
               <div className="h-2 w-32 overflow-hidden rounded-full bg-gray-700">

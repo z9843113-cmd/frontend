@@ -4,7 +4,7 @@ import { adminAPI, uploadToCloudinary } from '../../services/api';
 import { useAuthStore } from '../../store';
 import AdminNotificationBell from '../../components/AdminNotificationBell';
 
-const FILTERS = ['', 'WAITING_ADMIN', 'READY_TO_PAY', 'PAYMENT_STARTED', 'PAYMENT_SUBMITTED', 'APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'];
+const FILTERS = ['', 'WAITING_ORDER', 'READY_TO_PAY', 'PAYMENT_STARTED', 'PAYMENT_SUBMITTED', 'APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'];
 
 const AdminJTokenRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -387,14 +387,14 @@ const AdminJTokenRequests = () => {
                   {request.screenshot && <a href={request.screenshot} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm text-sky-400">View payment screenshot</a>}
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  {request.status === 'WAITING_ADMIN' && <button onClick={() => { 
+                  {request.status === 'WAITING_ORDER' && <button onClick={() => { 
                     setSelected(request); 
                     setPaymentUpi(''); 
                     setAdminNote(''); 
                     setQrImage(''); 
                   }} className="rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#FFD700] px-4 py-3 font-bold text-black">Assign Details</button>}
                   {request.status === 'PAYMENT_SUBMITTED' && <button onClick={() => handleApprove(request.id)} disabled={processingId === request.id} className="rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 px-4 py-3 font-bold text-white disabled:opacity-50">Approve</button>}
-                  {['WAITING_ADMIN', 'READY_TO_PAY', 'PAYMENT_STARTED', 'PAYMENT_SUBMITTED'].includes(request.status) && <button onClick={() => handleReject(request.id)} disabled={processingId === request.id} className="rounded-2xl bg-red-500/15 px-4 py-3 font-bold text-red-400 disabled:opacity-50">Reject</button>}
+                  {['WAITING_ORDER', 'READY_TO_PAY', 'PAYMENT_STARTED', 'PAYMENT_SUBMITTED'].includes(request.status) && <button onClick={() => handleReject(request.id)} disabled={processingId === request.id} className="rounded-2xl bg-red-500/15 px-4 py-3 font-bold text-red-400 disabled:opacity-50">Reject</button>}
                 </div>
               </div>
             </div>

@@ -23,7 +23,6 @@ const BuyJToken = () => {
   const [uploading, setUploading] = useState(false);
   const [selectedUpi, setSelectedUpi] = useState('');
   const [userUpiAccounts, setUserUpiAccounts] = useState([]);
-  const [pendingRequest, setPendingRequest] = useState(null);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -53,9 +52,7 @@ const BuyJToken = () => {
         else setRequest(null);
         
         const rawUpi = userUpiRes?.data || userUpiRes || [];
-        const userUpiAccounts = rawUpi;
-        
-        setUserUpiAccounts(userUpiAccounts);
+        setUserUpiAccounts(rawUpi);
       } catch (err) {
         console.error('Load error:', err);
       } finally {
@@ -81,7 +78,8 @@ const BuyJToken = () => {
   }, []);
 
   useEffect(() => {
-    if (request?.status === 'PAYMENT_STARTED') {
+    if (request?.status === 'PAYMENT_STARTED' || request?.status === 'READY_TO_PAY') {
+      setShowWaitPopup(false);
       setShowPaymentPopup(true);
     }
   }, [request?.status]);
@@ -96,10 +94,8 @@ const BuyJToken = () => {
       return;
     }
     
-    // Auto-set method from selected UPI's appid
     const selectedUpiData = userUpiAccounts.find(u => u.id === selectedUpi);
     const appId = selectedUpiData?.appid || selectedUpiData?.appId || selectedUpiData?.appID;
-    console.log('Selected UPI:', selectedUpiData, 'appId:', appId);
     if (!appId) {
       setMessage('Please select a verified UPI account');
       return;
@@ -110,22 +106,10 @@ const BuyJToken = () => {
       const res = await jTokenPurchaseAPI.create({ amount: parseFloat(amount), method: appId, upiId: selectedUpi });
       const newRequest = res?.data?.request || res?.request || res?.data || res;
       setRequest(newRequest);
-      setPendingRequest({ id: newRequest.id, type: 'JTOKEN', title: 'J Token Purchase' });
+      setShowWaitPopup(true);
       setMessage('');
     } catch (err) {
       setMessage(err?.message || 'Failed to create request');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleStartPay = async () => {
-    setSubmitting(true);
-    try {
-      await jTokenPurchaseAPI.startPay(request.id);
-      setRequest({ ...request, status: 'PAYMENT_STARTED' });
-    } catch (err) {
-      setMessage(err?.message || 'Failed to start payment');
     } finally {
       setSubmitting(false);
     }
@@ -137,25 +121,9 @@ const BuyJToken = () => {
     try {
       await jTokenPurchaseAPI.cancel(request.id);
       setRequest(null);
+      setShowWaitPopup(false);
     } catch (err) {
       setMessage(err?.message || 'Failed to cancel');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleSubmitPayment = async () => {
-    if (!utr) {
-      setMessage('Please enter UTR number');
-      return;
-    }
-    setSubmitting(true);
-    try {
-      await jTokenPurchaseAPI.submitPayment(request.id, { utr, screenshot });
-      setMessage('');
-      setShowPaymentPopup(false);
-    } catch (err) {
-      setMessage(err?.message || 'Failed to submit payment');
     } finally {
       setSubmitting(false);
     }
@@ -242,7 +210,6 @@ const BuyJToken = () => {
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
             <h2 className="text-white font-bold text-lg mb-4">Buy J Token</h2>
             
-            {/* Select UPI Account */}
             <div className="mb-4">
               <p className="text-gray-400 text-sm mb-2">Select Your UPI Account</p>
               {userUpiAccounts.length === 0 ? (
@@ -296,7 +263,7 @@ const BuyJToken = () => {
               </div>
               <div className="flex justify-between">
                 <p className="text-gray-400">Method</p>
-                <p className="text-white">{request.method || selectedMethod}</p>
+                <p className="text-white">{request.method}</p>
               </div>
               <div className="flex justify-between">
                 <p className="text-gray-400">Status</p>
@@ -319,7 +286,7 @@ const BuyJToken = () => {
               </div>
             )}
 
-            {(request.status === 'WAITING_ADMIN' || request.status === 'READY_TO_PAY' || request.status === 'PAYMENT_STARTED') && (
+            {(request.status === 'WAITING_ORDER' || request.status === 'WAITING_ORDER' || request.status === 'READY_TO_PAY' || request.status === 'PAYMENT_STARTED') && (
               <button onClick={handleCancel} disabled={submitting} className="w-full py-3 bg-red-500/20 text-red-400 rounded-2xl font-semibold mt-3 disabled:opacity-50">
                 Cancel Request
               </button>
@@ -387,6 +354,20 @@ const BuyJToken = () => {
         </div>
       )}
 
+      {showWaitPopup && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-8 border border-[#2a2a2a] w-full max-w-sm text-center">
+            <div className="animate-spin w-16 h-16 border-4 border-[#D4AF37] border-t-transparent rounded-full mx-auto mb-6"></div>
+            <h3 className="text-white font-bold text-xl mb-2">Wait for Order</h3>
+            <p className="text-gray-400 text-sm">Payment details will be received soon</p>
+            <p className="text-gray-500 text-xs mt-4">Please wait while admin assigns payment details...</p>
+            <button onClick={() => { setShowWaitPopup(false); setRequest(null); }} className="mt-6 text-gray-500 text-sm hover:text-white">
+              Cancel Request
+            </button>
+          </div>
+        </div>
+      )}
+
       {showPaymentPopup && request && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a] w-full max-w-md">
@@ -424,6 +405,46 @@ const BuyJToken = () => {
                 <div className="bg-[#0a0a0a] rounded-xl p-3">
                   <p className="text-gray-400 text-xs">Note:</p>
                   <p className="text-white text-sm">{request.adminnote}</p>
+                </div>
+              )}
+              
+              {request.bankdetails && (
+                <div className="bg-[#0a0a0a] rounded-xl p-4 space-y-2">
+                  <p className="text-gray-400 text-sm font-semibold text-center">Bank Transfer Details</p>
+                  {request.bankdetails.bankName && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500">Bank:</span>
+                      <span className="text-white">{request.bankdetails.bankName}</span>
+                    </div>
+                  )}
+                  {request.bankdetails.accountNumber && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500">A/C:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-mono">{request.bankdetails.accountNumber}</span>
+                        <button onClick={() => copyToClipboard(request.bankdetails.accountNumber)} className="text-gray-400 hover:text-[#D4AF37]">
+                          <FaCopy className="text-xs" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {request.bankdetails.ifscCode && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500">IFSC:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-white font-mono">{request.bankdetails.ifscCode}</span>
+                        <button onClick={() => copyToClipboard(request.bankdetails.ifscCode)} className="text-gray-400 hover:text-[#D4AF37]">
+                          <FaCopy className="text-xs" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {request.bankdetails.payeeName && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Payee:</span>
+                      <span className="text-white">{request.bankdetails.payeeName}</span>
+                    </div>
+                  )}
                 </div>
               )}
               
