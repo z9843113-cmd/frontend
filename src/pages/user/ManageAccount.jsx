@@ -330,8 +330,20 @@ const ManageAccount = () => {
                       placeholder="e.g., yourname@okhdfcbank"
                       className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none"
                     />
+                    {newUpi && selectedUpiApp && (
+                      <p className="text-gray-500 text-xs mt-1">
+                        Expected: yourname@ 
+                        {selectedUpiApp === 'mobikwik' || selectedUpiApp === 'mobiwik' ? 'mobwik' : 
+                         selectedUpiApp === 'freecharge' || selectedUpiApp === 'freerecharge' ? 'freerecharge' :
+                         selectedUpiApp === 'paytm' ? 'paytm' :
+                         selectedUpiApp === 'phonepe' ? 'phonepe' :
+                         selectedUpiApp === 'google-pay' ? 'gpay' :
+                         selectedUpiApp === 'bhim' ? 'bhim' :
+                         selectedUpiApp === 'amazon-pay' ? 'amazon' : 'upi'}
+                      </p>
+                    )}
                   </div>
-                  <button onClick={handleSendOtp} disabled={submitting || !selectedUpiApp} className="w-full py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">
+                  <button onClick={handleSendOtp} disabled={submitting || !selectedUpiApp || !newUpi.includes('@')} className="w-full py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">
                     {submitting ? 'Submitting...' : 'Send OTP'}
                   </button>
                 </div>
@@ -342,7 +354,7 @@ const ManageAccount = () => {
               <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
                 <h3 className="text-lg font-bold text-white mb-4">Supported UPI Apps</h3>
                 <div className="grid grid-cols-2 gap-2 md:gap-3">
-                  {upiApps.filter(app => app.isActive || app.isactive).map((app) => (
+                  {upiApps.map((app) => (
                     <div key={app.id} className="p-3 md:p-4 bg-[#0a0a0a] rounded-2xl border border-[#1a1a1a] flex items-center gap-2 md:gap-3">
                       <div className="w-8 md:w-10 h-8 md:h-10 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
                         <svg className="w-4 md:w-5 h-4 md:h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
