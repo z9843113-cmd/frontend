@@ -238,8 +238,8 @@ const BuyJToken = () => {
             </div>
           </div>
           <div className="text-right bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-xl px-3 py-2 border border-[#D4AF37]/20">
-            <p className="text-[#D4AF37] font-bold text-sm">₹{parseFloat(wallet?.tokenbalance || 0).toFixed(2)}</p>
-            <p className="text-gray-500 text-xs">J Token</p>
+            <p className="text-[#D4AF37] font-bold text-sm">₹{parseFloat(wallet?.inrbalance || 0).toFixed(2)}</p>
+            <p className="text-gray-500 text-xs">INR Wallet</p>
           </div>
         </div>
       </div>
@@ -355,13 +355,13 @@ const BuyJToken = () => {
               </div>
             </div>
 
-            {request.status === 'PAYMENT_STARTED' && (
+            {(request.status === 'PAYMENT_STARTED' || request.status === 'READY_TO_PAY') && (
               <button onClick={handleStartPay} disabled={submitting} className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl font-bold text-white disabled:opacity-50 mt-4">
                 {submitting ? 'Loading...' : 'Pay Now'}
               </button>
             )}
 
-            {(request.status === 'WAITING_ADMIN' || request.status === 'READY_TO_PAY') && (
+            {(request.status === 'WAITING_ADMIN' || request.status === 'READY_TO_PAY' || request.status === 'PAYMENT_STARTED') && (
               <button onClick={handleCancel} disabled={submitting} className="w-full py-3 bg-red-500/20 text-red-400 rounded-2xl font-semibold mt-3 disabled:opacity-50">
                 Cancel Request
               </button>
