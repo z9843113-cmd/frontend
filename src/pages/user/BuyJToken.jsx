@@ -61,27 +61,51 @@ const BuyJToken = () => {
         setPrimaryUpi(primaryUpi);
         
         const allApps = upiRes?.data || upiRes || [];
-        const jtokenApps = allApps.filter(app => 
-          app.isforjtoken === true || app.isforjtoken === 'true' ||
-          app.isForJToken === true || app.isForJToken === 'true'
-        );
+        
+        // Only show apps that match user's primary UPI
+        let jtokenApps = [];
+        if (primaryUpi) {
+          const primaryUpiId = (primaryUpi.upiid || primaryUpi.upiId || '').toLowerCase();
+          jtokenApps = allApps.filter(app => {
+            const appId = (app.id || '').toLowerCase();
+            // Only include apps that match user's UPI
+            if (appId === 'mobikwik' || appId === 'mobiwik') {
+              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
+                     (primaryUpiId.includes('mobwik') || primaryUpiId.includes('mobiwik'));
+            }
+            if (appId === 'freecharge' || appId === 'freerecharge') {
+              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
+                     primaryUpiId.includes('freerecharge');
+            }
+            if (appId === 'paytm') {
+              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
+                     primaryUpiId.includes('paytm');
+            }
+            if (appId === 'phonepe') {
+              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
+                     primaryUpiId.includes('phonepe');
+            }
+            if (appId === 'google-pay') {
+              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
+                     (primaryUpiId.includes('gpay') || primaryUpiId.includes('google'));
+            }
+            if (appId === 'bhim') {
+              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
+                     primaryUpiId.includes('bhim');
+            }
+            if (appId === 'amazon-pay') {
+              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
+                     primaryUpiId.includes('amazon');
+            }
+            return false;
+          });
+        }
+        
         setUpiApps(jtokenApps);
         
-        if (jtokenApps.length > 0 && !selectedMethod) {
-          if (primaryUpi) {
-            const primaryUpiId = (primaryUpi.upiid || primaryUpi.upiId || '').toLowerCase();
-            const matchedApp = jtokenApps.find(app => {
-              const appId = (app.id || '').toLowerCase();
-              if (appId === 'mobikwik' || appId === 'mobiwik') {
-                return primaryUpiId.includes('mobwik') || primaryUpiId.includes('mobiwik');
-              }
-              if (appId === 'freecharge' || appId === 'freerecharge') {
-                return primaryUpiId.includes('freerecharge');
-              }
-              return false;
-            });
-            if (matchedApp) setSelectedMethod(matchedApp.id);
-          }
+        // Auto-select only if exactly one matching app
+        if (jtokenApps.length === 1 && !selectedMethod) {
+          setSelectedMethod(jtokenApps[0].id);
         }
       } catch (err) {
         console.error('Load error:', err);
