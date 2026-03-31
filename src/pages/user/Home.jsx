@@ -120,7 +120,7 @@ const Home = () => {
       } catch (error) {
         console.error('Failed to refresh wallet', error);
       }
-    }, 15000);
+    }, 2000);
 
     return () => {
       clearTimeout(timeoutId);

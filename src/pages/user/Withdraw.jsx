@@ -20,6 +20,8 @@ const Withdraw = () => {
 
   useEffect(() => {
     fetchData();
+    const interval = setInterval(fetchData, 2000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchData = async () => {

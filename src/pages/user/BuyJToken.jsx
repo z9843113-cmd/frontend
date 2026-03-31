@@ -88,7 +88,7 @@ const BuyJToken = () => {
 
   useEffect(() => { 
     fetchRequestData(); 
-    const interval = setInterval(() => fetchRequestData(true), 3000);
+    const interval = setInterval(() => fetchRequestData(true), 2000);
     return () => clearInterval(interval);
   }, [fetchRequestData]);
 

@@ -38,7 +38,7 @@ const Deposit = () => {
       depositAPI.getHistory().then((history) => {
         setDeposits(history?.data || history || []);
       }).catch(console.error);
-    }, 1500);
+    }, 2000);
     return () => clearInterval(interval);
   }, []);
 
