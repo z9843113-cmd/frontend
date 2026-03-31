@@ -312,9 +312,11 @@ const BuyJToken = () => {
             </div>
 
             {(request.status === 'PAYMENT_STARTED' || request.status === 'READY_TO_PAY') && (
-              <button onClick={handleStartPay} disabled={submitting} className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl font-bold text-white disabled:opacity-50 mt-4">
-                {submitting ? 'Loading...' : 'Pay Now'}
-              </button>
+              <div className="mt-4">
+                <button onClick={() => setShowPaymentPopup(true)} className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl font-bold text-white disabled:opacity-50">
+                  {submitting ? 'Loading...' : 'Pay Now'}
+                </button>
+              </div>
             )}
 
             {(request.status === 'WAITING_ADMIN' || request.status === 'READY_TO_PAY' || request.status === 'PAYMENT_STARTED') && (
@@ -379,6 +381,94 @@ const BuyJToken = () => {
                 }`}>
                   {request.status}
                 </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPaymentPopup && request && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a] w-full max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-white font-bold text-lg">Payment Details</h3>
+              <button onClick={() => setShowPaymentPopup(false)} className="text-gray-400"><FaTimes /></button>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="bg-[#0a0a0a] rounded-2xl p-4 text-center">
+                <p className="text-gray-400 text-sm mb-2">Amount to Pay</p>
+                <p className="text-[#D4AF37] font-bold text-2xl">₹{parseFloat(request.amount || 0).toFixed(2)}</p>
+              </div>
+              
+              {request.paymentupi && (
+                <div className="text-center">
+                  <p className="text-gray-400 text-sm mb-2">Pay to this UPI ID</p>
+                  <p className="text-white font-bold text-lg">{request.paymentupi}</p>
+                </div>
+              )}
+              
+              {request.qrimage && (
+                <div className="text-center">
+                  <p className="text-gray-400 text-sm mb-2">Scan QR to Pay</p>
+                  <img src={request.qrimage} alt="Payment QR" className="mx-auto h-48 rounded-xl" />
+                </div>
+              )}
+              
+              {request.adminnote && (
+                <div className="bg-[#0a0a0a] rounded-xl p-3">
+                  <p className="text-gray-400 text-xs">Note:</p>
+                  <p className="text-white text-sm">{request.adminnote}</p>
+                </div>
+              )}
+              
+              <div className="border-t border-[#2a2a2a] pt-4 mt-4">
+                <p className="text-white font-semibold mb-3">Submit Payment Proof</p>
+                <input 
+                  type="text" 
+                  value={utr} 
+                  onChange={(e) => setUtr(e.target.value)} 
+                  placeholder="Enter UTR / Transaction ID" 
+                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none mb-3"
+                />
+                <label className="block rounded-xl border border-dashed border-[#2a2a2a] bg-[#0a0a0a] p-4 text-center text-gray-500 cursor-pointer hover:border-[#D4AF37]/50 mb-3">
+                  {screenshotPreview || screenshot ? (
+                    <img src={screenshotPreview || screenshot} alt="Screenshot" className="mx-auto h-32 rounded-lg object-contain" />
+                  ) : 'Upload Payment Screenshot'}
+                  <input type="file" accept="image/*" className="hidden" onChange={handleScreenshot} />
+                </label>
+                {uploading && <p className="text-sm text-[#D4AF37] text-center">Uploading...</p>}
+              </div>
+              
+              <div className="flex gap-3 mt-4">
+                <button onClick={() => setShowPaymentPopup(false)} className="flex-1 py-3 bg-gray-600 text-white rounded-xl font-semibold">
+                  Cancel
+                </button>
+                <button onClick={async () => {
+                  if (!utr.trim()) {
+                    setMessage('Please enter UTR/Transaction ID');
+                    return;
+                  }
+                  if (!screenshot && !screenshotPreview) {
+                    setMessage('Please upload payment screenshot');
+                    return;
+                  }
+                  setSubmitting(true);
+                  try {
+                    await jTokenPurchaseAPI.submitPayment(request.id, { utr: utr.trim(), screenshot });
+                    setMessage('');
+                    setShowPaymentPopup(false);
+                    setUtr('');
+                    setScreenshot('');
+                    setScreenshotPreview('');
+                  } catch (err) {
+                    setMessage(err?.message || 'Failed to submit payment');
+                  } finally {
+                    setSubmitting(false);
+                  }
+                }} disabled={submitting} className="flex-1 py-3 bg-[#D4AF37] text-black rounded-xl font-semibold disabled:opacity-50">
+                  {submitting ? 'Submitting...' : 'I Have Paid'}
+                </button>
               </div>
             </div>
           </div>
