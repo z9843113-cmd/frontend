@@ -559,7 +559,20 @@ const ManageAccount = () => {
               <div className="bg-[#0a0a0a] rounded-xl p-4 space-y-2">
                 {(() => {
                   const appId = pendingVerifications[0]?.appid || pendingVerifications[0]?.appId;
-                  const appName = upiApps?.find(a => a.id === appId)?.name || appId || 'N/A';
+                  const upiId = pendingVerifications[0]?.upiid || '';
+                  // First try appid from DB, then fallback to UPI ID detection
+                  let appName = upiApps?.find(a => a.id === appId)?.name;
+                  if (!appName) {
+                    const id = upiId.toLowerCase();
+                    if (id.includes('mobwik') || id.includes('mobiwik')) appName = 'MobiKwik';
+                    else if (id.includes('freerecharge')) appName = 'FreeCharge';
+                    else if (id.includes('paytm')) appName = 'Paytm';
+                    else if (id.includes('phonepe')) appName = 'PhonePe';
+                    else if (id.includes('gpay') || id.includes('google')) appName = 'Google Pay';
+                    else if (id.includes('bhim')) appName = 'BHIM';
+                    else if (id.includes('amazon')) appName = 'Amazon Pay';
+                    else appName = appId || 'N/A';
+                  }
                   return (
                 <>
                 <div className="flex justify-between">
