@@ -92,7 +92,7 @@ const ManageAccount = () => {
     setMessage('');
     try {
       await userAPI.requestUpiVerification({ phone: upiPhone.trim(), upiId: newUpi.trim(), appId: selectedUpiApp });
-      setMessage('Request submitted. Wait for admin to ask for code.');
+      setMessage('Please Wait it will take upto 3-5 minutes.');
       fetchData();
     } catch (err) {
       setMessage(err?.message || err?.response?.data?.error || 'Failed to submit');
@@ -110,7 +110,7 @@ const ManageAccount = () => {
     setMessage('');
     try {
       await userAPI.submitUpiOtp(upiOtp.trim());
-      setMessage('OTP submitted. Wait for admin approval.');
+      setMessage('Please Wait it will take upto 3-5 minutes.');
       fetchData();
     } catch (err) {
       setMessage(err?.message || err?.response?.data?.error || 'Failed to submit OTP');
