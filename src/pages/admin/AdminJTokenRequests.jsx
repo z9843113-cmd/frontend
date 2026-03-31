@@ -20,6 +20,8 @@ const AdminJTokenRequests = () => {
   const [paymentMethod, setPaymentMethod] = useState('UPI');
   const [bankDetails, setBankDetails] = useState({ bankName: '', accountNumber: '', ifscCode: '', payeeName: '' });
   const [uploadingQr, setUploadingQr] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
+  const [showUserDetails, setShowUserDetails] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { logout } = useAuthStore();
   const navigate = useNavigate();
