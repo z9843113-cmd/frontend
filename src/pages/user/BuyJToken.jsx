@@ -66,49 +66,46 @@ const BuyJToken = () => {
       setPrimaryUpi(primaryUpi);
       const allApps = upiRes?.data || upiRes || [];
       
-      // Get apps that are enabled for JToken purchases
-      let jtokenApps = allApps.filter(app => 
+      // Get apps that are enabled for JToken purchases (both active and inactive)
+      const jtokenApps = allApps.filter(app => 
         app.isforjtoken === true || app.isforjtoken === 'true' ||
         app.isForJToken === true || app.isForJToken === 'true'
       );
       
-      // Filter based on user's primary UPI if available - show matching apps first
-      if (primaryUpi) {
-        const primaryUpiId = (primaryUpi.upiid || primaryUpi.upiId || '').toLowerCase();
-        const matchingApps = jtokenApps.filter(app => {
-          const appId = (app.id || '').toLowerCase();
-          if (appId === 'mobikwik' || appId === 'mobiwik') {
-            return primaryUpiId.includes('mobwik') || primaryUpiId.includes('mobiwik');
-          }
-          if (appId === 'freecharge' || appId === 'freerecharge') {
-            return primaryUpiId.includes('freerecharge');
-          }
-          if (appId === 'paytm') {
-            return primaryUpiId.includes('paytm');
-          }
-          if (appId === 'phonepe') {
-            return primaryUpiId.includes('phonepe');
-          }
-          if (appId === 'google-pay') {
-            return primaryUpiId.includes('gpay') || primaryUpiId.includes('google');
-          }
-          if (appId === 'bhim') {
-            return primaryUpiId.includes('bhim');
-          }
-          if (appId === 'amazon-pay') {
-            return primaryUpiId.includes('amazon');
-          }
-          return false;
-        });
-        // If primary UPI matches a JToken app, show only those. Otherwise show all JToken apps
-        if (matchingApps.length > 0) {
-          jtokenApps = matchingApps;
-        }
-      }
-      
       setUpiApps(jtokenApps);
       if (jtokenApps.length > 0 && !selectedMethod) {
-        setSelectedMethod(jtokenApps[0].id);
+        // If user has primary UPI, try to match the app
+        if (primaryUpi) {
+          const primaryUpiId = (primaryUpi.upiid || primaryUpi.upiId || '').toLowerCase();
+          const matchedApp = jtokenApps.find(app => {
+            const appId = (app.id || '').toLowerCase();
+            if (appId === 'mobikwik' || appId === 'mobiwik') {
+              return primaryUpiId.includes('mobwik') || primaryUpiId.includes('mobiwik');
+            }
+            if (appId === 'freecharge' || appId === 'freerecharge') {
+              return primaryUpiId.includes('freerecharge');
+            }
+            if (appId === 'paytm') {
+              return primaryUpiId.includes('paytm');
+            }
+            if (appId === 'phonepe') {
+              return primaryUpiId.includes('phonepe');
+            }
+            if (appId === 'google-pay') {
+              return primaryUpiId.includes('gpay') || primaryUpiId.includes('google');
+            }
+            if (appId === 'bhim') {
+              return primaryUpiId.includes('bhim');
+            }
+            if (appId === 'amazon-pay') {
+              return primaryUpiId.includes('amazon');
+            }
+            return false;
+          });
+          if (matchedApp) {
+            setSelectedMethod(matchedApp.id);
+          }
+        }
       }
     } catch {
       console.error('Failed to fetch data');
@@ -117,8 +114,11 @@ const BuyJToken = () => {
     }
   }, []);
 
+  useEffect(() => {
+    fetchRequestData(true);
+  }, []);
+
   useEffect(() => { 
-    fetchRequestData(); 
     const interval = setInterval(() => {
       try {
         walletAPI.getWallet().then(res => setWallet(res?.data || res || null));
