@@ -420,77 +420,44 @@ const BuyJToken = () => {
                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                     <p className="text-gray-300 text-sm font-semibold">Bank Transfer Details</p>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {(() => {
                       let bd = request.bankdetails;
+                      let fields = [];
+                      
                       if (typeof bd === 'string') {
-                        try { bd = JSON.parse(bd); } catch {
-                          const lines = bd.split(/\s+/);
-                          const result = {};
-                          let currentKey = '';
-                          lines.forEach(line => {
-                            if (line.startsWith('Bank:')) result.bankName = line.replace('Bank:', '').trim();
-                            else if (line.startsWith('Account')) currentKey = 'accountNumber';
-                            else if (line.startsWith('IFSC:')) result.ifscCode = line.replace('IFSC:', '').trim();
-                            else if (line.startsWith('Payee')) currentKey = 'payeeName';
-                            else if (currentKey) {
-                              result[currentKey] = (result[currentKey] || '') + ' ' + line;
-                              result[currentKey] = result[currentKey].trim();
-                              currentKey = '';
-                            }
-                          });
-                          bd = result;
+                        bd = bd.replace(/[{}"]/g, '').trim();
+                        const parts = bd.split(/(?:Bank:|Account No\.|IFSC:|Payee Name:)/i);
+                        if (parts.length > 1) {
+                          fields = [
+                            { label: 'Bank Name', value: parts[1]?.split('Account')[0]?.trim() || parts[1]?.split('IFSC')[0]?.trim() || '' },
+                            { label: 'Account No.', value: parts[1]?.match(/Account No\.\s*(\S+)/)?.[1] || parts[2]?.trim() || '' },
+                            { label: 'IFSC Code', value: parts[2]?.match(/IFSC:\s*(\S+)/)?.[1] || parts[2]?.split('Payee')[0]?.trim() || '' },
+                            { label: 'Payee Name', value: parts[3]?.replace('Payee Name:', '').trim() || '' }
+                          ].filter(f => f.value);
+                        } else {
+                          fields = [{ label: 'Details', value: bd }];
                         }
+                      } else if (bd && typeof bd === 'object') {
+                        fields = [
+                          { label: 'Bank Name', value: bd.bankName || bd.bank || '' },
+                          { label: 'Account No.', value: bd.accountNumber || bd.accountNo || bd.ac || '' },
+                          { label: 'IFSC Code', value: bd.ifscCode || bd.ifsc || '' },
+                          { label: 'Payee Name', value: bd.payeeName || bd.payee || '' }
+                        ].filter(f => f.value);
                       }
-                      if (!bd || typeof bd !== 'object') return null;
-                      return (
-                        <>
-                          {(bd.bankName || bd.bank) && (
-                            <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
-                              <span className="text-gray-500 text-xs">Bank Name</span>
-                              <div className="flex items-center gap-2">
-                                <span className="text-white text-sm font-medium">{bd.bankName || bd.bank}</span>
-                                <button onClick={() => copyToClipboard(bd.bankName || bd.bank)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
-                                  <FaCopy className="text-xs" />
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                          {(bd.accountNumber || bd.accountNo || bd.ac) && (
-                            <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
-                              <span className="text-gray-500 text-xs">Account No.</span>
-                              <div className="flex items-center gap-2">
-                                <span className="text-white text-sm font-mono">{bd.accountNumber || bd.accountNo || bd.ac}</span>
-                                <button onClick={() => copyToClipboard(bd.accountNumber || bd.accountNo || bd.ac)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
-                                  <FaCopy className="text-xs" />
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                          {(bd.ifscCode || bd.ifsc) && (
-                            <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
-                              <span className="text-gray-500 text-xs">IFSC Code</span>
-                              <div className="flex items-center gap-2">
-                                <span className="text-white text-sm font-mono">{bd.ifscCode || bd.ifsc}</span>
-                                <button onClick={() => copyToClipboard(bd.ifscCode || bd.ifsc)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
-                                  <FaCopy className="text-xs" />
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                          {(bd.payeeName || bd.payee) && (
-                            <div className="flex justify-between items-center py-2">
-                              <span className="text-gray-500 text-xs">Payee Name</span>
-                              <div className="flex items-center gap-2">
-                                <span className="text-white text-sm font-medium">{bd.payeeName || bd.payee}</span>
-                                <button onClick={() => copyToClipboard(bd.payeeName || bd.payee)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
-                                  <FaCopy className="text-xs" />
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </>
-                      );
+                      
+                      return fields.filter(f => f.value).map((field, idx) => (
+                        <div key={idx} className="flex justify-between items-center py-2 border-b border-[#2a2a2a] last:border-0">
+                          <span className="text-gray-500 text-xs">{field.label}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-white text-sm font-mono">{field.value}</span>
+                            <button onClick={() => copyToClipboard(field.value)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
+                              <FaCopy className="text-xs" />
+                            </button>
+                          </div>
+                        </div>
+                      ));
                     })()}
                   </div>
                 </div>
