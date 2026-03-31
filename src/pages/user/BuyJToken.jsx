@@ -88,7 +88,7 @@ const BuyJToken = () => {
 
   useEffect(() => { 
     fetchRequestData(); 
-    const interval = setInterval(() => fetchRequestData(true), 1500);
+    const interval = setInterval(() => fetchRequestData(true), 3000);
     return () => clearInterval(interval);
   }, [fetchRequestData]);
 
@@ -370,11 +370,18 @@ const BuyJToken = () => {
             {/* Status Messages */}
             {request.status === 'WAITING_ADMIN' && (
               <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a] text-center">
-                <div className="w-16 h-16 bg-[#D4AF37]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FaClock className="w-8 h-8 text-[#D4AF37]" />
+                <div className="relative w-20 h-20 mx-auto mb-4">
+                  <div className="absolute inset-0 border-4 border-[#D4AF37]/30 rounded-full"></div>
+                  <div className="absolute inset-0 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <FaClock className="w-8 h-8 text-[#D4AF37]" />
+                  </div>
                 </div>
                 <p className="text-white font-bold text-lg mb-2">Waiting for Admin</p>
-                <p className="text-gray-400 text-sm">Admin will assign payment details soon</p>
+                <p className="text-gray-400 text-sm mb-4">Admin will assign payment details soon...</p>
+                <div className="bg-[#0a0a0a] rounded-xl p-3 inline-block">
+                  <p className="text-[#D4AF37] text-sm">Auto-refreshing every 3s</p>
+                </div>
               </div>
             )}
 
