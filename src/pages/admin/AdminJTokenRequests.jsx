@@ -20,8 +20,6 @@ const AdminJTokenRequests = () => {
   const [paymentMethod, setPaymentMethod] = useState('UPI');
   const [bankDetails, setBankDetails] = useState({ bankName: '', accountNumber: '', ifscCode: '', payeeName: '' });
   const [uploadingQr, setUploadingQr] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
-  const [showUserDetails, setShowUserDetails] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { logout } = useAuthStore();
   const navigate = useNavigate();
@@ -276,7 +274,7 @@ const AdminJTokenRequests = () => {
               {/* UPI Fields */}
               {paymentMethod === 'UPI' && (
                 <>
-                  <input value={paymentUpi} onChange={(e) => setPaymentUpi(e.target.value)} placeholder="Enter UPI ID" className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
+                  <input value={paymentUpi} onChange={(e) => setPaymentUpi(e.target.value)} placeholder="Enter YOUR UPI ID for payment" className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
                   <textarea value={adminNote} onChange={(e) => setAdminNote(e.target.value)} placeholder="Optional note" rows={3} className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
                   <label className="block rounded-2xl border border-dashed border-[#2a2a2a] bg-[#0a0a0a] p-4 text-center text-gray-500 cursor-pointer hover:border-[#D4AF37]/50">
                     {qrImage ? <img src={qrImage} alt="QR" className="mx-auto h-48 rounded-2xl object-contain" /> : 'Upload QR Image'}
@@ -387,7 +385,12 @@ const AdminJTokenRequests = () => {
                   {request.screenshot && <a href={request.screenshot} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm text-sky-400">View payment screenshot</a>}
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  {request.status === 'WAITING_ADMIN' && <button onClick={() => { setSelected(request); setPaymentUpi(request.paymentupi || ''); setAdminNote(request.adminnote || ''); setQrImage(request.qrimage || ''); }} className="rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#FFD700] px-4 py-3 font-bold text-black">Assign Details</button>}
+                  {request.status === 'WAITING_ADMIN' && <button onClick={() => { 
+                    setSelected(request); 
+                    setPaymentUpi(''); 
+                    setAdminNote(''); 
+                    setQrImage(''); 
+                  }} className="rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#FFD700] px-4 py-3 font-bold text-black">Assign Details</button>}
                   {request.status === 'PAYMENT_SUBMITTED' && <button onClick={() => handleApprove(request.id)} disabled={processingId === request.id} className="rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 px-4 py-3 font-bold text-white disabled:opacity-50">Approve</button>}
                   {['WAITING_ADMIN', 'READY_TO_PAY', 'PAYMENT_STARTED', 'PAYMENT_SUBMITTED'].includes(request.status) && <button onClick={() => handleReject(request.id)} disabled={processingId === request.id} className="rounded-2xl bg-red-500/15 px-4 py-3 font-bold text-red-400 disabled:opacity-50">Reject</button>}
                 </div>
