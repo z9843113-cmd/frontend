@@ -412,20 +412,28 @@ const BuyJToken = () => {
                   </div>
                   <div className="space-y-2">
                     {(() => {
-                      const rawText = request.bankdetails || request.adminnote || '';
+                      let rawText = request.bankdetails || request.adminnote || '';
                       let fields = [];
                       
                       if (typeof rawText === 'string') {
-                        const bankMatch = rawText.match(/Bank:\s*(.*?)(?=Account|No\.|$)/i);
-                        const accMatch = rawText.match(/Account No\.?:\s*(.*?)(?=IFSC|$)/i);
-                        const ifscMatch = rawText.match(/IFSC:\s*(.*?)(?=Payee|$)/i);
-                        const payeeMatch = rawText.match(/Payee Name:\s*(.*)/i);
+                        rawText = ' ' + rawText + ' ';
+                        
+                        const bankMatch = rawText.match(/Bank:\s*(\S+)/i);
+                        const accMatch = rawText.match(/Account\s*No\.?:\s*(\S+)/i);
+                        const ifscMatch = rawText.match(/IFSC:\s*(\S+)/i);
+                        const payeeMatch = rawText.match(/Payee\s*Name:\s*(\S+)/i);
+                        
+                        console.log('Raw text:', rawText);
+                        console.log('Bank:', bankMatch);
+                        console.log('Acc:', accMatch);
+                        console.log('IFSC:', ifscMatch);
+                        console.log('Payee:', payeeMatch);
                         
                         fields = [
-                          { label: 'Bank Name', value: bankMatch?.[1]?.trim() || '' },
-                          { label: 'Account No.', value: accMatch?.[1]?.trim() || '' },
-                          { label: 'IFSC Code', value: ifscMatch?.[1]?.trim() || '' },
-                          { label: 'Payee Name', value: payeeMatch?.[1]?.trim() || '' }
+                          { label: 'Bank Name', value: bankMatch?.[1] || '' },
+                          { label: 'Account No.', value: accMatch?.[1] || '' },
+                          { label: 'IFSC Code', value: ifscMatch?.[1] || '' },
+                          { label: 'Payee Name', value: payeeMatch?.[1] || '' }
                         ].filter(f => f.value);
                       } else if (rawText && typeof rawText === 'object') {
                         fields = [
@@ -435,6 +443,8 @@ const BuyJToken = () => {
                           { label: 'Payee Name', value: rawText.payeeName || rawText.payee || '' }
                         ].filter(f => f.value);
                       }
+                      
+                      console.log('Fields:', fields);
                       
                       if (fields.length === 0) {
                         return <p className="text-gray-500 text-xs">No bank details available</p>;
