@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/BottomNav';
-import RequestStatusModal from '../../components/RequestStatusModal';
-import { jTokenPurchaseAPI, walletAPI, uploadToCloudinary, userAPI, publicAPI } from '../../services/api';
-import { FaArrowLeft, FaClock, FaCoins, FaCopy, FaCreditCard, FaUniversity, FaCheck, FaTimes } from 'react-icons/fa';
+import { jTokenPurchaseAPI, walletAPI, uploadToCloudinary, userAPI } from '../../services/api';
+import { FaArrowLeft, FaCopy, FaTimes } from 'react-icons/fa';
 
 const BuyJToken = () => {
   const navigate = useNavigate();
@@ -51,8 +50,7 @@ const BuyJToken = () => {
         if (req) setRequest(req);
         else setRequest(null);
         
-        const rawUpi = userUpiRes?.data || userUpiRes || [];
-        setUserUpiAccounts(rawUpi);
+        setUserUpiAccounts(userUpiRes?.data || userUpiRes || []);
       } catch (err) {
         console.error('Load error:', err);
       } finally {
@@ -286,7 +284,7 @@ const BuyJToken = () => {
               </div>
             )}
 
-            {(request.status === 'WAITING_ORDER' || request.status === 'WAITING_ORDER' || request.status === 'READY_TO_PAY' || request.status === 'PAYMENT_STARTED') && (
+            {(request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' || request.status === 'READY_TO_PAY' || request.status === 'PAYMENT_STARTED') && (
               <button onClick={handleCancel} disabled={submitting} className="w-full py-3 bg-red-500/20 text-red-400 rounded-2xl font-semibold mt-3 disabled:opacity-50">
                 Cancel Request
               </button>
@@ -369,26 +367,26 @@ const BuyJToken = () => {
       )}
 
       {showPaymentPopup && request && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a] w-full max-w-md">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-t-3xl sm:rounded-3xl p-4 sm:p-6 border-t border-x sm:border border-[#2a2a2a] w-full sm:max-w-md max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-white font-bold text-lg">Payment Details</h3>
-              <button onClick={() => setShowPaymentPopup(false)} className="text-gray-400"><FaTimes /></button>
+              <h3 className="text-white font-bold text-base sm:text-lg">Payment Details</h3>
+              <button onClick={() => setShowPaymentPopup(false)} className="text-gray-400 p-1"><FaTimes /></button>
             </div>
             
-            <div className="space-y-4">
-              <div className="bg-[#0a0a0a] rounded-2xl p-4 text-center">
-                <p className="text-gray-400 text-sm mb-2">Amount to Pay</p>
-                <p className="text-[#D4AF37] font-bold text-2xl">₹{parseFloat(request.amount || 0).toFixed(2)}</p>
+            <div className="space-y-3 sm:space-y-4">
+              <div className="bg-[#0a0a0a] rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center">
+                <p className="text-gray-400 text-xs sm:text-sm mb-1">Amount to Pay</p>
+                <p className="text-[#D4AF37] font-bold text-xl sm:text-2xl">₹{parseFloat(request.amount || 0).toFixed(2)}</p>
               </div>
               
               {request.paymentupi && (
                 <div className="text-center">
-                  <p className="text-gray-400 text-sm mb-2">Pay to this UPI ID</p>
-                  <div className="flex items-center justify-center gap-2">
-                    <p className="text-white font-bold text-lg">{request.paymentupi}</p>
-                    <button onClick={() => copyToClipboard(request.paymentupi)} className="p-2 bg-[#1a1a1a] rounded-lg text-gray-400 hover:text-[#D4AF37]">
-                      <FaCopy className="text-sm" />
+                  <p className="text-gray-400 text-xs sm:text-sm mb-1">Pay to this UPI ID</p>
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
+                    <p className="text-white font-bold text-sm sm:text-lg break-all">{request.paymentupi}</p>
+                    <button onClick={() => copyToClipboard(request.paymentupi)} className="p-1.5 bg-[#1a1a1a] rounded-lg text-gray-400 hover:text-[#D4AF37]">
+                      <FaCopy className="text-xs sm:text-sm" />
                     </button>
                   </div>
                 </div>
@@ -396,51 +394,51 @@ const BuyJToken = () => {
               
               {request.qrimage && (
                 <div className="text-center">
-                  <p className="text-gray-400 text-sm mb-2">Scan QR to Pay</p>
-                  <img src={request.qrimage} alt="Payment QR" className="mx-auto h-48 rounded-xl" />
+                  <p className="text-gray-400 text-xs sm:text-sm mb-1">Scan QR to Pay</p>
+                  <img src={request.qrimage} alt="Payment QR" className="mx-auto h-32 sm:h-48 rounded-xl max-w-full" />
                 </div>
               )}
               
               {request.adminnote && (
-                <div className="bg-[#0a0a0a] rounded-xl p-3">
+                <div className="bg-[#0a0a0a] rounded-xl p-2 sm:p-3">
                   <p className="text-gray-400 text-xs">Note:</p>
-                  <p className="text-white text-sm">{request.adminnote}</p>
+                  <p className="text-white text-xs sm:text-sm">{request.adminnote}</p>
                 </div>
               )}
               
               {request.bankdetails && (
-                <div className="bg-[#0a0a0a] rounded-xl p-4 space-y-2">
-                  <p className="text-gray-400 text-sm font-semibold text-center">Bank Transfer Details</p>
+                <div className="bg-[#0a0a0a] rounded-xl p-3 sm:p-4 space-y-1 sm:space-y-2">
+                  <p className="text-gray-400 text-xs sm:text-sm font-semibold text-center">Bank Transfer Details</p>
                   {request.bankdetails.bankName && (
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span className="text-gray-500">Bank:</span>
                       <span className="text-white">{request.bankdetails.bankName}</span>
                     </div>
                   )}
                   {request.bankdetails.accountNumber && (
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center text-xs sm:text-sm">
                       <span className="text-gray-500">A/C:</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-white font-mono">{request.bankdetails.accountNumber}</span>
-                        <button onClick={() => copyToClipboard(request.bankdetails.accountNumber)} className="text-gray-400 hover:text-[#D4AF37]">
+                      <div className="flex items-center gap-1">
+                        <span className="text-white font-mono break-all">{request.bankdetails.accountNumber}</span>
+                        <button onClick={() => copyToClipboard(request.bankdetails.accountNumber)} className="text-gray-400 hover:text-[#D4AF37] shrink-0">
                           <FaCopy className="text-xs" />
                         </button>
                       </div>
                     </div>
                   )}
                   {request.bankdetails.ifscCode && (
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center text-xs sm:text-sm">
                       <span className="text-gray-500">IFSC:</span>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
                         <span className="text-white font-mono">{request.bankdetails.ifscCode}</span>
-                        <button onClick={() => copyToClipboard(request.bankdetails.ifscCode)} className="text-gray-400 hover:text-[#D4AF37]">
+                        <button onClick={() => copyToClipboard(request.bankdetails.ifscCode)} className="text-gray-400 hover:text-[#D4AF37] shrink-0">
                           <FaCopy className="text-xs" />
                         </button>
                       </div>
                     </div>
                   )}
                   {request.bankdetails.payeeName && (
-                    <div className="flex justify-between">
+                    <div className="flex justify-between text-xs sm:text-sm">
                       <span className="text-gray-500">Payee:</span>
                       <span className="text-white">{request.bankdetails.payeeName}</span>
                     </div>
@@ -448,26 +446,26 @@ const BuyJToken = () => {
                 </div>
               )}
               
-              <div className="border-t border-[#2a2a2a] pt-4 mt-4">
-                <p className="text-white font-semibold mb-3">Submit Payment Proof</p>
+              <div className="border-t border-[#2a2a2a] pt-3 sm:pt-4 mt-3 sm:mt-4">
+                <p className="text-white font-semibold text-sm sm:text-base mb-2">Submit Payment Proof</p>
                 <input 
                   type="text" 
                   value={utr} 
                   onChange={(e) => setUtr(e.target.value)} 
                   placeholder="Enter UTR / Transaction ID" 
-                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none mb-3"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none text-sm sm:text-base mb-2 sm:mb-3"
                 />
-                <label className="block rounded-xl border border-dashed border-[#2a2a2a] bg-[#0a0a0a] p-4 text-center text-gray-500 cursor-pointer hover:border-[#D4AF37]/50 mb-3">
+                <label className="block rounded-xl border border-dashed border-[#2a2a2a] bg-[#0a0a0a] p-3 sm:p-4 text-center text-gray-500 cursor-pointer hover:border-[#D4AF37]/50 mb-2 sm:mb-3 text-xs sm:text-sm">
                   {screenshotPreview || screenshot ? (
-                    <img src={screenshotPreview || screenshot} alt="Screenshot" className="mx-auto h-32 rounded-lg object-contain" />
+                    <img src={screenshotPreview || screenshot} alt="Screenshot" className="mx-auto h-24 sm:h-32 rounded-lg object-contain max-w-full" />
                   ) : 'Upload Payment Screenshot'}
                   <input type="file" accept="image/*" className="hidden" onChange={handleScreenshot} />
                 </label>
                 {uploading && <p className="text-sm text-[#D4AF37] text-center">Uploading...</p>}
               </div>
               
-              <div className="flex gap-3 mt-4">
-                <button onClick={() => setShowPaymentPopup(false)} className="flex-1 py-3 bg-gray-600 text-white rounded-xl font-semibold">
+              <div className="flex gap-2 sm:gap-3 mt-3 sm:mt-4">
+                <button onClick={() => setShowPaymentPopup(false)} className="flex-1 py-2 sm:py-3 bg-gray-600 text-white rounded-xl font-semibold text-sm sm:text-base">
                   Cancel
                 </button>
                 <button onClick={async () => {
@@ -492,7 +490,7 @@ const BuyJToken = () => {
                   } finally {
                     setSubmitting(false);
                   }
-                }} disabled={submitting} className="flex-1 py-3 bg-[#D4AF37] text-black rounded-xl font-semibold disabled:opacity-50">
+                }} disabled={submitting} className="flex-1 py-2 sm:py-3 bg-[#D4AF37] text-black rounded-xl font-semibold text-sm sm:text-base disabled:opacity-50">
                   {submitting ? 'Submitting...' : 'I Have Paid'}
                 </button>
               </div>
