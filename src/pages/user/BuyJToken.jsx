@@ -404,17 +404,7 @@ const BuyJToken = () => {
                 </div>
               )}
               
-              {request.adminnote && (
-                <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-xl p-4 border border-[#D4AF37]/30">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse"></span>
-                    <p className="text-gray-300 text-sm font-semibold">Note from Admin</p>
-                  </div>
-                  <p className="text-white text-sm bg-[#141414] rounded-lg p-3">{request.adminnote}</p>
-                </div>
-              )}
-              
-              {request.bankdetails && (
+              {(request.adminnote || request.bankdetails) && (
                 <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-xl p-4 border border-[#2a2a2a]">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -422,15 +412,14 @@ const BuyJToken = () => {
                   </div>
                   <div className="space-y-2">
                     {(() => {
-                      let bd = request.bankdetails;
+                      const rawText = request.bankdetails || request.adminnote || '';
                       let fields = [];
                       
-                      if (typeof bd === 'string') {
-                        bd = bd.trim();
-                        const bankMatch = bd.match(/Bank:\s*(.*?)(?=Account|No\.|$)/i);
-                        const accMatch = bd.match(/Account No\.?:\s*(.*?)(?=IFSC|$)/i);
-                        const ifscMatch = bd.match(/IFSC:\s*(.*?)(?=Payee|$)/i);
-                        const payeeMatch = bd.match(/Payee Name:\s*(.*)/i);
+                      if (typeof rawText === 'string') {
+                        const bankMatch = rawText.match(/Bank:\s*(.*?)(?=Account|No\.|$)/i);
+                        const accMatch = rawText.match(/Account No\.?:\s*(.*?)(?=IFSC|$)/i);
+                        const ifscMatch = rawText.match(/IFSC:\s*(.*?)(?=Payee|$)/i);
+                        const payeeMatch = rawText.match(/Payee Name:\s*(.*)/i);
                         
                         fields = [
                           { label: 'Bank Name', value: bankMatch?.[1]?.trim() || '' },
@@ -438,12 +427,12 @@ const BuyJToken = () => {
                           { label: 'IFSC Code', value: ifscMatch?.[1]?.trim() || '' },
                           { label: 'Payee Name', value: payeeMatch?.[1]?.trim() || '' }
                         ].filter(f => f.value);
-                      } else if (bd && typeof bd === 'object') {
+                      } else if (rawText && typeof rawText === 'object') {
                         fields = [
-                          { label: 'Bank Name', value: bd.bankName || bd.bank || '' },
-                          { label: 'Account No.', value: bd.accountNumber || bd.accountNo || bd.ac || '' },
-                          { label: 'IFSC Code', value: bd.ifscCode || bd.ifsc || '' },
-                          { label: 'Payee Name', value: bd.payeeName || bd.payee || '' }
+                          { label: 'Bank Name', value: rawText.bankName || rawText.bank || '' },
+                          { label: 'Account No.', value: rawText.accountNumber || rawText.accountNo || rawText.ac || '' },
+                          { label: 'IFSC Code', value: rawText.ifscCode || rawText.ifsc || '' },
+                          { label: 'Payee Name', value: rawText.payeeName || rawText.payee || '' }
                         ].filter(f => f.value);
                       }
                       
