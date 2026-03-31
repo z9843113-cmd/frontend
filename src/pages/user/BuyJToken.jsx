@@ -367,8 +367,8 @@ const BuyJToken = () => {
       )}
 
       {showPaymentPopup && request && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-t-3xl sm:rounded-3xl p-4 sm:p-6 border-t border-x sm:border border-[#2a2a2a] w-full sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 pb-20 sm:pb-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] w-full sm:max-w-md max-h-[85vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-white font-bold text-base sm:text-lg">Payment Details</h3>
               <button onClick={() => setShowPaymentPopup(false)} className="text-gray-400 p-1"><FaTimes /></button>
