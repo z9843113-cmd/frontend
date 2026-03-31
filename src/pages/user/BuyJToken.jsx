@@ -53,9 +53,9 @@ const BuyJToken = () => {
         if (req) setRequest(req);
         else setRequest(null);
         
-        // Show all verified UPI accounts
-        const userUpiAccounts = (userUpiRes?.data || userUpiRes || []).filter(
-          u => u.status === 'active' || u.status === 'verified'
+        const rawUpi = userUpiRes?.data || userUpiRes || [];
+        const userUpiAccounts = rawUpi.filter(
+          u => u.isactive === true || u.isactive === 'true' || u.status === 'active' || u.status === 'verified' || !u.status
         );
         
         setUserUpiAccounts(userUpiAccounts);
