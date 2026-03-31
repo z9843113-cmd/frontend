@@ -404,7 +404,12 @@ const BuyJToken = () => {
               {request.paymentupi && (
                 <div className="text-center">
                   <p className="text-gray-400 text-sm mb-2">Pay to this UPI ID</p>
-                  <p className="text-white font-bold text-lg">{request.paymentupi}</p>
+                  <div className="flex items-center justify-center gap-2">
+                    <p className="text-white font-bold text-lg">{request.paymentupi}</p>
+                    <button onClick={() => copyToClipboard(request.paymentupi)} className="p-2 bg-[#1a1a1a] rounded-lg text-gray-400 hover:text-[#D4AF37]">
+                      <FaCopy className="text-sm" />
+                    </button>
+                  </div>
                 </div>
               )}
               
