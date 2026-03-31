@@ -375,7 +375,15 @@ const ManageAccount = () => {
                   {upiAccounts.map((upi) => {
                     const getAppName = (upiAccount) => {
                       const appId = upiAccount.appid || upiAccount.appId;
+                    const appId = upiAccount.appid || upiAccount.appId;
                       const upiId = (upiAccount.upiid || upiAccount.upiId || '').toLowerCase();
+                      if (appId) {
+                        const found = upiApps?.find(app => 
+                          app.id?.toLowerCase() === appId?.toLowerCase() || 
+                          app.name?.toLowerCase().replace(/\s+/g, '') === appId?.toLowerCase().replace(/\s+/g, '')
+                        );
+                        if (found) return found.name;
+                      }
                       if (upiId.includes('mobwik') || upiId.includes('mobiwik')) return 'MobiKwik';
                       if (upiId.includes('freerecharge')) return 'FreeCharge';
                       if (upiId.includes('paytm')) return 'Paytm';
@@ -388,16 +396,10 @@ const ManageAccount = () => {
                       if (upiId.includes('icici')) return 'ICICI';
                       if (upiId.includes('hdfc')) return 'HDFC';
                       if (upiId.includes('axix')) return 'Axis Bank';
-                      if (appId) {
-                        const found = upiApps?.find(app => 
-                          app.id?.toLowerCase() === appId?.toLowerCase() || 
-                          app.name?.toLowerCase().replace(/\s+/g, '') === appId?.toLowerCase().replace(/\s+/g, '')
-                        );
-                        if (found) return found.name;
-                      }
                       return 'UPI App';
                     };
                     const appName = getAppName(upi);
+                    const isActive = upi.isactive === true || upi.isactive === 'true' || upi.status === 'active' || upi.status === 'verified';
                     return (
                       <div key={upi.id} className="bg-gradient-to-r from-[#0a0a0a] to-[#151515] rounded-2xl border border-[#2a2a2a] hover:border-[#D4AF37]/50 transition-all overflow-hidden">
                         <div className="p-3 md:p-4">
@@ -406,33 +408,21 @@ const ManageAccount = () => {
                               <span className="text-black font-bold text-sm md:text-lg">{appName.charAt(0)}</span>
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="text-white font-semibold text-sm md:text-base truncate">{upi.upiId || upi.upiid}</p>
-                              <p className="text-gray-400 text-xs md:text-sm">{appName}</p>
+                              <div className="flex items-center gap-2">
+                                <p className="text-white font-semibold text-sm md:text-base truncate">{upi.upiId || upi.upiid}</p>
+                                <span className={`px-2 py-0.5 text-xs rounded-full ${isActive ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                                  {isActive ? 'Active' : 'Pending'}
+                                </span>
+                              </div>
+                              <p className="text-[#D4AF37] text-xs md:text-sm">{appName}</p>
                             </div>
                           </div>
                         </div>
-                        {(upi.isPrimary || upi.isprimary) && (
-                          <div className="px-3 pb-3">
-                            <span className="inline-block px-2 py-1 bg-[#D4AF37]/20 text-[#D4AF37] text-xs font-medium rounded-full">Primary</span>
-                          </div>
-                        )}
-                        {!(upi.isPrimary || upi.isprimary) && (
-                          <div className="flex border-t border-[#2a2a2a]">
-                            <button onClick={() => handleSetPrimaryUpi(upi.id)} className="flex-1 py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-semibold text-sm hover:opacity-90 transition-opacity">
-                              Set Primary
-                            </button>
-                            <button onClick={() => handleDeleteUpi(upi.id)} className="flex-1 py-3 bg-red-500/10 text-red-400 font-medium text-sm hover:bg-red-500/20 transition-colors border-l border-[#2a2a2a]">
-                              Delete
-                            </button>
-                          </div>
-                        )}
-                        {(upi.isPrimary || upi.isprimary) && (
-                          <div className="flex border-t border-[#2a2a2a]">
-                            <button onClick={() => handleDeleteUpi(upi.id)} className="flex-1 py-3 bg-red-500/10 text-red-400 font-medium text-sm hover:bg-red-500/20 transition-colors">
-                              Delete
-                            </button>
-                          </div>
-                        )}
+                        <div className="flex border-t border-[#2a2a2a]">
+                          <button onClick={() => handleDeleteUpi(upi.id)} className="flex-1 py-3 bg-red-500/10 text-red-400 font-medium text-sm hover:bg-red-500/20 transition-colors">
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     );
                   })}

@@ -258,7 +258,10 @@ const BuyJToken = () => {
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">
-                  {userUpiAccounts.map((upi) => (
+                  {userUpiAccounts.map((upi) => {
+                    const appId = upi.appid || upi.appId;
+                    const appName = appId ? upiApps?.find(a => a.id === appId)?.name : null;
+                    return (
                     <button
                       key={upi.id}
                       onClick={() => setSelectedUpi(upi.id)}
@@ -268,9 +271,9 @@ const BuyJToken = () => {
                           : 'bg-[#0a0a0a] border border-[#2a2a2a] text-gray-400'
                       }`}
                     >
-                      {upi.upiid || upi.upiId}
+                      {upi.upiid || upi.upiId} {appName && <span className="text-[#D4AF37] text-xs">({appName})</span>}
                     </button>
-                  ))}
+                  )})}
                 </div>
               )}
             </div>
