@@ -18,6 +18,7 @@ import BuyJToken from './pages/user/BuyJToken';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminActiveUsers from './pages/admin/AdminActiveUsers';
 import AdminDeposits from './pages/admin/AdminDeposits';
 import AdminWithdrawals from './pages/admin/AdminWithdrawals';
 import AdminUpiApps from './pages/admin/AdminUpiApps';
@@ -109,6 +110,11 @@ function App() {
         <Route path="/admin/users" element={
           <ProtectedRoute roles={['ADMIN', 'SUBADMIN']}>
             <Layout><AdminUsers /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/active-users" element={
+          <ProtectedRoute roles={['ADMIN', 'SUBADMIN']}>
+            <Layout><AdminActiveUsers /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/admin/deposits" element={
