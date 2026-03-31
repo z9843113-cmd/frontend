@@ -175,6 +175,9 @@ const AdminJTokenRequests = () => {
                   <div><span className="text-gray-500">Telegram Username:</span> <span className="text-white">@{userDetails.user?.telegramusername || 'N/A'}</span></div>
                   <div><span className="text-gray-500">Telegram Chat ID:</span> <span className="text-white font-mono text-xs">{userDetails.user?.telegramchatid || 'N/A'}</span></div>
                   <div><span className="text-gray-500">Referral Code:</span> <span className="text-[#D4AF37]">{userDetails.user?.referralcode || 'N/A'}</span></div>
+                  <div className={userDetails.paymentEnabled ? 'text-green-400' : 'text-red-400'}>
+                    {userDetails.paymentEnabled ? '✓ Can receive payment' : '✕ Cannot receive payment'}
+                  </div>
                   <div><span className="text-gray-500">Joined:</span> <span className="text-white">{formatDate(userDetails.user?.createdat)}</span></div>
                 </div>
               </div>

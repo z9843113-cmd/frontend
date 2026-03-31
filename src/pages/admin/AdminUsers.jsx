@@ -123,6 +123,13 @@ const AdminUsers = () => {
                         {userDetails.user?.isblocked ? 'Blocked' : userDetails.user?.isverified ? 'Active' : 'Unverified'}
                       </span>
                     </div>
+                    <div className={`rounded-xl p-3 ${userDetails.paymentEnabled ? 'bg-green-500/10 border border-green-500/30' : 'bg-red-500/10 border border-red-500/30'}`}>
+                      <p className="text-gray-500 text-xs">Receive Payment</p>
+                      <p className={`font-bold text-sm ${userDetails.paymentEnabled ? 'text-green-400' : 'text-red-400'}`}>
+                        {userDetails.paymentEnabled ? '✓ Able to receive payment' : '✕ Cannot receive payment'}
+                      </p>
+                      {!userDetails.paymentEnabled && <p className="text-red-400/70 text-xs mt-1">User has disabled payments</p>}
+                    </div>
                     <div className="bg-[#0a0a0a] rounded-xl p-3">
                       <p className="text-gray-500 text-xs">Telegram Name</p>
                       <p className="text-white font-medium">{userDetails.user?.telegramname || 'N/A'}</p>

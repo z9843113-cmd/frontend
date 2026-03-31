@@ -118,6 +118,9 @@ const AdminWithdrawals = () => {
                   <div className="text-gray-400">Telegram Username:</div><div className="text-white">@{userDetails.user?.telegramusername || 'N/A'}</div>
                   <div className="text-gray-400">Telegram Chat ID:</div><div className="text-white font-mono text-xs">{userDetails.user?.telegramchatid || 'N/A'}</div>
                   <div className="text-gray-400">Status:</div><div className={userDetails.user?.isblocked ? 'text-red-400' : 'text-green-400'}>{userDetails.user?.isblocked ? 'Blocked' : 'Active'}</div>
+                  <div className={`${userDetails.paymentEnabled ? 'text-green-400' : 'text-red-400'}`}>
+                    {userDetails.paymentEnabled ? '✓ Can receive payment' : '✕ Cannot receive payment'}
+                  </div>
                   <div className="text-gray-400">Joined:</div><div className="text-white text-xs">{formatDate(userDetails.user?.createdat)}</div>
                   <div className="text-gray-400">User ID:</div><div className="text-white text-xs font-mono">{userDetails.user?.id?.slice(0, 8)}...</div>
                 </div>

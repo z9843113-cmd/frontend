@@ -233,6 +233,12 @@ const AdminUpiVerifications = () => {
                     {userDetails.user?.isblocked ? 'Blocked' : 'Active'}
                   </span>
                 </div>
+                <div className={`rounded-lg p-3 ${userDetails.paymentEnabled ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
+                  <p className="text-xs text-gray-500">Receive Payment</p>
+                  <p className={`font-bold text-sm ${userDetails.paymentEnabled ? 'text-green-400' : 'text-red-400'}`}>
+                    {userDetails.paymentEnabled ? '✓ Enabled' : '✕ Disabled'}
+                  </p>
+                </div>
               </div>
             </div>
 
