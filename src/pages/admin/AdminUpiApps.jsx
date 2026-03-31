@@ -64,11 +64,11 @@ const AdminUpiApps = () => {
       </div>
       <div className="sticky top-0 z-30 bg-[#0d0d0d]/80 backdrop-blur-2xl border-b border-[#1a1a1a]">
         <div className="flex items-center justify-between gap-2 px-3 py-3 sm:px-5 sm:py-4">
-          <button onClick={() => setSidebarOpen(true)} className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-[#1a1a1a] hover:bg-[#252525]"><svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg></button>
+          <button onClick={() => setSidebarOpen(true)} className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-[#1a1a1a] hover:bg-[#252525]"><svg className="w-5 sm:w-6 h-5 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg></button>
           <h1 className="min-w-0 flex-1 truncate text-center text-base sm:text-xl font-bold text-white">UPI Apps</h1>
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <AdminNotificationBell />
-            <button onClick={handleLogout} className="rounded-xl sm:rounded-2xl bg-red-500/10 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-red-400 hover:bg-red-500/20">Logout</button>
+            <button onClick={handleLogout} className="rounded-xl sm:rounded-2xl bg-red-500/10 px-2 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-red-400 hover:bg-red-500/20">Logout</button>
           </div>
         </div>
       </div>
@@ -78,16 +78,16 @@ const AdminUpiApps = () => {
           <button onClick={() => setShowForm(!showForm)} className="px-5 py-2.5 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl">{showForm ? 'Cancel' : 'Add UPI App'}</button>
         </div>
         {showForm && (
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-4 sm:p-6 border border-[#2a2a2a]">
             <h3 className="text-lg font-semibold text-white mb-4">{editId ? 'Edit UPI App' : 'Add New UPI App'}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div><label className="block text-gray-400 text-sm mb-2">App Name / UPI ID</label><input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter UPI ID or app name" className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" required /></div>
-              <div><label className="block text-gray-400 text-sm mb-2">Icon URL (Optional)</label><input type="text" value={iconUrl} onChange={(e) => setIconUrl(e.target.value)} placeholder="Enter icon URL" className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" /></div>
-              <div className="flex items-center gap-3 p-4 bg-[#0a0a0a] rounded-2xl border border-[#D4AF37]/30">
+              <div><label className="block text-gray-400 text-sm mb-2">App Name / UPI ID</label><input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter UPI ID or app name" className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" required /></div>
+              <div><label className="block text-gray-400 text-sm mb-2">Icon URL (Optional)</label><input type="text" value={iconUrl} onChange={(e) => setIconUrl(e.target.value)} placeholder="Enter icon URL" className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" /></div>
+              <div className="flex items-center gap-3 p-3 sm:p-4 bg-[#0a0a0a] rounded-2xl border border-[#D4AF37]/30">
                 <input type="checkbox" id="isForJToken" checked={isForJToken} onChange={(e) => setIsForJToken(e.target.checked)} className="w-5 h-5 accent-[#D4AF37]" />
-                <label htmlFor="isForJToken" className="text-white font-medium">Use for JToken Purchase</label>
+                <label htmlFor="isForJToken" className="text-white font-medium text-sm">Use for JToken Purchase</label>
               </div>
-              <button type="submit" disabled={saving} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">{saving ? 'Saving...' : (editId ? 'Update' : 'Create')}</button>
+              <button type="submit" disabled={saving} className="w-full py-3 sm:py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">{saving ? 'Saving...' : (editId ? 'Update' : 'Create')}</button>
             </form>
           </div>
         )}
@@ -97,19 +97,19 @@ const AdminUpiApps = () => {
               {apps.map((app) => {
                 const isJToken = app.isForJToken === true || app.isForJToken === 'true';
                 return (
-                <div key={app.id} className="flex items-center justify-between p-4 bg-[#0a0a0a] rounded-2xl border border-[#1a1a1a]">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-white font-medium">{app.name}</p>
-                      {isJToken && <span className="px-2 py-0.5 bg-[#D4AF37]/20 text-[#D4AF37] text-xs rounded-full">JToken</span>}
+                <div key={app.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 bg-[#0a0a0a] rounded-2xl border border-[#1a1a1a] gap-3">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="shrink-0">
+                      <p className="text-white font-medium text-sm sm:text-base truncate">{app.name}</p>
+                      <p className="text-gray-500 text-xs">{(app.isActive || app.isactive) ? 'Active' : 'Inactive'}</p>
                     </div>
-                    <p className="text-gray-500 text-sm">{(app.isActive || app.isactive) ? 'Active' : 'Inactive'}</p>
+                    {isJToken && <span className="px-2 py-0.5 bg-[#D4AF37]/20 text-[#D4AF37] text-xs rounded-full shrink-0">JToken</span>}
                   </div>
-                  <div className="flex gap-2">
-                    <button onClick={() => handleSetJToken(app)} className={`px-4 py-2 rounded-xl text-sm ${isJToken ? 'bg-[#D4AF37] text-black' : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#252525]'}`}>{isJToken ? 'JToken ✓' : 'Set JToken'}</button>
-                    <button onClick={() => handleToggle(app)} className="px-4 py-2 bg-[#1a1a1a] text-gray-400 rounded-xl text-sm hover:bg-[#252525]">{(app.isActive || app.isactive) ? 'Disable' : 'Enable'}</button>
-                    <button onClick={() => handleEdit(app)} className="px-4 py-2 bg-[#1a1a1a] text-gray-400 rounded-xl text-sm hover:bg-[#252525]">Edit</button>
-                    <button onClick={() => handleDelete(app.id)} className="px-4 py-2 bg-red-500/20 text-red-400 rounded-xl text-sm hover:bg-red-500/30">Delete</button>
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={() => handleSetJToken(app)} className={`px-2 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm ${isJToken ? 'bg-[#D4AF37] text-black' : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#252525]'}`}>{isJToken ? 'JToken ✓' : 'Set JToken'}</button>
+                    <button onClick={() => handleToggle(app)} className="px-2 sm:px-4 py-1.5 sm:py-2 bg-[#1a1a1a] text-gray-400 rounded-xl text-xs sm:text-sm hover:bg-[#252525]">{(app.isActive || app.isactive) ? 'Disable' : 'Enable'}</button>
+                    <button onClick={() => handleEdit(app)} className="px-2 sm:px-4 py-1.5 sm:py-2 bg-[#1a1a1a] text-gray-400 rounded-xl text-xs sm:text-sm hover:bg-[#252525]">Edit</button>
+                    <button onClick={() => handleDelete(app.id)} className="px-2 sm:px-4 py-1.5 sm:py-2 bg-red-500/20 text-red-400 rounded-xl text-xs sm:text-sm hover:bg-red-500/30">Delete</button>
                   </div>
                 </div>
               )})}
