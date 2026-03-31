@@ -13,7 +13,6 @@ const AdminActiveUsers = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
-  const [loadingDetails, setLoadingDetails] = useState(false);
   const { logout } = useAuthStore();
   const navigate = useNavigate();
 
@@ -32,15 +31,12 @@ const AdminActiveUsers = () => {
   };
 
   const viewUserDetails = async (userId) => {
-    setLoadingDetails(true);
     try {
       const res = await adminAPI.getUserDetails(userId);
       setUserDetails(res?.data || res);
       setSelectedUser(users.find(u => u.id === userId));
     } catch (err) {
       console.error('Failed to fetch user details:', err);
-    } finally {
-      setLoadingDetails(false);
     }
   };
 
@@ -62,8 +58,8 @@ const AdminActiveUsers = () => {
   const handleLogout = () => { logout(); navigate('/login'); };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] font-['Ubuntu',sans-serif]">
-      <div className="fixed top-0 left-0 h-full w-72 bg-[#0d0d0d] border-r border-[#242424] transform transition-transform z-40 {sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0">
+    <div className="min-h-screen bg-[#0a0a0a] font-['Ubuntu',sans-serif] pb-20">
+      <div className={`fixed top-0 left-0 h-full w-72 bg-[#0d0d0d] border-r border-[#242424] transform transition-transform z-50 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
         <div className="p-5 border-b border-[#242424]">
           <img src="/jexpaylogo.png" alt="Logo" className="h-10" />
         </div>
@@ -85,24 +81,25 @@ const AdminActiveUsers = () => {
       <div className="lg:ml-72">
         <div className="sticky top-0 z-30 bg-[#0d0d0d] border-b border-[#242424] px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 bg-[#1a1a1a] rounded-xl text-white"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg></button>
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 bg-[#1a1a1a] rounded-xl text-white">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            </button>
             <h1 className="text-white font-bold text-xl">Active Users</h1>
           </div>
           <AdminNotificationBell />
         </div>
 
         <div className="p-4">
-          <div className="flex flex-col sm:flex-row gap-3 mb-4">
-            <input type="text" placeholder="Search by email or user ID" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="flex-1 px-4 py-3 bg-[#1a1a1a] border border-[#242424] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
+          <div className="mb-4">
+            <input type="text" placeholder="Search by email or user ID" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#242424] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px]">
+            <table className="w-full min-w-[600px]">
               <thead>
                 <tr className="text-left text-gray-400 text-sm border-b border-[#242424]">
                   <th className="pb-3 pl-2">User</th>
                   <th className="pb-3">Mobile</th>
-                  <th className="pb-3">Referral</th>
                   <th className="pb-3">Status</th>
                   <th className="pb-3">Joined</th>
                   <th className="pb-3">Action</th>
@@ -110,9 +107,9 @@ const AdminActiveUsers = () => {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={6} className="py-8 text-center text-gray-400">Loading...</td></tr>
+                  <tr><td colSpan={5} className="py-8 text-center text-gray-400">Loading...</td></tr>
                 ) : users.length === 0 ? (
-                  <tr><td colSpan={6} className="py-8 text-center text-gray-400">No active users found</td></tr>
+                  <tr><td colSpan={5} className="py-8 text-center text-gray-400">No active users found</td></tr>
                 ) : (
                   users.map((user) => (
                     <tr key={user.id} className="border-b border-[#1a1a1a] hover:bg-[#1a1a1a]/50">
@@ -124,7 +121,6 @@ const AdminActiveUsers = () => {
                         </div>
                       </td>
                       <td className="py-3 text-gray-300">{user.mobile || 'N/A'}</td>
-                      <td className="py-3 text-gray-300">{user.referralcode || 'N/A'}</td>
                       <td className="py-3">
                         <span className={`px-2 py-1 rounded-lg text-xs ${user.isblocked ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
                           {user.isblocked ? 'Blocked' : 'Active'}
@@ -174,7 +170,7 @@ const AdminActiveUsers = () => {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div><span className="text-gray-500">INR:</span> <span className="text-white ml-1">₹{parseFloat(userDetails.wallet?.inrbalance || 0).toFixed(2)}</span></div>
                   <div><span className="text-gray-500">USDT:</span> <span className="text-white ml-1">{parseFloat(userDetails.wallet?.usdtbalance || 0).toFixed(2)}</span></div>
-                  <div><span className="text-gray-500">J Token:</span> <span className="text-white ml-1">{parseFloat(userDetails.wallet?.jtokenbalance || 0).toFixed(2)}</span></div>
+                  <div><span className="text-gray-500">J Token:</span> <span className="text-white ml-1">{parseFloat(userDetails.wallet?.tokenbalance || 0).toFixed(2)}</span></div>
                   <div><span className="text-gray-500">Referral:</span> <span className="text-white ml-1">₹{parseFloat(userDetails.wallet?.referralbalance || 0).toFixed(2)}</span></div>
                 </div>
               </div>
@@ -191,25 +187,6 @@ const AdminActiveUsers = () => {
                         </div>
                         <span className={`px-2 py-1 rounded-lg text-xs ${upi.isactive ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
                           {upi.isactive ? 'Active' : 'Pending'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {userDetails.bankAccounts?.length > 0 && (
-                <div className="bg-[#1a1a1a] rounded-xl p-4">
-                  <h4 className="text-[#D4AF37] font-semibold mb-3">Bank Accounts</h4>
-                  <div className="space-y-2">
-                    {userDetails.bankAccounts.map((bank, i) => (
-                      <div key={i} className="flex justify-between items-center p-2 bg-[#0a0a0a] rounded-lg">
-                        <div>
-                          <p className="text-white text-sm">{bank.payeename}</p>
-                          <p className="text-gray-500 text-xs">{bank.bankname} • {bank.accountnumber}</p>
-                        </div>
-                        <span className={`px-2 py-1 rounded-lg text-xs ${bank.isactive ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
-                          {bank.isactive ? 'Active' : 'Pending'}
                         </span>
                       </div>
                     ))}
