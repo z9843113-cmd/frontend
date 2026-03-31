@@ -420,50 +420,70 @@ const BuyJToken = () => {
                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                     <p className="text-gray-300 text-sm font-semibold">Bank Transfer Details</p>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {(() => {
-                      const bd = typeof request.bankdetails === 'string' ? JSON.parse(request.bankdetails) : request.bankdetails;
+                      let bd = request.bankdetails;
+                      if (typeof bd === 'string') {
+                        try { bd = JSON.parse(bd); } catch {
+                          const lines = bd.split(/\s+/);
+                          const result = {};
+                          let currentKey = '';
+                          lines.forEach(line => {
+                            if (line.startsWith('Bank:')) result.bankName = line.replace('Bank:', '').trim();
+                            else if (line.startsWith('Account')) currentKey = 'accountNumber';
+                            else if (line.startsWith('IFSC:')) result.ifscCode = line.replace('IFSC:', '').trim();
+                            else if (line.startsWith('Payee')) currentKey = 'payeeName';
+                            else if (currentKey) {
+                              result[currentKey] = (result[currentKey] || '') + ' ' + line;
+                              result[currentKey] = result[currentKey].trim();
+                              currentKey = '';
+                            }
+                          });
+                          bd = result;
+                        }
+                      }
+                      if (!bd || typeof bd !== 'object') return null;
                       return (
                         <>
-                          {bd.bankName && (
+                          {(bd.bankName || bd.bank) && (
                             <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
                               <span className="text-gray-500 text-xs">Bank Name</span>
                               <div className="flex items-center gap-2">
-                                <span className="text-white text-sm font-medium">{bd.bankName}</span>
-                                <button onClick={() => copyToClipboard(bd.bankName)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
+                                <span className="text-white text-sm font-medium">{bd.bankName || bd.bank}</span>
+                                <button onClick={() => copyToClipboard(bd.bankName || bd.bank)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
                                   <FaCopy className="text-xs" />
                                 </button>
                               </div>
                             </div>
                           )}
-                          {bd.accountNumber && (
+                          {(bd.accountNumber || bd.accountNo || bd.ac) && (
                             <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
                               <span className="text-gray-500 text-xs">Account No.</span>
                               <div className="flex items-center gap-2">
-                                <span className="text-white text-sm font-mono">{bd.accountNumber}</span>
-                                <button onClick={() => copyToClipboard(bd.accountNumber)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
+                                <span className="text-white text-sm font-mono">{bd.accountNumber || bd.accountNo || bd.ac}</span>
+                                <button onClick={() => copyToClipboard(bd.accountNumber || bd.accountNo || bd.ac)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
                                   <FaCopy className="text-xs" />
                                 </button>
                               </div>
                             </div>
                           )}
-                          {bd.ifscCode && (
+                          {(bd.ifscCode || bd.ifsc) && (
                             <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
                               <span className="text-gray-500 text-xs">IFSC Code</span>
                               <div className="flex items-center gap-2">
-                                <span className="text-white text-sm font-mono">{bd.ifscCode}</span>
-                                <button onClick={() => copyToClipboard(bd.ifscCode)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
+                                <span className="text-white text-sm font-mono">{bd.ifscCode || bd.ifsc}</span>
+                                <button onClick={() => copyToClipboard(bd.ifscCode || bd.ifsc)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
                                   <FaCopy className="text-xs" />
                                 </button>
                               </div>
                             </div>
                           )}
-                          {bd.payeeName && (
+                          {(bd.payeeName || bd.payee) && (
                             <div className="flex justify-between items-center py-2">
                               <span className="text-gray-500 text-xs">Payee Name</span>
                               <div className="flex items-center gap-2">
-                                <span className="text-white text-sm font-medium">{bd.payeeName}</span>
-                                <button onClick={() => copyToClipboard(bd.payeeName)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
+                                <span className="text-white text-sm font-medium">{bd.payeeName || bd.payee}</span>
+                                <button onClick={() => copyToClipboard(bd.payeeName || bd.payee)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
                                   <FaCopy className="text-xs" />
                                 </button>
                               </div>
