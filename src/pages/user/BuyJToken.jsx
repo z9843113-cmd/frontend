@@ -66,17 +66,15 @@ const BuyJToken = () => {
       setPrimaryUpi(primaryUpi);
       const allApps = upiRes?.data || upiRes || [];
       
-      // Get apps that are enabled for JToken purchases OR any active app with primary UPI
+      // Get apps that are enabled for JToken purchases only
       let jtokenApps = [];
       
       if (primaryUpi) {
-        // User has primary UPI - show JToken enabled apps
-        jtokenApps = allApps.filter(app => app.isForJToken === true || app.isForJToken === 'true');
-        
-        // If no JToken-specific apps, show all active apps
-        if (jtokenApps.length === 0) {
-          jtokenApps = allApps.filter(app => app.isactive === true || app.isActive === true);
-        }
+        // User has primary UPI - show only JToken enabled apps
+        jtokenApps = allApps.filter(app => 
+          app.isforjtoken === true || app.isforjtoken === 'true' ||
+          app.isForJToken === true || app.isForJToken === 'true'
+        );
       }
       
       setUpiApps(jtokenApps);
