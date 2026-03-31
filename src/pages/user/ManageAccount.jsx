@@ -27,7 +27,6 @@ const ManageAccount = () => {
   useEffect(() => {
     fetchData();
     const interval = setInterval(() => {
-      fetchData();
       userAPI.getUpiVerificationStatus().then(statusRes => {
         const status = statusRes?.verification || statusRes?.data?.verification || null;
         if (status && ['PENDING', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
@@ -36,7 +35,6 @@ const ManageAccount = () => {
         } else if (pendingVerifications.length > 0) {
           setPendingVerifications([]);
           setShowVerifyPopup(false);
-          fetchData();
         }
       }).catch(() => {});
     }, 2000);
@@ -55,7 +53,7 @@ const ManageAccount = () => {
       setBankAccounts(bank?.data || bank || []);
       const allApps = apps?.data || apps || [];
       setUpiApps(allApps);
-      if (allApps.length > 0 && !selectedUpiApp) {
+      if (allApps.length > 0 && !selectedUpiApp && !upiPhone && !newUpi) {
         setSelectedUpiApp(allApps[0].id);
       }
       const status = statusRes?.verification || statusRes?.data?.verification || null;
