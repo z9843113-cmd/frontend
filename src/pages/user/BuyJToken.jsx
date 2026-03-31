@@ -367,26 +367,31 @@ const BuyJToken = () => {
       )}
 
       {showPaymentPopup && request && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 pb-20 sm:pb-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] w-full sm:max-w-md max-h-[85vh] sm:max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-white font-bold text-base sm:text-lg">Payment Details</h3>
-              <button onClick={() => setShowPaymentPopup(false)} className="text-gray-400 p-1"><FaTimes /></button>
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 pb-20 sm:pb-4">
+          <div className="bg-gradient-to-b from-[#1f1f1f] via-[#141414] to-[#0a0a0a] rounded-2xl sm:rounded-3xl p-4 sm:p-6 w-full sm:max-w-md max-h-[85vh] sm:max-h-[90vh] overflow-y-auto shadow-2xl border border-[#333]">
+            <div className="flex justify-between items-center mb-4 pb-3 border-b border-[#2a2a2a]">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-[#D4AF37] animate-pulse"></div>
+                <h3 className="text-white font-bold text-lg">Payment Details</h3>
+              </div>
+              <button onClick={() => setShowPaymentPopup(false)} className="text-gray-400 hover:text-white p-1">
+                <FaTimes />
+              </button>
             </div>
             
-            <div className="space-y-3 sm:space-y-4">
-              <div className="bg-[#0a0a0a] rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center">
-                <p className="text-gray-400 text-xs sm:text-sm mb-1">Amount to Pay</p>
-                <p className="text-[#D4AF37] font-bold text-xl sm:text-2xl">₹{parseFloat(request.amount || 0).toFixed(2)}</p>
+            <div className="space-y-4">
+              <div className="bg-gradient-to-r from-[#D4AF37]/15 via-[#D4AF37]/10 to-transparent rounded-xl p-5 text-center border border-[#D4AF37]/20">
+                <p className="text-gray-300 text-sm font-medium mb-1">Amount to Pay</p>
+                <p className="text-[#D4AF37] font-bold text-3xl">₹{parseFloat(request.amount || 0).toFixed(2)}</p>
               </div>
               
               {request.paymentupi && (
-                <div className="text-center">
-                  <p className="text-gray-400 text-xs sm:text-sm mb-1">Pay to this UPI ID</p>
-                  <div className="flex items-center justify-center gap-2 flex-wrap">
+                <div className="bg-[#0a0a0a] rounded-xl p-4 border border-[#2a2a2a]">
+                  <p className="text-gray-400 text-xs mb-2">Pay to this UPI ID</p>
+                  <div className="flex items-center justify-between bg-[#141414] rounded-lg p-3">
                     <p className="text-white font-bold text-sm sm:text-lg break-all">{request.paymentupi}</p>
-                    <button onClick={() => copyToClipboard(request.paymentupi)} className="p-1.5 bg-[#1a1a1a] rounded-lg text-gray-400 hover:text-[#D4AF37]">
-                      <FaCopy className="text-xs sm:text-sm" />
+                    <button onClick={() => copyToClipboard(request.paymentupi)} className="ml-2 p-2 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30 transition-colors">
+                      <FaCopy className="text-sm" />
                     </button>
                   </div>
                 </div>
@@ -400,49 +405,61 @@ const BuyJToken = () => {
               )}
               
               {request.adminnote && (
-                <div className="bg-[#0a0a0a] rounded-xl p-2 sm:p-3">
-                  <p className="text-gray-400 text-xs">Note:</p>
-                  <p className="text-white text-xs sm:text-sm">{request.adminnote}</p>
+                <div className="bg-gradient-to-r from-[#D4AF37]/10 to-transparent rounded-xl p-3 border-l-2 border-[#D4AF37]">
+                  <p className="text-[#D4AF37] text-xs font-medium">📝 Note:</p>
+                  <p className="text-white text-sm mt-1">{request.adminnote}</p>
                 </div>
               )}
               
               {request.bankdetails && (
-                <div className="bg-[#0a0a0a] rounded-xl p-3 sm:p-4 space-y-1 sm:space-y-2">
-                  <p className="text-gray-400 text-xs sm:text-sm font-semibold text-center">Bank Transfer Details</p>
-                  {request.bankdetails.bankName && (
-                    <div className="flex justify-between text-xs sm:text-sm">
-                      <span className="text-gray-500">Bank:</span>
-                      <span className="text-white">{request.bankdetails.bankName}</span>
-                    </div>
-                  )}
-                  {request.bankdetails.accountNumber && (
-                    <div className="flex justify-between items-center text-xs sm:text-sm">
-                      <span className="text-gray-500">A/C:</span>
-                      <div className="flex items-center gap-1">
-                        <span className="text-white font-mono break-all">{request.bankdetails.accountNumber}</span>
-                        <button onClick={() => copyToClipboard(request.bankdetails.accountNumber)} className="text-gray-400 hover:text-[#D4AF37] shrink-0">
-                          <FaCopy className="text-xs" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  {request.bankdetails.ifscCode && (
-                    <div className="flex justify-between items-center text-xs sm:text-sm">
-                      <span className="text-gray-500">IFSC:</span>
-                      <div className="flex items-center gap-1">
-                        <span className="text-white font-mono">{request.bankdetails.ifscCode}</span>
-                        <button onClick={() => copyToClipboard(request.bankdetails.ifscCode)} className="text-gray-400 hover:text-[#D4AF37] shrink-0">
-                          <FaCopy className="text-xs" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  {request.bankdetails.payeeName && (
-                    <div className="flex justify-between text-xs sm:text-sm">
-                      <span className="text-gray-500">Payee:</span>
-                      <span className="text-white">{request.bankdetails.payeeName}</span>
-                    </div>
-                  )}
+                <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-xl p-4 border border-[#2a2a2a]">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="w-2 h-2 rounded-full bg-[#D4AF37]"></span>
+                    <p className="text-gray-300 text-sm font-semibold">Bank Transfer Details</p>
+                  </div>
+                  <div className="space-y-2">
+                    {(() => {
+                      const bd = typeof request.bankdetails === 'string' ? JSON.parse(request.bankdetails) : request.bankdetails;
+                      return (
+                        <>
+                          {bd.bankName && (
+                            <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
+                              <span className="text-gray-500 text-xs">Bank Name</span>
+                              <span className="text-white text-sm font-medium">{bd.bankName}</span>
+                            </div>
+                          )}
+                          {bd.accountNumber && (
+                            <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
+                              <span className="text-gray-500 text-xs">Account No.</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-white text-sm font-mono">{bd.accountNumber}</span>
+                                <button onClick={() => copyToClipboard(bd.accountNumber)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
+                                  <FaCopy className="text-xs" />
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                          {bd.ifscCode && (
+                            <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
+                              <span className="text-gray-500 text-xs">IFSC Code</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-white text-sm font-mono">{bd.ifscCode}</span>
+                                <button onClick={() => copyToClipboard(bd.ifscCode)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
+                                  <FaCopy className="text-xs" />
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                          {bd.payeeName && (
+                            <div className="flex justify-between items-center py-2">
+                              <span className="text-gray-500 text-xs">Payee Name</span>
+                              <span className="text-white text-sm font-medium">{bd.payeeName}</span>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
                 </div>
               )}
               
