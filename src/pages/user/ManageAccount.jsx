@@ -567,9 +567,14 @@ const ManageAccount = () => {
               </div>
               
               <div className="bg-[#0a0a0a] rounded-xl p-4 space-y-2">
+                {(() => {
+                  const appId = pendingVerifications[0]?.appid || pendingVerifications[0]?.appId;
+                  const appName = upiApps?.find(a => a.id === appId)?.name || appId || 'N/A';
+                  return (
+                <>
                 <div className="flex justify-between">
                   <span className="text-gray-400 text-sm">App</span>
-                  <span className="text-white text-sm">{pendingVerifications[0]?.appid || 'N/A'}</span>
+                  <span className="text-white text-sm">{appName}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400 text-sm">Phone</span>
@@ -583,6 +588,8 @@ const ManageAccount = () => {
                   <span className="text-gray-400 text-sm">Status</span>
                   <span className="text-amber-400 text-sm">{pendingVerifications[0]?.status || 'PENDING'}</span>
                 </div>
+                </>
+                )})()}
               </div>
 
               {pendingVerifications[0]?.status === 'OTP_REQUESTED' && (
