@@ -158,21 +158,26 @@ const AdminDeposits = () => {
                 {userDetails.upiAccounts?.length > 0 ? (
                   <div className="space-y-2 text-sm">
                     {userDetails.upiAccounts.map((u, i) => {
-                      const getUpiAppName = (upiId) => {
-                        const id = (upiId || '').toLowerCase();
-                        if (id.includes('mobwik') || id.includes('mobiwik')) return 'MobiKwik';
-                        if (id.includes('freerecharge')) return 'FreeCharge';
-                        if (id.includes('paytm')) return 'Paytm';
-                        if (id.includes('phonepe')) return 'PhonePe';
-                        if (id.includes('google') || id.includes('gpay')) return 'Google Pay';
-                        if (id.includes('bhim')) return 'BHIM';
-                        if (id.includes('amazon')) return 'Amazon Pay';
-                        return 'UPI App';
-                      };
+                      const appId = u.appid || '';
+                      const upiId = (u.upiid || '').toLowerCase();
+                      let appName = '';
+                      if (appId === 'mobikwik' || appId === 'mobiwik' || upiId.includes('mobwik') || upiId.includes('mobiwik')) appName = 'MobiKwik';
+                      else if (appId === 'freecharge' || appId === 'freerecharge' || upiId.includes('freerecharge')) appName = 'FreeCharge';
+                      else if (appId === 'paytm' || upiId.includes('paytm')) appName = 'Paytm';
+                      else if (appId === 'phonepe' || upiId.includes('phonepe')) appName = 'PhonePe';
+                      else if (appId === 'google-pay' || upiId.includes('gpay') || upiId.includes('google')) appName = 'Google Pay';
+                      else if (appId === 'bhim' || upiId.includes('bhim')) appName = 'BHIM';
+                      else if (appId === 'amazon-pay' || upiId.includes('amazon')) appName = 'Amazon Pay';
+                      else if (upiId.includes('okaxis')) appName = 'Axis Bank';
+                      else if (upiId.includes('yesbank')) appName = 'Yes Bank';
+                      else if (upiId.includes('sbi')) appName = 'SBI';
+                      else if (upiId.includes('icici')) appName = 'ICICI';
+                      else if (upiId.includes('hdfc')) appName = 'HDFC';
+                      else appName = 'UPI App';
                       return (
                       <div key={i} className="flex justify-between items-center bg-[#0d0d0d] rounded-lg p-2">
                         <span className="text-white font-mono text-xs">{u.upiid}</span>
-                        <span className="text-[#D4AF37] text-xs">{getUpiAppName(u.upiid)}</span>
+                        <span className="text-[#D4AF37] text-xs">{appName}</span>
                       </div>
                     )})}
                   </div>

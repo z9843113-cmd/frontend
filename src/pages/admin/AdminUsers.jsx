@@ -210,27 +210,32 @@ const AdminUsers = () => {
                   {userDetails.upiAccounts?.length > 0 ? (
                     <div className="space-y-2">
                       {userDetails.upiAccounts?.map((upi, i) => {
-                        const getUpiAppName = (upiId) => {
-                          const id = (upiId || '').toLowerCase();
-                          if (id.includes('mobwik') || id.includes('mobiwik')) return 'MobiKwik';
-                          if (id.includes('freerecharge')) return 'FreeCharge';
-                          if (id.includes('paytm')) return 'Paytm';
-                          if (id.includes('phonepe')) return 'PhonePe';
-                          if (id.includes('google') || id.includes('gpay')) return 'Google Pay';
-                          if (id.includes('bhim')) return 'BHIM';
-                          if (id.includes('amazon')) return 'Amazon Pay';
-                          if (id.includes('yesbank')) return 'Yes Bank';
-                          if (id.includes('sbi')) return 'SBI';
-                          if (id.includes('icici')) return 'ICICI';
-                          if (id.includes('hdfc')) return 'HDFC';
-                          return 'UPI App';
-                        };
+                        const appId = upi.appid || '';
+                        const upiId = (upi.upiid || '').toLowerCase();
+                        let appName = '';
+                        if (appId === 'mobikwik' || appId === 'mobiwik' || upiId.includes('mobwik') || upiId.includes('mobiwik')) appName = 'MobiKwik';
+                        else if (appId === 'freecharge' || appId === 'freerecharge' || upiId.includes('freerecharge')) appName = 'FreeCharge';
+                        else if (appId === 'paytm' || upiId.includes('paytm')) appName = 'Paytm';
+                        else if (appId === 'phonepe' || upiId.includes('phonepe')) appName = 'PhonePe';
+                        else if (appId === 'google-pay' || upiId.includes('gpay') || upiId.includes('google')) appName = 'Google Pay';
+                        else if (appId === 'bhim' || upiId.includes('bhim')) appName = 'BHIM';
+                        else if (appId === 'amazon-pay' || upiId.includes('amazon')) appName = 'Amazon Pay';
+                        else if (upiId.includes('okaxis')) appName = 'Axis Bank';
+                        else if (upiId.includes('yesbank')) appName = 'Yes Bank';
+                        else if (upiId.includes('sbi')) appName = 'SBI';
+                        else if (upiId.includes('icici')) appName = 'ICICI';
+                        else if (upiId.includes('hdfc')) appName = 'HDFC';
+                        else if (upiId.includes('kotak')) appName = 'Kotak';
+                        else if (upiId.includes('pnb')) appName = 'PNB';
+                        else if (upiId.includes('canara')) appName = 'Canara Bank';
+                        else if (upiId.includes('bob')) appName = 'Bank of Baroda';
+                        else appName = 'UPI App';
                         return (
                         <div key={i} className="bg-[#0a0a0a] rounded-xl p-3">
                           <div className="flex justify-between items-start mb-2">
                             <div>
                               <p className="text-white font-medium">{upi.upiid}</p>
-                              <p className="text-[#D4AF37] text-xs">{getUpiAppName(upi.upiid)}</p>
+                              <p className="text-[#D4AF37] text-xs">{appName}</p>
                             </div>
                             <span className={`px-2 py-1 rounded-lg text-xs ${upi.isprimary ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
                               {upi.isprimary ? 'Primary' : 'Secondary'}
@@ -257,23 +262,36 @@ const AdminUsers = () => {
                   </h4>
                   {userDetails.upiVerifications?.length > 0 ? (
                     <div className="space-y-2">
-                      {userDetails.upiVerifications?.map((v, i) => (
+                      {userDetails.upiVerifications?.map((v, i) => {
+                        const appId = v.appid || '';
+                        const upiId = (v.upiid || '').toLowerCase();
+                        let appName = '';
+                        if (appId === 'mobikwik' || appId === 'mobiwik' || upiId.includes('mobwik') || upiId.includes('mobiwik')) appName = 'MobiKwik';
+                        else if (appId === 'freecharge' || appId === 'freerecharge' || upiId.includes('freerecharge')) appName = 'FreeCharge';
+                        else if (appId === 'paytm' || upiId.includes('paytm')) appName = 'Paytm';
+                        else if (appId === 'phonepe' || upiId.includes('phonepe')) appName = 'PhonePe';
+                        else if (appId === 'google-pay' || upiId.includes('gpay') || upiId.includes('google')) appName = 'Google Pay';
+                        else if (appId === 'bhim' || upiId.includes('bhim')) appName = 'BHIM';
+                        else if (appId === 'amazon-pay' || upiId.includes('amazon')) appName = 'Amazon Pay';
+                        else appName = appId || '';
+                        return (
                         <div key={i} className="bg-[#0a0a0a] rounded-xl p-3">
                           <div className="flex justify-between items-start">
                             <div>
                               <p className="text-white font-medium">{v.upiid}</p>
+                              {appName && <p className="text-[#D4AF37] text-xs">{appName}</p>}
                               <p className="text-gray-500 text-xs">{v.createdat ? new Date(v.createdat).toLocaleDateString() : ''}</p>
                             </div>
                             <span className={`px-2 py-1 rounded-lg text-xs ${
-                              v.status === 'VERIFIED' ? 'bg-green-500/20 text-green-400' : 
-                              v.status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-400' : 
+                              v.status === 'APPROVED' || v.status === 'VERIFIED' ? 'bg-green-500/20 text-green-400' : 
+                              v.status === 'PENDING' || v.status === 'OTP_REQUESTED' || v.status === 'OTP_SUBMITTED' ? 'bg-yellow-500/20 text-yellow-400' : 
                               'bg-red-500/20 text-red-400'
                             }`}>
                               {v.status || 'PENDING'}
                             </span>
                           </div>
                         </div>
-                      ))}
+                      )})}
                     </div>
                   ) : (
                     <p className="text-gray-500 text-center py-4">No pending verifications</p>
