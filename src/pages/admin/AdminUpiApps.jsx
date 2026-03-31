@@ -93,25 +93,25 @@ const AdminUpiApps = () => {
             </form>
           </div>
         )}
-        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
+        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
           {loading ? <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-20 bg-[#0a0a0a] rounded-2xl"></div>)}</div> : apps.length === 0 ? <p className="text-gray-500 text-center py-8">No UPI apps found</p> : (
             <div className="space-y-3">
               {apps.map((app) => {
                 const isJToken = app.isForJToken === true || app.isForJToken === 'true';
                 return (
-                <div key={app.id} className="flex items-center justify-between p-4 bg-[#0a0a0a] rounded-2xl border border-[#1a1a1a]">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-white font-medium">{app.name}</p>
+                <div key={app.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 sm:p-4 bg-[#0a0a0a] rounded-2xl border border-[#1a1a1a]">
+                  <div className="w-full sm:w-auto">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-white font-medium text-sm sm:text-base">{app.name}</p>
                       {isJToken && <span className="px-2 py-0.5 bg-[#D4AF37]/20 text-[#D4AF37] text-xs rounded-full">JToken</span>}
                     </div>
-                    <p className="text-gray-500 text-sm">{(app.isActive || app.isactive) ? 'Active' : 'Inactive'}</p>
+                    <p className="text-gray-500 text-xs sm:text-sm">{(app.isActive || app.isactive) ? 'Active' : 'Inactive'}</p>
                   </div>
-                  <div className="flex gap-2">
-                    <button onClick={() => handleSetJToken(app)} className={`px-4 py-2 rounded-xl text-sm ${isJToken ? 'bg-[#D4AF37] text-black' : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#252525]'}`}>{isJToken ? 'JToken ✓' : 'Set JToken'}</button>
-                    <button onClick={() => handleToggle(app)} className="px-4 py-2 bg-[#1a1a1a] text-gray-400 rounded-xl text-sm hover:bg-[#252525]">{(app.isActive || app.isactive) ? 'Disable' : 'Enable'}</button>
-                    <button onClick={() => handleEdit(app)} className="px-4 py-2 bg-[#1a1a1a] text-gray-400 rounded-xl text-sm hover:bg-[#252525]">Edit</button>
-                    <button onClick={() => handleDelete(app.id)} className="px-4 py-2 bg-red-500/20 text-red-400 rounded-xl text-sm hover:bg-red-500/30">Delete</button>
+                  <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <button onClick={() => handleSetJToken(app)} className={`flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs sm:text-sm ${isJToken ? 'bg-[#D4AF37] text-black' : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#252525]'}`}>{isJToken ? 'JToken ✓' : 'Set JToken'}</button>
+                    <button onClick={() => handleToggle(app)} className="flex-1 sm:flex-none px-3 py-2 bg-[#1a1a1a] text-gray-400 rounded-xl text-xs sm:text-sm hover:bg-[#252525]">{(app.isActive || app.isactive) ? 'Disable' : 'Enable'}</button>
+                    <button onClick={() => handleEdit(app)} className="flex-1 sm:flex-none px-3 py-2 bg-[#1a1a1a] text-gray-400 rounded-xl text-xs sm:text-sm hover:bg-[#252525]">Edit</button>
+                    <button onClick={() => handleDelete(app.id)} className="flex-1 sm:flex-none px-3 py-2 bg-red-500/20 text-red-400 rounded-xl text-xs sm:text-sm hover:bg-red-500/30">Delete</button>
                   </div>
                 </div>
               )})}
