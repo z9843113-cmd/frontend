@@ -108,7 +108,9 @@ const AdminUpiApps = () => {
                     <p className="text-gray-500 text-xs sm:text-sm">{(app.isActive || app.isactive) ? 'Active' : 'Inactive'}</p>
                   </div>
                   <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                    <button onClick={() => handleSetJToken(app)} className={`flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs sm:text-sm ${isJToken ? 'bg-[#D4AF37] text-black' : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#252525]'}`}>{isJToken ? 'JToken ✓' : 'Set JToken'}</button>
+                    <button onClick={() => handleSetJToken(app)} className={`flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1 ${isJToken ? 'bg-green-500 text-white' : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#252525]'}`}>
+                      {isJToken ? <><span className="text-lg">●</span> JToken</> : 'Set JToken'}
+                    </button>
                     <button onClick={() => handleToggle(app)} className="flex-1 sm:flex-none px-3 py-2 bg-[#1a1a1a] text-gray-400 rounded-xl text-xs sm:text-sm hover:bg-[#252525]">{(app.isActive || app.isactive) ? 'Disable' : 'Enable'}</button>
                     <button onClick={() => handleEdit(app)} className="flex-1 sm:flex-none px-3 py-2 bg-[#1a1a1a] text-gray-400 rounded-xl text-xs sm:text-sm hover:bg-[#252525]">Edit</button>
                     <button onClick={() => handleDelete(app.id)} className="flex-1 sm:flex-none px-3 py-2 bg-red-500/20 text-red-400 rounded-xl text-xs sm:text-sm hover:bg-red-500/30">Delete</button>
