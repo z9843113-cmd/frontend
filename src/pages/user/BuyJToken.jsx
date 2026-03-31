@@ -428,7 +428,12 @@ const BuyJToken = () => {
                           {bd.bankName && (
                             <div className="flex justify-between items-center py-2 border-b border-[#2a2a2a]">
                               <span className="text-gray-500 text-xs">Bank Name</span>
-                              <span className="text-white text-sm font-medium">{bd.bankName}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-white text-sm font-medium">{bd.bankName}</span>
+                                <button onClick={() => copyToClipboard(bd.bankName)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
+                                  <FaCopy className="text-xs" />
+                                </button>
+                              </div>
                             </div>
                           )}
                           {bd.accountNumber && (
@@ -456,7 +461,12 @@ const BuyJToken = () => {
                           {bd.payeeName && (
                             <div className="flex justify-between items-center py-2">
                               <span className="text-gray-500 text-xs">Payee Name</span>
-                              <span className="text-white text-sm font-medium">{bd.payeeName}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-white text-sm font-medium">{bd.payeeName}</span>
+                                <button onClick={() => copyToClipboard(bd.payeeName)} className="p-1.5 bg-[#D4AF37]/20 rounded-lg text-[#D4AF37] hover:bg-[#D4AF37]/30">
+                                  <FaCopy className="text-xs" />
+                                </button>
+                              </div>
                             </div>
                           )}
                         </>
