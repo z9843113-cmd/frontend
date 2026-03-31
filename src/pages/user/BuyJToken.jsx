@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/BottomNav';
 import RequestStatusModal from '../../components/RequestStatusModal';
-import { jTokenPurchaseAPI, walletAPI, uploadToCloudinary, userAPI } from '../../services/api';
+import { jTokenPurchaseAPI, walletAPI, uploadToCloudinary, userAPI, publicAPI } from '../../services/api';
 import { FaArrowLeft, FaClock, FaCoins, FaCopy, FaCreditCard, FaUniversity, FaCheck, FaTimes } from 'react-icons/fa';
 
 const BuyJToken = () => {
@@ -43,7 +43,6 @@ const BuyJToken = () => {
       try {
         const walletRes = await walletAPI.getWallet().catch(() => null);
         const requestsRes = await jTokenPurchaseAPI.getMyRequests().catch(() => ({ data: { purchases: [] } }));
-        const upiRes = await publicAPI.getUpiApps().catch(() => []);
         const userUpiRes = await userAPI.getUpiAccounts().catch(() => []);
         
         setWallet(walletRes?.data || walletRes || null);
