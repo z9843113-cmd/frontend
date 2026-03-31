@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/BottomNav';
 import RequestStatusModal from '../../components/RequestStatusModal';
@@ -38,84 +38,58 @@ const BuyJToken = () => {
     return `A${dateStr}${random}`;
   };
 
-  const JTOKEN_APPS = ['mobiwik', 'mobwik', 'freerecharge'];
-  
-  const fetchRequestData = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
-    try {
-      const [walletRes, requestsRes, upiRes, userUpiRes] = await Promise.all([
-        walletAPI.getWallet(),
-        jTokenPurchaseAPI.getMyRequests(),
-        publicAPI.getUpiApps(),
-        userAPI.getUpiAccounts()
-      ]);
-      setWallet(walletRes?.data || walletRes || null);
-      const allRequests = requestsRes?.data?.purchases || requestsRes?.purchases || requestsRes?.data || requestsRes || [];
-      setHistory(allRequests);
-      const req = allRequests.find(r => !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(r.status));
-      if (req) setRequest(req);
-      else setRequest(null);
-      
-      // Use verified/active UPI accounts
-      const userUpiAccounts = (userUpiRes?.data || userUpiRes || []).filter(
-        u => u.status === 'active' || u.status === 'verified'
-      );
-      
-      // Get primary UPI account
-      const primaryUpi = userUpiAccounts.find(u => u.isprimary === true || u.isprimary === 'true');
-      setPrimaryUpi(primaryUpi);
-      const allApps = upiRes?.data || upiRes || [];
-      
-      // Get apps that are enabled for JToken purchases (both active and inactive)
-      const jtokenApps = allApps.filter(app => 
-        app.isforjtoken === true || app.isforjtoken === 'true' ||
-        app.isForJToken === true || app.isForJToken === 'true'
-      );
-      
-      setUpiApps(jtokenApps);
-      if (jtokenApps.length > 0 && !selectedMethod) {
-        // If user has primary UPI, try to match the app
-        if (primaryUpi) {
-          const primaryUpiId = (primaryUpi.upiid || primaryUpi.upiId || '').toLowerCase();
-          const matchedApp = jtokenApps.find(app => {
-            const appId = (app.id || '').toLowerCase();
-            if (appId === 'mobikwik' || appId === 'mobiwik') {
-              return primaryUpiId.includes('mobwik') || primaryUpiId.includes('mobiwik');
-            }
-            if (appId === 'freecharge' || appId === 'freerecharge') {
-              return primaryUpiId.includes('freerecharge');
-            }
-            if (appId === 'paytm') {
-              return primaryUpiId.includes('paytm');
-            }
-            if (appId === 'phonepe') {
-              return primaryUpiId.includes('phonepe');
-            }
-            if (appId === 'google-pay') {
-              return primaryUpiId.includes('gpay') || primaryUpiId.includes('google');
-            }
-            if (appId === 'bhim') {
-              return primaryUpiId.includes('bhim');
-            }
-            if (appId === 'amazon-pay') {
-              return primaryUpiId.includes('amazon');
-            }
-            return false;
-          });
-          if (matchedApp) {
-            setSelectedMethod(matchedApp.id);
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const walletRes = await walletAPI.getWallet().catch(() => null);
+        const requestsRes = await jTokenPurchaseAPI.getMyRequests().catch(() => ({ data: { purchases: [] } }));
+        const upiRes = await publicAPI.getUpiApps().catch(() => []);
+        const userUpiRes = await userAPI.getUpiAccounts().catch(() => []);
+        
+        setWallet(walletRes?.data || walletRes || null);
+        const allRequests = requestsRes?.data?.purchases || requestsRes?.purchases || requestsRes?.data || requestsRes || [];
+        setHistory(allRequests);
+        const req = allRequests.find(r => !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(r.status));
+        if (req) setRequest(req);
+        else setRequest(null);
+        
+        const userUpiAccounts = (userUpiRes?.data || userUpiRes || []).filter(
+          u => u.status === 'active' || u.status === 'verified'
+        );
+        const primaryUpi = userUpiAccounts.find(u => u.isprimary === true || u.isprimary === 'true');
+        setPrimaryUpi(primaryUpi);
+        
+        const allApps = upiRes?.data || upiRes || [];
+        const jtokenApps = allApps.filter(app => 
+          app.isforjtoken === true || app.isforjtoken === 'true' ||
+          app.isForJToken === true || app.isForJToken === 'true'
+        );
+        setUpiApps(jtokenApps);
+        
+        if (jtokenApps.length > 0 && !selectedMethod) {
+          if (primaryUpi) {
+            const primaryUpiId = (primaryUpi.upiid || primaryUpi.upiId || '').toLowerCase();
+            const matchedApp = jtokenApps.find(app => {
+              const appId = (app.id || '').toLowerCase();
+              if (appId === 'mobikwik' || appId === 'mobiwik') {
+                return primaryUpiId.includes('mobwik') || primaryUpiId.includes('mobiwik');
+              }
+              if (appId === 'freecharge' || appId === 'freerecharge') {
+                return primaryUpiId.includes('freerecharge');
+              }
+              return false;
+            });
+            if (matchedApp) setSelectedMethod(matchedApp.id);
           }
         }
+      } catch (err) {
+        console.error('Load error:', err);
+      } finally {
+        setLoading(false);
       }
-    } catch {
-      console.error('Failed to fetch data');
-    } finally {
-      if (!silent) setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchRequestData(true);
+    };
+    loadData();
   }, []);
 
   useEffect(() => { 
@@ -180,9 +154,25 @@ const BuyJToken = () => {
     try {
       await jTokenPurchaseAPI.cancel(request.id);
       setRequest(null);
-      fetchRequestData(true);
     } catch (err) {
       setMessage(err?.message || 'Failed to cancel');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSubmitPayment = async () => {
+    if (!utr) {
+      setMessage('Please enter UTR number');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await jTokenPurchaseAPI.submitPayment(request.id, { utr, screenshot });
+      setMessage('');
+      setShowPaymentPopup(false);
+    } catch (err) {
+      setMessage(err?.message || 'Failed to submit payment');
     } finally {
       setSubmitting(false);
     }
@@ -191,37 +181,21 @@ const BuyJToken = () => {
   const handleScreenshot = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      setMessage('File too large (max 5MB)');
-      return;
-    }
     setUploading(true);
     try {
       const url = await uploadToCloudinary(file);
       setScreenshot(url);
       setScreenshotPreview(URL.createObjectURL(file));
-    } catch {
-      setMessage('Upload failed');
+    } catch (err) {
+      setMessage('Failed to upload screenshot');
     } finally {
       setUploading(false);
     }
   };
 
-  const handleSubmitPayment = async () => {
-    if (!utr.trim()) {
-      setMessage('Please enter UTR number');
-      return;
-    }
-    setSubmitting(true);
-    try {
-      await jTokenPurchaseAPI.submitPayment(request.id, { utr: utr.trim(), screenshot: screenshot });
-      setRequest({ ...request, status: 'PAYMENT_SUBMITTED' });
-      setShowWaitPopup(true);
-    } catch (err) {
-      setMessage(err?.message || 'Failed to submit');
-    } finally {
-      setSubmitting(false);
-    }
+  const formatDate = (date) => {
+    if (!date) return '';
+    return new Date(date).toLocaleDateString('en-GB');
   };
 
   if (loading) {
@@ -246,16 +220,19 @@ const BuyJToken = () => {
         </div>
       </div>
 
-      <div className="px-4 py-5 max-w-2xl mx-auto space-y-4">
-        
-        {/* Warning Note */}
+      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+        {message && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
+            <p className="text-red-400 text-sm">{message}</p>
+          </div>
+        )}
+
         <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4">
           <p className="text-yellow-400 font-bold text-sm mb-2">⚠️ NOTE..</p>
           <p className="text-white text-sm">Cancel the order if the payment details do not match ❗️</p>
           <p className="text-gray-400 text-sm mt-2">अगर पेमेंट डिटेल्स मैच नहीं होती हैं तो ऑर्डर कैंसिल करें ❗️</p>
         </div>
 
-        {/* Active Request Card */}
         {request && (
           <div onClick={() => setShowActivePopup(true)} className="bg-gradient-to-r from-[#D4AF37]/20 to-[#FFD700]/10 border border-[#D4AF37]/30 rounded-2xl p-4 cursor-pointer hover:from-[#D4AF37]/30 hover:to-[#FFD700]/20 transition-all">
             <div className="flex items-center justify-between">
@@ -282,7 +259,6 @@ const BuyJToken = () => {
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
             <h2 className="text-white font-bold text-lg mb-4">Buy J Token</h2>
             
-            {/* Payment Method Selector */}
             <div className="mb-4">
               <p className="text-gray-400 text-sm mb-2">Select Payment Method</p>
               {upiApps.length === 0 ? (
@@ -311,286 +287,125 @@ const BuyJToken = () => {
                 </div>
               )}
             </div>
-            
-            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Enter amount (min ₹10)" className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl px-4 py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none text-lg" />
-            {message && <p className="text-red-400 text-sm mt-3">{message}</p>}
-            <button onClick={handleCreate} disabled={submitting} className="w-full mt-5 py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl font-bold text-black disabled:opacity-50">
+
+            <div className="mb-4">
+              <p className="text-gray-400 text-sm mb-2">Enter amount (min ₹10)</p>
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="Enter amount"
+                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none"
+              />
+            </div>
+
+            <button onClick={handleCreate} disabled={submitting || !selectedMethod || !amount} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">
               {submitting ? 'Creating...' : 'Create Request'}
             </button>
           </div>
         ) : (
-          <div className="space-y-4">
-            {/* Order Details Card */}
-            <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#D4AF37]/30">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-white font-bold text-lg">Recharge Order</h2>
-                <span className="text-yellow-400 text-sm">⚠️ Please give feedback in time!</span>
-              </div>
-              
-              <div className="bg-[#0a0a0a] rounded-2xl p-4 space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400 text-sm">Order Number</span>
-                  <span className="text-white font-mono text-sm">{generateOrderNumber()}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400 text-sm">Payment Method</span>
-                  <span className="text-white font-semibold">{request.method === 'BANK' ? 'UPI to Bank A/C' : 'UPI'}</span>
-                </div>
-              </div>
-
-              {/* Bank Details (if available) */}
-              {request.adminnote && request.adminnote.includes('Bank:') && (
-                <div className="mt-4 bg-[#0a0a0a] rounded-2xl p-4 space-y-3">
-                  <p className="text-[#D4AF37] font-semibold">Receiving Bank Details</p>
-                  
-                  {request.adminnote.split('\n').filter(line => line.includes(':')).map((line, i) => {
-                    const [key, ...valueParts] = line.split(':');
-                    const value = valueParts.join(':').trim();
-                    if (!value) return null;
-                    return (
-                      <div key={i} className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">{key.trim()}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-white text-sm font-mono">{value}</span>
-                          <button onClick={() => copyToClipboard(value)} className="text-[#D4AF37] hover:text-[#FFD700]">
-                            <FaCopy className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  
-                  <div className="flex justify-between items-center pt-2 border-t border-[#2a2a2a]">
-                    <span className="text-gray-400 text-sm">Receipt Amount</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-400 font-bold">₹{parseFloat(request.amount || 0).toFixed(2)}</span>
-                      <button onClick={() => copyToClipboard(request.amount)} className="text-[#D4AF37] hover:text-[#FFD700]">
-                        <FaCopy className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* UPI Details (if available) */}
-              {request.paymentupi && (
-                <div className="mt-4 bg-[#0a0a0a] rounded-2xl p-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400 text-sm">UPI ID</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-white font-mono">{request.paymentupi}</span>
-                      <button onClick={() => copyToClipboard(request.paymentupi)} className="text-[#D4AF37] hover:text-[#FFD700]">
-                        <FaCopy className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* QR Code */}
-              {request.qrimage && (
-                <div className="mt-4 bg-white p-3 rounded-2xl">
-                  <img src={request.qrimage} alt="QR Code" className="w-full h-48 object-contain" />
-                </div>
-              )}
-
-              <div className="mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-3">
-                <p className="text-yellow-400 text-sm">⚠️ Please pay with PhonePe wallet</p>
-              </div>
-
-              {request.status === 'PAYMENT_STARTED' && (
-                <div className="mt-4 bg-red-500/10 border border-red-500/30 rounded-2xl p-3 flex items-center gap-2">
-                  <FaClock className="text-red-400" />
-                  <span className="text-red-400 text-sm">Order will be canceled in 10:00</span>
-                </div>
-              )}
-            </div>
-
-
-
-            {/* Status Messages */}
-            {request.status === 'WAITING_ADMIN' && (
-              <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a] text-center">
-                <div className="relative w-20 h-20 mx-auto mb-4">
-                  <div className="absolute inset-0 border-4 border-[#D4AF37]/30 rounded-full"></div>
-                  <div className="absolute inset-0 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <FaClock className="w-8 h-8 text-[#D4AF37]" />
-                  </div>
-                </div>
-                <p className="text-white font-bold text-lg mb-2">Waiting for Admin</p>
-                <p className="text-gray-400 text-sm mb-4">Admin will assign payment details soon...</p>
-                <div className="bg-[#0a0a0a] rounded-xl p-3 inline-block">
-                  <p className="text-[#D4AF37] text-sm">Auto-refreshing every 3s</p>
-                </div>
-              </div>
-            )}
-
-            {request.status === 'READY_TO_PAY' && (
-              <button onClick={handleStartPay} disabled={submitting} className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl font-bold text-white disabled:opacity-50">
-                {submitting ? 'Loading...' : 'Pay Now'}
-              </button>
-            )}
-
-            {request.status === 'PAYMENT_SUBMITTED' && (
-              <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#D4AF37]/30 text-center">
-                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <FaCheck className="w-8 h-8 text-green-400" />
-                </div>
-                <p className="text-[#D4AF37] font-bold text-lg mb-2">Submitted Successfully!</p>
-                <p className="text-gray-400 text-sm">Please wait 3-5 minutes for admin verification</p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      {showWaitPopup && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4" onClick={() => setShowWaitPopup(false)}>
-          <div className="bg-[#1a1a1a] rounded-3xl p-6 max-w-sm w-full text-center border border-[#D4AF37]/30">
-            <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FaClock className="w-8 h-8 text-yellow-400" />
-            </div>
-            <p className="text-white font-bold text-lg mb-2">Waiting for Verification</p>
-            <p className="text-gray-400 text-sm">Your payment is being verified by admin</p>
-            <button onClick={() => setShowWaitPopup(false)} className="mt-5 w-full py-3 bg-[#D4AF37] rounded-xl font-bold text-black">OK</button>
-          </div>
-        </div>
-      )}
-
-      {/* Payment Popup */}
-      {showPaymentPopup && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1a1a1a] rounded-3xl p-6 max-w-md w-full border border-[#D4AF37]/30">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-white font-bold text-lg">UTR Input</h3>
-              <button onClick={() => setShowPaymentPopup(false)} className="text-gray-400">✕</button>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3">
-                <p className="text-yellow-400 text-sm">Please pay ₹{parseFloat(request?.amount || 0).toFixed(2)} and enter UTR</p>
-              </div>
-              
-              <input 
-                type="text" 
-                value={utr} 
-                onChange={(e) => setUtr(e.target.value)} 
-                placeholder="Enter UTR number" 
-                className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl px-4 py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" 
-              />
-              
-              <div>
-                <p className="text-gray-400 text-sm mb-2">Payment Screenshot</p>
-                <label className="block">
-                  <div className="border-2 border-dashed border-[#2a2a2a] rounded-2xl p-6 text-center cursor-pointer hover:border-[#D4AF37]/50 transition-colors">
-                    {screenshotPreview ? (
-                      <img src={screenshotPreview} alt="Preview" className="w-full h-32 object-contain rounded-xl" />
-                    ) : (
-                      <p className="text-gray-500">+ (Add file)</p>
-                    )}
-                  </div>
-                  <input type="file" accept="image/*,video/*" onChange={handleScreenshot} className="hidden" />
-                </label>
-                {uploading && <p className="text-[#D4AF37] text-sm mt-2">Uploading...</p>}
-              </div>
-
-              {message && <p className="text-red-400 text-sm">{message}</p>}
-
-              <div className="grid grid-cols-2 gap-3">
-                <button 
-                  onClick={() => { handleSubmitPayment(); setShowPaymentPopup(false); }} 
-                  disabled={submitting || !utr.trim()} 
-                  className="py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] rounded-2xl font-bold text-black disabled:opacity-50"
-                >
-                  {submitting ? 'Submitting...' : 'Submit'}
-                </button>
-                <button 
-                  onClick={() => { handleCancel(); setShowPaymentPopup(false); }} 
-                  disabled={submitting} 
-                  className="py-4 bg-[#1a1a1a] rounded-2xl font-bold text-white disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* History Section */}
-      {history.length > 0 && (
-        <div className="px-4 py-5 max-w-2xl mx-auto space-y-3">
-          <h3 className="text-white font-bold text-lg mb-3">History</h3>
-          {history.slice(0, 5).map((item, i) => (
-            <div key={i} className="bg-[#1a1a1a] rounded-xl p-4 flex justify-between items-center">
-              <div>
-                <p className="text-white font-semibold">₹{parseFloat(item.amount || 0).toFixed(2)}</p>
-                <p className="text-gray-500 text-xs">{item.createdat ? new Date(item.createdat).toLocaleDateString() : ''}</p>
-              </div>
-              <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                item.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' :
-                item.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' :
-                item.status === 'CANCELLED' ? 'bg-gray-500/20 text-gray-400' :
-                'bg-yellow-500/20 text-yellow-400'
-              }`}>
-                {item.status}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Active Request Popup */}
-      {showActivePopup && request && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4" onClick={() => setShowActivePopup(false)}>
-          <div className="bg-[#1a1a1a] rounded-3xl p-6 max-w-md w-full border border-[#D4AF37]/30" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-white font-bold text-lg">Active Request</h3>
-              <button onClick={() => setShowActivePopup(false)} className="text-gray-400">✕</button>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
+            <div className="text-center mb-4">
+              <p className="text-white font-bold text-lg">Request Details</p>
+              <p className="text-gray-400 text-sm">Order: {request.ordernumber || generateOrderNumber()}</p>
             </div>
             <div className="space-y-3">
-              <div className="bg-[#0a0a0a] rounded-xl p-4">
-                <p className="text-gray-400 text-sm">Amount</p>
-                <p className="text-white font-bold text-xl">₹{parseFloat(request.amount || 0).toFixed(2)}</p>
+              <div className="flex justify-between">
+                <p className="text-gray-400">Amount</p>
+                <p className="text-white font-bold">₹{parseFloat(request.amount || 0).toFixed(2)}</p>
               </div>
-              <div className="bg-[#0a0a0a] rounded-xl p-4">
-                <p className="text-gray-400 text-sm">Status</p>
-                <span className={`inline-block px-3 py-1 rounded-full text-sm font-bold ${
+              <div className="flex justify-between">
+                <p className="text-gray-400">Method</p>
+                <p className="text-white">{request.method || selectedMethod}</p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-gray-400">Status</p>
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                   request.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' :
                   request.status === 'PAYMENT_SUBMITTED' ? 'bg-yellow-500/20 text-yellow-400' :
-                  'bg-blue-500/20 text-blue-400'
+                  request.status === 'PAYMENT_STARTED' ? 'bg-blue-500/20 text-blue-400' :
+                  'bg-gray-500/20 text-gray-400'
                 }`}>
                   {request.status}
                 </span>
               </div>
-              {request.paymentupi && (
-                <div className="bg-[#0a0a0a] rounded-xl p-4">
-                  <p className="text-gray-400 text-sm">UPI ID</p>
-                  <p className="text-white font-mono">{request.paymentupi}</p>
+            </div>
+
+            {request.status === 'PAYMENT_STARTED' && (
+              <button onClick={handleStartPay} disabled={submitting} className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl font-bold text-white disabled:opacity-50 mt-4">
+                {submitting ? 'Loading...' : 'Pay Now'}
+              </button>
+            )}
+
+            {(request.status === 'WAITING_ADMIN' || request.status === 'READY_TO_PAY') && (
+              <button onClick={handleCancel} disabled={submitting} className="w-full py-3 bg-red-500/20 text-red-400 rounded-2xl font-semibold mt-3 disabled:opacity-50">
+                Cancel Request
+              </button>
+            )}
+          </div>
+        )}
+
+        {history.length > 0 && (
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
+            <h3 className="text-white font-bold text-lg mb-4">History</h3>
+            <div className="space-y-3">
+              {history.slice(0, 5).map((item) => (
+                <div key={item.id} className="flex items-center justify-between p-3 bg-[#0a0a0a] rounded-xl">
+                  <div>
+                    <p className="text-white font-medium">₹{parseFloat(item.amount || 0).toFixed(2)}</p>
+                    <p className="text-gray-500 text-xs">{formatDate(item.createdat)}</p>
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                    item.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' :
+                    item.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' :
+                    item.status === 'CANCELLED' ? 'bg-gray-500/20 text-gray-400' :
+                    'bg-yellow-500/20 text-yellow-400'
+                  }`}>
+                    {item.status}
+                  </span>
                 </div>
-              )}
-              {request.adminnote && (
-                <div className="bg-[#0a0a0a] rounded-xl p-4">
-                  <p className="text-gray-400 text-sm">Note</p>
-                  <p className="text-white text-sm">{request.adminnote}</p>
-                </div>
-              )}
-              <p className="text-gray-500 text-xs">{request.createdat ? `Created: ${new Date(request.createdat).toLocaleString()}` : ''}</p>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {showActivePopup && request && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowActivePopup(false)}>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a] w-full max-w-md" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-white font-bold text-lg">Request Details</h3>
+              <button onClick={() => setShowActivePopup(false)} className="text-gray-400"><FaTimes /></button>
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <p className="text-gray-400">Order</p>
+                <p className="text-white font-mono text-sm">{request.ordernumber || 'N/A'}</p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-gray-400">Amount</p>
+                <p className="text-white font-bold">₹{parseFloat(request.amount || 0).toFixed(2)}</p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-gray-400">Method</p>
+                <p className="text-white">{request.method}</p>
+              </div>
+              <div className="flex justify-between">
+                <p className="text-gray-400">Status</p>
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                  request.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' :
+                  request.status === 'PAYMENT_SUBMITTED' ? 'bg-yellow-500/20 text-yellow-400' :
+                  'bg-gray-500/20 text-gray-400'
+                }`}>
+                  {request.status}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       <BottomNav />
-
-      <RequestStatusModal 
-        isOpen={!!pendingRequest}
-        onClose={() => setPendingRequest(null)}
-        type={pendingRequest?.type}
-        requestId={pendingRequest?.id}
-        title={pendingRequest?.title}
-      />
     </div>
   );
 };
