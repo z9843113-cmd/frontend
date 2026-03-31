@@ -22,9 +22,10 @@ const BuyJToken = () => {
   const [screenshotPreview, setScreenshotPreview] = useState('');
   const [uploading, setUploading] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState('');
+  const [selectedUpi, setSelectedUpi] = useState('');
   const [upiApps, setUpiApps] = useState([]);
+  const [userUpiAccounts, setUserUpiAccounts] = useState([]);
   const [pendingRequest, setPendingRequest] = useState(null);
-  const [primaryUpi, setPrimaryUpi] = useState(null);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -54,59 +55,20 @@ const BuyJToken = () => {
         if (req) setRequest(req);
         else setRequest(null);
         
+        // Show all verified UPI accounts
         const userUpiAccounts = (userUpiRes?.data || userUpiRes || []).filter(
           u => u.status === 'active' || u.status === 'verified'
         );
-        const primaryUpi = userUpiAccounts.find(u => u.isprimary === true || u.isprimary === 'true');
-        setPrimaryUpi(primaryUpi);
         
+        // Show all JToken-enabled apps for selection
         const allApps = upiRes?.data || upiRes || [];
-        
-        // Only show apps that match user's primary UPI
-        let jtokenApps = [];
-        if (primaryUpi) {
-          const primaryUpiId = (primaryUpi.upiid || primaryUpi.upiId || '').toLowerCase();
-          jtokenApps = allApps.filter(app => {
-            const appId = (app.id || '').toLowerCase();
-            // Only include apps that match user's UPI
-            if (appId === 'mobikwik' || appId === 'mobiwik') {
-              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
-                     (primaryUpiId.includes('mobwik') || primaryUpiId.includes('mobiwik'));
-            }
-            if (appId === 'freecharge' || appId === 'freerecharge') {
-              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
-                     primaryUpiId.includes('freerecharge');
-            }
-            if (appId === 'paytm') {
-              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
-                     primaryUpiId.includes('paytm');
-            }
-            if (appId === 'phonepe') {
-              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
-                     primaryUpiId.includes('phonepe');
-            }
-            if (appId === 'google-pay') {
-              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
-                     (primaryUpiId.includes('gpay') || primaryUpiId.includes('google'));
-            }
-            if (appId === 'bhim') {
-              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
-                     primaryUpiId.includes('bhim');
-            }
-            if (appId === 'amazon-pay') {
-              return (app.isforjtoken === true || app.isforjtoken === 'true') && 
-                     primaryUpiId.includes('amazon');
-            }
-            return false;
-          });
-        }
+        const jtokenApps = allApps.filter(app => 
+          app.isforjtoken === true || app.isforjtoken === 'true' ||
+          app.isForJToken === true || app.isForJToken === 'true'
+        );
         
         setUpiApps(jtokenApps);
-        
-        // Auto-select only if exactly one matching app
-        if (jtokenApps.length === 1 && !selectedMethod) {
-          setSelectedMethod(jtokenApps[0].id);
-        }
+        setUserUpiAccounts(userUpiAccounts);
       } catch (err) {
         console.error('Load error:', err);
       } finally {
@@ -142,13 +104,17 @@ const BuyJToken = () => {
       setMessage('Minimum amount is ₹10');
       return;
     }
+    if (!selectedUpi) {
+      setMessage('Please select your UPI account');
+      return;
+    }
     if (!selectedMethod) {
-      setMessage('Please select a payment method');
+      setMessage('Please select payment app');
       return;
     }
     setSubmitting(true);
     try {
-      const res = await jTokenPurchaseAPI.create({ amount: parseFloat(amount), method: selectedMethod });
+      const res = await jTokenPurchaseAPI.create({ amount: parseFloat(amount), method: selectedMethod, upiId: selectedUpi });
       const newRequest = res?.data?.request || res?.request || res?.data || res;
       setRequest(newRequest);
       setPendingRequest({ id: newRequest.id, type: 'JTOKEN', title: 'J Token Purchase' });
@@ -283,15 +249,38 @@ const BuyJToken = () => {
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
             <h2 className="text-white font-bold text-lg mb-4">Buy J Token</h2>
             
+            {/* Select UPI Account */}
             <div className="mb-4">
-              <p className="text-gray-400 text-sm mb-2">Select Payment Method</p>
+              <p className="text-gray-400 text-sm mb-2">Select Your UPI Account</p>
+              {userUpiAccounts.length === 0 ? (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
+                  <p className="text-red-400 text-sm">Please add and verify a UPI account first.</p>
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {userUpiAccounts.map((upi) => (
+                    <button
+                      key={upi.id}
+                      onClick={() => setSelectedUpi(upi.id)}
+                      className={`px-4 py-2 rounded-xl font-semibold text-sm ${
+                        selectedUpi === upi.id
+                          ? 'bg-[#D4AF37] text-black'
+                          : 'bg-[#0a0a0a] border border-[#2a2a2a] text-gray-400'
+                      }`}
+                    >
+                      {upi.upiid || upi.upiId}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Select Payment App */}
+            <div className="mb-4">
+              <p className="text-gray-400 text-sm mb-2">Select Payment App</p>
               {upiApps.length === 0 ? (
                 <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
-                  {primaryUpi ? (
-                    <p className="text-red-400 text-sm">JToken payment method not configured. Please contact support.</p>
-                  ) : (
-                    <p className="text-red-400 text-sm">Please add and verify a Primary UPI first to purchase JToken.</p>
-                  )}
+                  <p className="text-red-400 text-sm">No payment method available. Please contact support.</p>
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">

@@ -161,7 +161,9 @@ const Home = () => {
   const getTotalBalance = () => {
     const inrBalance = parseFloat(wallet?.inrbalance || 0);
     const usdtBalance = parseFloat(wallet?.usdtbalance || 0);
-    return inrBalance + usdtBalance * parseFloat(usdtRate || 0);
+    const tokenBalance = parseFloat(wallet?.tokenbalance || 0);
+    const tokenRate = parseFloat(wallet?.tokenRate || wallet?.tokenrate || 0.01);
+    return inrBalance + (usdtBalance * parseFloat(usdtRate || 0)) + (tokenBalance * tokenRate);
   };
 
   const getRewardValue = () => parseFloat(wallet?.tokenbalance || 0) * parseFloat(wallet?.tokenRate || wallet?.tokenrate || 0.01);
@@ -297,7 +299,7 @@ const Home = () => {
                 <p className="mt-2 text-xl font-semibold text-white">{parseFloat(wallet?.usdtbalance || 0).toFixed(4)}</p>
               </div>
               <div className="col-span-2 rounded-2xl border border-white/5 bg-black/20 p-4 sm:col-span-1">
-                <p className="text-xs text-gray-500">Reward Balance</p>
+                <p className="text-xs text-gray-500">J Token Balance</p>
                 <p className="mt-2 text-xl font-semibold text-white">{formatToken(wallet?.tokenbalance || 0)} J Token</p>
               </div>
             </div>
