@@ -426,18 +426,18 @@ const BuyJToken = () => {
                       let fields = [];
                       
                       if (typeof bd === 'string') {
-                        bd = bd.replace(/[{}"]/g, '').trim();
-                        const parts = bd.split(/(?:Bank:|Account No\.|IFSC:|Payee Name:)/i);
-                        if (parts.length > 1) {
-                          fields = [
-                            { label: 'Bank Name', value: parts[1]?.split('Account')[0]?.trim() || parts[1]?.split('IFSC')[0]?.trim() || '' },
-                            { label: 'Account No.', value: parts[1]?.match(/Account No\.\s*(\S+)/)?.[1] || parts[2]?.trim() || '' },
-                            { label: 'IFSC Code', value: parts[2]?.match(/IFSC:\s*(\S+)/)?.[1] || parts[2]?.split('Payee')[0]?.trim() || '' },
-                            { label: 'Payee Name', value: parts[3]?.replace('Payee Name:', '').trim() || '' }
-                          ].filter(f => f.value);
-                        } else {
-                          fields = [{ label: 'Details', value: bd }];
-                        }
+                        bd = bd.trim();
+                        const bankMatch = bd.match(/Bank:\s*(.*?)(?=Account|No\.|$)/i);
+                        const accMatch = bd.match(/Account No\.?:\s*(.*?)(?=IFSC|$)/i);
+                        const ifscMatch = bd.match(/IFSC:\s*(.*?)(?=Payee|$)/i);
+                        const payeeMatch = bd.match(/Payee Name:\s*(.*)/i);
+                        
+                        fields = [
+                          { label: 'Bank Name', value: bankMatch?.[1]?.trim() || '' },
+                          { label: 'Account No.', value: accMatch?.[1]?.trim() || '' },
+                          { label: 'IFSC Code', value: ifscMatch?.[1]?.trim() || '' },
+                          { label: 'Payee Name', value: payeeMatch?.[1]?.trim() || '' }
+                        ].filter(f => f.value);
                       } else if (bd && typeof bd === 'object') {
                         fields = [
                           { label: 'Bank Name', value: bd.bankName || bd.bank || '' },
@@ -445,6 +445,10 @@ const BuyJToken = () => {
                           { label: 'IFSC Code', value: bd.ifscCode || bd.ifsc || '' },
                           { label: 'Payee Name', value: bd.payeeName || bd.payee || '' }
                         ].filter(f => f.value);
+                      }
+                      
+                      if (fields.length === 0) {
+                        return <p className="text-gray-500 text-xs">No bank details available</p>;
                       }
                       
                       return fields.filter(f => f.value).map((field, idx) => (
