@@ -54,9 +54,7 @@ const BuyJToken = () => {
         else setRequest(null);
         
         const rawUpi = userUpiRes?.data || userUpiRes || [];
-        const userUpiAccounts = rawUpi.filter(
-          u => u.isactive === true || u.isactive === 'true' || u.status === 'active' || u.status === 'verified' || !u.status
-        );
+        const userUpiAccounts = rawUpi;
         
         setUserUpiAccounts(userUpiAccounts);
       } catch (err) {
