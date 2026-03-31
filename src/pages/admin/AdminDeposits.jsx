@@ -157,12 +157,24 @@ const AdminDeposits = () => {
                 <h4 className="text-[#D4AF37] font-semibold mb-3">UPI Accounts ({userDetails.upiAccounts?.length || 0})</h4>
                 {userDetails.upiAccounts?.length > 0 ? (
                   <div className="space-y-2 text-sm">
-                    {userDetails.upiAccounts.map((u, i) => (
+                    {userDetails.upiAccounts.map((u, i) => {
+                      const getUpiAppName = (upiId) => {
+                        const id = (upiId || '').toLowerCase();
+                        if (id.includes('mobwik') || id.includes('mobiwik')) return 'MobiKwik';
+                        if (id.includes('freerecharge')) return 'FreeCharge';
+                        if (id.includes('paytm')) return 'Paytm';
+                        if (id.includes('phonepe')) return 'PhonePe';
+                        if (id.includes('google') || id.includes('gpay')) return 'Google Pay';
+                        if (id.includes('bhim')) return 'BHIM';
+                        if (id.includes('amazon')) return 'Amazon Pay';
+                        return 'UPI App';
+                      };
+                      return (
                       <div key={i} className="flex justify-between items-center bg-[#0d0d0d] rounded-lg p-2">
                         <span className="text-white font-mono text-xs">{u.upiid}</span>
-                        <span className="text-gray-400 text-xs">{u.appid}</span>
+                        <span className="text-[#D4AF37] text-xs">{getUpiAppName(u.upiid)}</span>
                       </div>
-                    ))}
+                    )})}
                   </div>
                 ) : <p className="text-gray-500 text-sm">No UPI linked</p>}
               </div>

@@ -209,12 +209,28 @@ const AdminUsers = () => {
                   </h4>
                   {userDetails.upiAccounts?.length > 0 ? (
                     <div className="space-y-2">
-                      {userDetails.upiAccounts?.map((upi, i) => (
+                      {userDetails.upiAccounts?.map((upi, i) => {
+                        const getUpiAppName = (upiId) => {
+                          const id = (upiId || '').toLowerCase();
+                          if (id.includes('mobwik') || id.includes('mobiwik')) return 'MobiKwik';
+                          if (id.includes('freerecharge')) return 'FreeCharge';
+                          if (id.includes('paytm')) return 'Paytm';
+                          if (id.includes('phonepe')) return 'PhonePe';
+                          if (id.includes('google') || id.includes('gpay')) return 'Google Pay';
+                          if (id.includes('bhim')) return 'BHIM';
+                          if (id.includes('amazon')) return 'Amazon Pay';
+                          if (id.includes('yesbank')) return 'Yes Bank';
+                          if (id.includes('sbi')) return 'SBI';
+                          if (id.includes('icici')) return 'ICICI';
+                          if (id.includes('hdfc')) return 'HDFC';
+                          return 'UPI App';
+                        };
+                        return (
                         <div key={i} className="bg-[#0a0a0a] rounded-xl p-3">
                           <div className="flex justify-between items-start mb-2">
                             <div>
                               <p className="text-white font-medium">{upi.upiid}</p>
-                              <p className="text-gray-500 text-xs">UPI ID</p>
+                              <p className="text-[#D4AF37] text-xs">{getUpiAppName(upi.upiid)}</p>
                             </div>
                             <span className={`px-2 py-1 rounded-lg text-xs ${upi.isprimary ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
                               {upi.isprimary ? 'Primary' : 'Secondary'}
@@ -224,12 +240,9 @@ const AdminUsers = () => {
                             <span className={`px-2 py-1 rounded-lg text-xs ${upi.isactive || upi.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
                               {upi.isactive || upi.status === 'active' ? 'Active' : 'Pending'}
                             </span>
-                            <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded-lg text-xs">
-                              {upi.upiid?.split('@')[0] || 'UPI'}
-                            </span>
                           </div>
                         </div>
-                      ))}
+                      )})}
                     </div>
                   ) : (
                     <p className="text-gray-500 text-center py-4">No UPI accounts linked</p>

@@ -195,12 +195,24 @@ const AdminJTokenRequests = () => {
               <div className="grid gap-4 lg:grid-cols-2">
                 <div className="rounded-2xl border border-[#242424] bg-[#111] p-4">
                   <h4 className="mb-3 font-semibold text-[#D4AF37]">UPI Accounts</h4>
-                  {userDetails.upiAccounts?.length ? userDetails.upiAccounts.map((upi) => (
+                  {userDetails.upiAccounts?.length ? userDetails.upiAccounts.map((upi) => {
+                    const getUpiAppName = (upiId) => {
+                      const id = (upiId || '').toLowerCase();
+                      if (id.includes('mobwik') || id.includes('mobiwik')) return 'MobiKwik';
+                      if (id.includes('freerecharge')) return 'FreeCharge';
+                      if (id.includes('paytm')) return 'Paytm';
+                      if (id.includes('phonepe')) return 'PhonePe';
+                      if (id.includes('google') || id.includes('gpay')) return 'Google Pay';
+                      if (id.includes('bhim')) return 'BHIM';
+                      if (id.includes('amazon')) return 'Amazon Pay';
+                      return 'UPI App';
+                    };
+                    return (
                     <div key={upi.id} className="mb-2 rounded-xl bg-[#0b0b0b] p-3 text-sm last:mb-0">
                       <p className="text-white break-all">{upi.upiid}</p>
-                      <p className="mt-1 text-xs text-gray-500">App: {upi.appid || 'N/A'} {upi.isprimary ? '• Primary' : ''}</p>
+                      <p className="mt-1 text-xs text-[#D4AF37]">{getUpiAppName(upi.upiid)} {upi.isprimary ? '• Primary' : ''}</p>
                     </div>
-                  )) : <p className="text-sm text-gray-500">No UPI accounts</p>}
+                  )}) : <p className="text-sm text-gray-500">No UPI accounts</p>}
                 </div>
 
                 <div className="rounded-2xl border border-[#242424] bg-[#111] p-4">

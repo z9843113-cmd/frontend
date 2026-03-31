@@ -53,9 +53,11 @@ const ManageAccount = () => {
       ]);
       setUpiAccounts(upi?.data || upi || []);
       setBankAccounts(bank?.data || bank || []);
-      setUpiApps(apps?.data || apps || []);
-      const activeApps = (apps?.data || apps || []).filter(a => a.isActive || a.isactive);
-      if (activeApps.length > 0) setSelectedUpiApp(activeApps[0].id);
+      const allApps = apps?.data || apps || [];
+      setUpiApps(allApps);
+      if (allApps.length > 0 && !selectedUpiApp) {
+        setSelectedUpiApp(allApps[0].id);
+      }
       const status = statusRes?.verification || statusRes?.data?.verification || null;
       if (status && ['PENDING', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
         setPendingVerifications([status]);
@@ -306,7 +308,7 @@ const ManageAccount = () => {
                       className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
                     >
                       <option value="">Select app...</option>
-                      {upiApps.filter(app => app.isActive || app.isactive).map((app) => (
+                      {upiApps.map((app) => (
                         <option key={app.id} value={app.id}>{app.name}</option>
                       ))}
                     </select>
@@ -371,8 +373,19 @@ const ManageAccount = () => {
                       if (upiId.includes('google') || upiId.includes('gpay')) return 'Google Pay';
                       if (upiId.includes('bhim')) return 'BHIM';
                       if (upiId.includes('amazon')) return 'Amazon Pay';
-                      const found = upiApps?.find(app => app.id?.toLowerCase() === appId?.toLowerCase() || app.name?.toLowerCase() === appId?.toLowerCase());
-                      return found?.name || 'Unknown App';
+                      if (upiId.includes('yesbank')) return 'Yes Bank';
+                      if (upiId.includes('sbi')) return 'SBI';
+                      if (upiId.includes('icici')) return 'ICICI';
+                      if (upiId.includes('hdfc')) return 'HDFC';
+                      if (upiId.includes('axix')) return 'Axis Bank';
+                      if (appId) {
+                        const found = upiApps?.find(app => 
+                          app.id?.toLowerCase() === appId?.toLowerCase() || 
+                          app.name?.toLowerCase().replace(/\s+/g, '') === appId?.toLowerCase().replace(/\s+/g, '')
+                        );
+                        if (found) return found.name;
+                      }
+                      return 'UPI App';
                     };
                     const appName = getAppName(upi);
                     return (
