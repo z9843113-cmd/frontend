@@ -387,7 +387,7 @@ const AdminJTokenRequests = () => {
                   {request.screenshot && <a href={request.screenshot} target="_blank" rel="noreferrer" className="mt-2 inline-block text-sm text-sky-400">View payment screenshot</a>}
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  {request.status === 'WAITING_ORDER' && <button onClick={() => { 
+                  {(request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER') && <button onClick={() => { 
                     setSelected(request); 
                     setPaymentUpi(''); 
                     setAdminNote(''); 
