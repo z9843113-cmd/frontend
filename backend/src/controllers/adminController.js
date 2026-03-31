@@ -410,7 +410,7 @@ const getDashboardStats = async (req, res) => {
 };
 
 const updateUpiApp = async (req, res) => {
-  const { name, iconUrl, isActive, isForJToken } = req.body;
+  const { name, iconUrl, isActive, isForJToken, isForUpiVerify } = req.body;
   const { id } = req.params;
   const fields = [], params = [];
   let i = 0;
@@ -418,6 +418,7 @@ const updateUpiApp = async (req, res) => {
   if (iconUrl !== undefined) { i++; params.push(iconUrl); fields.push(`iconurl = $${i}`); }
   if (isActive !== undefined) { i++; params.push(isActive); fields.push(`isactive = $${i}`); }
   if (isForJToken !== undefined) { i++; params.push(isForJToken); fields.push(`"isForJToken" = $${i}`); }
+  if (isForUpiVerify !== undefined) { i++; params.push(isForUpiVerify); fields.push(`"isForUpiVerify" = $${i}`); }
   if (fields.length > 0) {
     params.push(id);
     await pool.query(`UPDATE "UPIApp" SET ${fields.join(', ')} WHERE id = $${i + 1}`, params);

@@ -54,8 +54,8 @@ const ManageAccount = () => {
       setUpiAccounts(upi?.data || upi || []);
       setBankAccounts(bank?.data || bank || []);
       setUpiApps(apps?.data || apps || []);
-      const activeApps = (apps?.data || apps || []).filter(a => a.isActive || a.isactive);
-      if (activeApps.length > 0) setSelectedUpiApp(activeApps[0].id);
+      const verifyApps = (apps?.data || apps || []).filter(a => (a.isForUpiVerify === true || a.isForUpiVerify === 'true') && (a.isActive || a.isactive));
+      if (verifyApps.length > 0) setSelectedUpiApp(verifyApps[0].id);
       const status = statusRes?.verification || statusRes?.data?.verification || null;
       if (status && ['PENDING', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
         setPendingVerifications([status]);
@@ -306,7 +306,7 @@ const ManageAccount = () => {
                       className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
                     >
                       <option value="">Select app...</option>
-                      {upiApps.filter(app => app.isActive || app.isactive).map((app) => (
+                      {upiApps.filter(app => (app.isForUpiVerify === true || app.isForUpiVerify === 'true') && (app.isActive || app.isactive)).map((app) => (
                         <option key={app.id} value={app.id}>{app.name}</option>
                       ))}
                     </select>
@@ -342,7 +342,7 @@ const ManageAccount = () => {
               <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
                 <h3 className="text-lg font-bold text-white mb-4">Supported UPI Apps</h3>
                 <div className="grid grid-cols-2 gap-2 md:gap-3">
-                  {upiApps.filter(app => app.isActive || app.isactive).map((app) => (
+                  {upiApps.filter(app => (app.isForUpiVerify === true || app.isForUpiVerify === 'true') && (app.isActive || app.isactive)).map((app) => (
                     <div key={app.id} className="p-3 md:p-4 bg-[#0a0a0a] rounded-2xl border border-[#1a1a1a] flex items-center gap-2 md:gap-3">
                       <div className="w-8 md:w-10 h-8 md:h-10 rounded-xl bg-purple-500/20 flex items-center justify-center flex-shrink-0">
                         <svg className="w-4 md:w-5 h-4 md:h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

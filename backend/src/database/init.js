@@ -100,7 +100,8 @@ CREATE TABLE IF NOT EXISTS "UPIApp" (
   name VARCHAR(255) NOT NULL,
   "iconUrl" VARCHAR(255),
   "isActive" BOOLEAN DEFAULT true,
-  "isForJToken" BOOLEAN DEFAULT false
+  "isForJToken" BOOLEAN DEFAULT false,
+  "isForUpiVerify" BOOLEAN DEFAULT false
 );
 
 -- Crypto Address Table
@@ -176,13 +177,13 @@ VALUES ('default', 83, 0.01, 5, 50, 100, 25, 'https://wa.me/919999999999', 'http
 ON CONFLICT (id) DO NOTHING;
 
 -- Insert UPI Apps if not exists
-INSERT INTO "UPIApp" (id, name, "isActive", "isForJToken") VALUES 
-('UPI', 'UPI', true, false),
-('paytm', 'Paytm', true, false),
-('phonepe', 'PhonePe', true, false),
-('google-pay', 'Google Pay (GPay)', true, false),
-('bhim', 'BHIM', true, false),
-('amazon-pay', 'Amazon Pay', true, false)
+INSERT INTO "UPIApp" (id, name, "isActive", "isForJToken", "isForUpiVerify") VALUES 
+('UPI', 'UPI', true, false, false),
+('paytm', 'Paytm', true, true, true),
+('phonepe', 'PhonePe', true, true, true),
+('google-pay', 'Google Pay (GPay)', true, true, true),
+('bhim', 'BHIM', true, false, false),
+('amazon-pay', 'Amazon Pay', true, false, false)
 ON CONFLICT (id) DO NOTHING;
 
 -- Insert Crypto Addresses if not exists
