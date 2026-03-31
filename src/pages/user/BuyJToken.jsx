@@ -98,7 +98,8 @@ const BuyJToken = () => {
     
     // Auto-set method from selected UPI's appid
     const selectedUpiData = userUpiAccounts.find(u => u.id === selectedUpi);
-    const appId = selectedUpiData?.appid || selectedUpiData?.appId;
+    const appId = selectedUpiData?.appid || selectedUpiData?.appId || selectedUpiData?.appID;
+    console.log('Selected UPI:', selectedUpiData, 'appId:', appId);
     if (!appId) {
       setMessage('Please select a verified UPI account');
       return;
