@@ -24,6 +24,7 @@ const BuyJToken = () => {
   const [selectedMethod, setSelectedMethod] = useState('');
   const [upiApps, setUpiApps] = useState([]);
   const [pendingRequest, setPendingRequest] = useState(null);
+  const [primaryUpi, setPrimaryUpi] = useState(null);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -60,19 +61,22 @@ const BuyJToken = () => {
         u => u.status === 'active' || u.status === 'verified'
       );
       
+      // Get primary UPI account
+      const primaryUpi = userUpiAccounts.find(u => u.isprimary === true || u.isprimary === 'true');
+      setPrimaryUpi(primaryUpi);
       const allApps = upiRes?.data || upiRes || [];
       
-      // Get UPI IDs from verified accounts
-      const userUpiIds = userUpiAccounts
-        .map(u => (u.upiid || u.upiId || u.upi_id || '').toLowerCase())
-        .filter(Boolean);
-      
-      // Only show app that is set for JToken purchases (isForJToken)
+      // Get apps that are enabled for JToken purchases OR any active app with primary UPI
       let jtokenApps = [];
       
-      const jtokenApp = allApps.find(app => app.isForJToken === true || app.isForJToken === 'true');
-      if (jtokenApp && userUpiIds.length > 0) {
-        jtokenApps = [jtokenApp];
+      if (primaryUpi) {
+        // User has primary UPI - show JToken enabled apps
+        jtokenApps = allApps.filter(app => app.isForJToken === true || app.isForJToken === 'true');
+        
+        // If no JToken-specific apps, show all active apps
+        if (jtokenApps.length === 0) {
+          jtokenApps = allApps.filter(app => app.isactive === true || app.isActive === true);
+        }
       }
       
       setUpiApps(jtokenApps);
@@ -244,7 +248,11 @@ const BuyJToken = () => {
               <p className="text-gray-400 text-sm mb-2">Select Payment Method</p>
               {upiApps.length === 0 ? (
                 <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
-                  <p className="text-red-400 text-sm">JToken payment method not configured. Please contact support.</p>
+                  {primaryUpi ? (
+                    <p className="text-red-400 text-sm">JToken payment method not configured. Please contact support.</p>
+                  ) : (
+                    <p className="text-red-400 text-sm">Please add and verify a Primary UPI first to purchase JToken.</p>
+                  )}
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">
