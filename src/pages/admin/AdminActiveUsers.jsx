@@ -78,6 +78,8 @@ const AdminActiveUsers = () => {
         </div>
       </div>
 
+      {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
+
       <div className="lg:ml-72">
         <div className="sticky top-0 z-30 bg-[#0d0d0d] border-b border-[#242424] px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -94,12 +96,14 @@ const AdminActiveUsers = () => {
             <input type="text" placeholder="Search by email or user ID" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#242424] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px]">
+          <div className="hidden lg:block overflow-x-auto">
+            <table className="w-full">
               <thead>
                 <tr className="text-left text-gray-400 text-sm border-b border-[#242424]">
                   <th className="pb-3 pl-2">User</th>
                   <th className="pb-3">Mobile</th>
+                  <th className="pb-3">UPI ID</th>
+                  <th className="pb-3">UPI App</th>
                   <th className="pb-3">Status</th>
                   <th className="pb-3">Joined</th>
                   <th className="pb-3">Action</th>
@@ -107,9 +111,9 @@ const AdminActiveUsers = () => {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={5} className="py-8 text-center text-gray-400">Loading...</td></tr>
+                  <tr><td colSpan={7} className="py-8 text-center text-gray-400">Loading...</td></tr>
                 ) : users.length === 0 ? (
-                  <tr><td colSpan={5} className="py-8 text-center text-gray-400">No active users found</td></tr>
+                  <tr><td colSpan={7} className="py-8 text-center text-gray-400">No active users found</td></tr>
                 ) : (
                   users.map((user) => (
                     <tr key={user.id} className="border-b border-[#1a1a1a] hover:bg-[#1a1a1a]/50">
@@ -121,6 +125,8 @@ const AdminActiveUsers = () => {
                         </div>
                       </td>
                       <td className="py-3 text-gray-300">{user.mobile || 'N/A'}</td>
+                      <td className="py-3 text-gray-300 text-sm">{user.upiId || 'N/A'}</td>
+                      <td className="py-3 text-[#D4AF37] text-sm">{user.appName || 'N/A'}</td>
                       <td className="py-3">
                         <span className={`px-2 py-1 rounded-lg text-xs ${user.isblocked ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
                           {user.isblocked ? 'Blocked' : 'Active'}
@@ -135,6 +141,36 @@ const AdminActiveUsers = () => {
                 )}
               </tbody>
             </table>
+          </div>
+
+          <div className="lg:hidden space-y-3">
+            {loading ? (
+              <div className="text-center py-8 text-gray-400">Loading...</div>
+            ) : users.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">No active users found</div>
+            ) : (
+              users.map((user) => (
+                <div key={user.id} className="bg-[#1a1a1a] rounded-xl p-4 border border-[#242424]">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <p className="text-white font-medium text-lg">{user.name || 'N/A'}</p>
+                      <p className="text-gray-400 text-sm">{user.email}</p>
+                      <p className="text-gray-600 text-xs">ID: {user.id}</p>
+                    </div>
+                    <span className={`px-2 py-1 rounded-lg text-xs ${user.isblocked ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                      {user.isblocked ? 'Blocked' : 'Active'}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+                    <div><span className="text-gray-500">Mobile:</span> <span className="text-white ml-1">{user.mobile || 'N/A'}</span></div>
+                    <div><span className="text-gray-500">Joined:</span> <span className="text-white ml-1">{user.createdat ? new Date(user.createdat).toLocaleDateString() : 'N/A'}</span></div>
+                    <div><span className="text-gray-500">UPI ID:</span> <span className="text-white ml-1">{user.upiId || 'N/A'}</span></div>
+                    <div><span className="text-gray-500">UPI App:</span> <span className="text-[#D4AF37] ml-1">{user.appName || 'N/A'}</span></div>
+                  </div>
+                  <button onClick={() => viewUserDetails(user.id)} className="w-full py-2 bg-[#D4AF37]/20 text-[#D4AF37] rounded-lg text-sm hover:bg-[#D4AF37]/30">View Details</button>
+                </div>
+              ))
+            )}
           </div>
 
           <div className="flex items-center justify-between mt-4">
