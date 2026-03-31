@@ -83,12 +83,10 @@ const AdminUpiApps = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div><label className="block text-gray-400 text-sm mb-2">App Name / UPI ID</label><input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter UPI ID or app name" className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" required /></div>
               <div><label className="block text-gray-400 text-sm mb-2">Icon URL (Optional)</label><input type="text" value={iconUrl} onChange={(e) => setIconUrl(e.target.value)} placeholder="Enter icon URL" className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" /></div>
-              {editId && (
-                <div className="flex items-center gap-3 p-4 bg-[#0a0a0a] rounded-2xl border border-[#D4AF37]/30">
-                  <input type="checkbox" id="isForJToken" checked={isForJToken} onChange={(e) => setIsForJToken(e.target.checked)} className="w-5 h-5 accent-[#D4AF37]" />
-                  <label htmlFor="isForJToken" className="text-white font-medium">Use for JToken Purchase</label>
-                </div>
-              )}
+              <div className="flex items-center gap-3 p-4 bg-[#0a0a0a] rounded-2xl border border-[#D4AF37]/30">
+                <input type="checkbox" id="isForJToken" checked={isForJToken} onChange={(e) => setIsForJToken(e.target.checked)} className="w-5 h-5 accent-[#D4AF37]" />
+                <label htmlFor="isForJToken" className="text-white font-medium">Use for JToken Purchase</label>
+              </div>
               <button type="submit" disabled={saving} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">{saving ? 'Saving...' : (editId ? 'Update' : 'Create')}</button>
             </form>
           </div>

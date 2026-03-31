@@ -36,8 +36,6 @@ const BuyJToken = () => {
     const random = Math.floor(Math.random() * 10000000000).toString().padStart(10, '0');
     return `A${dateStr}${random}`;
   };
-
-  const JTOKEN_APPS = ['mobiwik', 'mobwik', 'freerecharge'];
   
   const fetchRequestData = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -55,28 +53,34 @@ const BuyJToken = () => {
       if (req) setRequest(req);
       else setRequest(null);
       
-      // Use verified/active UPI accounts
+      // Use verified/active and primary UPI accounts
       const userUpiAccounts = (userUpiRes?.data || userUpiRes || []).filter(
-        u => u.status === 'active' || u.status === 'verified'
+        u => (u.status === 'active' || u.status === 'verified') && (u.isprimary === true || u.isPrimary === true)
       );
       
       const allApps = upiRes?.data || upiRes || [];
+      
+      // Check if user has primary UPI
+      if (userUpiAccounts.length === 0) {
+        setUpiApps([]);
+        setMessage('Please add and verify a UPI account first');
+        setLoading(false);
+        return;
+      }
       
       // Get UPI IDs from verified accounts
       const userUpiIds = userUpiAccounts
         .map(u => (u.upiid || u.upiId || u.upi_id || '').toLowerCase())
         .filter(Boolean);
       
-      // Only show app that is set for JToken purchases (isForJToken)
-      let jtokenApps = [];
-      
-      const jtokenApp = allApps.find(app => app.isForJToken === true || app.isForJToken === 'true');
-      if (jtokenApp && userUpiIds.length > 0) {
-        jtokenApps = [jtokenApp];
-      }
+      // Only show apps that are enabled for JToken purchases AND are active
+      const jtokenApps = allApps.filter(app => 
+        (app.isforjtoken === true || app.isforjtoken === 'true' || app.isForJToken === true || app.isForJToken === 'true') &&
+        (app.isactive === true || app.isactive === 'true' || app.isActive === true || app.isActive === 'true')
+      );
       
       setUpiApps(jtokenApps);
-      if (jtokenApps.length > 0) setSelectedMethod(jtokenApps[0].id);
+      if (jtokenApps.length > 0 && !selectedMethod) setSelectedMethod(jtokenApps[0].id);
     } catch {
       console.error('Failed to fetch data');
     } finally {
