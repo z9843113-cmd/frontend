@@ -28,9 +28,9 @@ const AdminUpiApps = () => {
     finally { setSaving(false); }
   };
 
-  const handleEdit = (app) => { setName(app.name); setIconUrl(app.iconUrl || ''); setIsForJToken(app.isForJToken === true || app.isForJToken === 'true'); setEditId(app.id); setShowForm(true); };
+  const handleEdit = (app) => { setName(app.name); setIconUrl(app.iconUrl || ''); setIsForJToken(app.isforjtoken === true || app.isforjtoken === 'true' || app.isForJToken === true || app.isForJToken === 'true'); setEditId(app.id); setShowForm(true); };
   const handleToggle = async (app) => { try { await adminAPI.updateUpiApp(app.id, { isActive: !(app.isActive || app.isactive) }); fetchApps(); } catch { console.error('Failed to toggle UPI app'); } };
-  const handleSetJToken = async (app) => { try { await adminAPI.updateUpiApp(app.id, { isForJToken: !(app.isForJToken === true || app.isForJToken === 'true') }); fetchApps(); } catch { console.error('Failed to set JToken app'); } };
+  const handleSetJToken = async (app) => { try { const current = app.isforjtoken === true || app.isforjtoken === 'true' || app.isForJToken === true || app.isForJToken === 'true'; await adminAPI.updateUpiApp(app.id, { isForJToken: !current }); fetchApps(); } catch { console.error('Failed to set JToken app'); } };
   const handleDelete = async (id) => { if (!confirm('Are you sure?')) return; try { await adminAPI.deleteUpiApp(id); fetchApps(); } catch { console.error('Failed to delete UPI app'); } };
 
   const menuItems = [
@@ -97,7 +97,7 @@ const AdminUpiApps = () => {
           {loading ? <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-20 bg-[#0a0a0a] rounded-2xl"></div>)}</div> : apps.length === 0 ? <p className="text-gray-500 text-center py-8">No UPI apps found</p> : (
             <div className="space-y-3">
               {apps.map((app) => {
-                const isJToken = app.isForJToken === true || app.isForJToken === 'true';
+                const isJToken = app.isforjtoken === true || app.isforjtoken === 'true' || app.isForJToken === true || app.isForJToken === 'true';
                 return (
                 <div key={app.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 sm:p-4 bg-[#0a0a0a] rounded-2xl border border-[#1a1a1a]">
                   <div className="w-full sm:w-auto">
