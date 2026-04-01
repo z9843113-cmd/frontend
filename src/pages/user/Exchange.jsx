@@ -18,7 +18,7 @@ const Exchange = () => {
   const [pendingRequest, setPendingRequest] = useState(null);
   const [usdtRate, setUsdtRate] = useState(0);
   const [usdtCommission, setUsdtCommission] = useState(0);
-  const [exchangeRates, setExchangeRates] = useState({ gamingRate: 103, mixRate: 108, minAmount: 100, maxAmount: 50000 });
+  const [exchangeRates, setExchangeRates] = useState({ gamingRate: 103, gamingRateMin: 80, mixRate: 108, mixRateMin: 80, minAmount: 100, maxAmount: 50000 });
   const [exchangeHistory, setExchangeHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(true);
 
@@ -35,7 +35,9 @@ const Exchange = () => {
         setUsdtCommission(parseFloat(settings.usdtcommissionpercent) || 0);
         setExchangeRates({
           gamingRate: parseFloat(settings.gamingrate) || 103,
+          gamingRateMin: parseFloat(settings.gamingratemin) || 80,
           mixRate: parseFloat(settings.mixrate) || 108,
+          mixRateMin: parseFloat(settings.mixratemin) || 80,
           minAmount: parseFloat(settings.exchangeminamount) || 100,
           maxAmount: parseFloat(settings.exchangemaxamount) || 50000
         });
