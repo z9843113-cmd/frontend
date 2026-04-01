@@ -327,9 +327,15 @@ const AdminDeposits = () => {
                           <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                         </button>
                         <span className={`px-2 py-1 rounded-lg text-xs font-medium ${deposit.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : deposit.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{deposit.status}</span>
-                      </div>
-                      <p className="text-[#D4AF37] font-bold text-base sm:text-lg">₹{parseFloat(deposit.amount || 0).toFixed(2)}</p>
-                      {deposit.status === 'PENDING' && (
+                        </div>
+                        {(() => {
+                          const isUSDT = deposit.method?.toUpperCase().includes('USDT');
+                          const symbol = isUSDT ? '$' : '₹';
+                          return (
+                            <p className={`${isUSDT ? 'text-green-400' : 'text-[#D4AF37]'} font-bold text-base sm:text-lg`}>{symbol}{parseFloat(deposit.amount || 0).toFixed(2)}</p>
+                          );
+                        })()}
+                        {deposit.status === 'PENDING' && (
                         <div className="flex gap-1 sm:gap-2">
                           <button onClick={() => handleApprove(deposit.id)} disabled={processingId === deposit.id} className="px-2 sm:px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-xs font-medium hover:bg-green-500/30 disabled:opacity-50">Approve</button>
                           <button onClick={() => handleReject(deposit.id)} disabled={processingId === deposit.id} className="px-2 sm:px-3 py-1 bg-red-500/20 text-red-400 rounded-lg text-xs font-medium hover:bg-red-500/30 disabled:opacity-50">Reject</button>

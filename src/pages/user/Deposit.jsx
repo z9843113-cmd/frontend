@@ -332,18 +332,30 @@ const Deposit = () => {
                 <div key={deposit.id} className="flex items-center justify-between p-4 bg-[#0a0a0a] rounded-2xl border border-[#1a1a1a]">
                   <div className="flex items-center gap-4">
                     <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${deposit.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : deposit.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
+                      {deposit.status === 'APPROVED' ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : deposit.status === 'REJECTED' ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      )}
                     </div>
                     <div>
-                      <p className="text-white font-semibold">₹{parseFloat(deposit.amount).toFixed(2)}</p>
+                      <p className={`font-semibold ${deposit.method?.toUpperCase().includes('USDT') ? 'text-green-400' : 'text-white'}`}>
+                        {deposit.method?.toUpperCase().includes('USDT') ? '$' : '₹'}{parseFloat(deposit.amount).toFixed(2)}
+                      </p>
                       <p className="text-gray-500 text-sm">{deposit.method}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <span className={`px-4 py-2 rounded-xl text-sm font-medium ${deposit.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : deposit.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
-                      {deposit.status}
+                      {deposit.status === 'APPROVED' ? 'SUCCESS' : deposit.status === 'REJECTED' ? 'FAILED' : deposit.status}
                     </span>
                     <p className="text-gray-500 text-sm mt-1">{deposit.createdat ? new Date(deposit.createdat).toLocaleDateString() : 'N/A'}</p>
                   </div>
