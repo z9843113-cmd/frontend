@@ -64,11 +64,7 @@ const Exchange = () => {
       return;
     }
     if (amountNum < exchangeRates.minAmount) {
-      showError(`Minimum amount is ₹${exchangeRates.minAmount}`);
-      return;
-    }
-    if (amountNum > exchangeRates.maxAmount) {
-      showError(`Maximum amount is ₹${exchangeRates.maxAmount}`);
+      showError(`Minimum amount is $${exchangeRates.minAmount}`);
       return;
     }
     
@@ -194,9 +190,10 @@ const Exchange = () => {
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Enter amount"
+                  placeholder={`Min: $${exchangeRates.minAmount}`}
                   className="w-full bg-gradient-to-br from-[#0a0a0a] to-[#151515] border border-[#2a2a2a] rounded-xl sm:rounded-2xl px-3 sm:px-4 py-3 sm:py-4 text-white placeholder-gray-600 focus:border-[#D4AF37] focus:outline-none text-base sm:text-lg font-medium"
                 />
+                <p className="text-gray-500 text-xs mt-1">Min: ${exchangeRates.minAmount} USDT</p>
               </div>
 
               {amount && (() => {
