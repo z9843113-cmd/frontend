@@ -120,7 +120,7 @@ const Wallet = () => {
             <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
               <p className="text-gray-400 text-sm mb-2">J Token Rewards</p>
               <p className="text-xl md:text-2xl font-bold text-white">{parseFloat(wallet?.tokenbalance || 0).toFixed(2)}</p>
-              <p className="text-gray-500 text-xs mt-2">Reward rate: ₹{wallet?.tokenrate || 0.01}</p>
+              <p className="text-[#D4AF37] text-sm mt-2 font-semibold">₹{(parseFloat(wallet?.tokenbalance || 0) * (wallet?.tokenrate || 0.01)).toFixed(2)} INR</p>
             </div>
         </div>
 
