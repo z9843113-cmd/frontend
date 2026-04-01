@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store';
-import { userAPI, walletAPI, depositAPI, withdrawalAPI, publicAPI } from '../../services/api';
+import { userAPI, walletAPI, depositAPI, withdrawalAPI, publicAPI, adminAPI } from '../../services/api';
 import RewardModal from '../../components/RewardModal';
 import BottomNav from '../../components/BottomNav';
 import {
@@ -31,6 +31,7 @@ const Home = () => {
   const [recentWithdrawals, setRecentWithdrawals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [usdtRate, setUsdtRate] = useState(0);
+  const [depositCommission, setDepositCommission] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [showUpiWarning, setShowUpiWarning] = useState(() => {
@@ -50,14 +51,15 @@ const Home = () => {
   useEffect(() => {
     const loadHome = async () => {
       try {
-        const [walletRes, depositsRes, withdrawalsRes, profileRes, upiRes, bankRes, ratesRes] = await Promise.all([
+        const [walletRes, depositsRes, withdrawalsRes, profileRes, upiRes, bankRes, ratesRes, settingsRes] = await Promise.all([
           walletAPI.getWallet(),
           depositAPI.getHistory(),
           withdrawalAPI.getHistory(),
           userAPI.getProfile(),
           userAPI.getUpiAccounts(),
           userAPI.getBankAccounts ? userAPI.getBankAccounts() : Promise.resolve({ data: [] }),
-          publicAPI.getCryptoRates()
+          publicAPI.getCryptoRates(),
+          adminAPI.getSettings()
         ]);
 
         const walletData = walletRes?.data || walletRes || null;
@@ -67,6 +69,7 @@ const Home = () => {
         const upiData = upiRes?.data || upiRes || [];
         const bankData = bankRes?.data || bankRes || [];
         const ratesData = ratesRes?.data || ratesRes || [];
+        const settingsData = settingsRes?.data || settingsRes || {};
         const tether = Array.isArray(ratesData) ? ratesData.find((rate) => rate.id === 'tether') : null;
 
         setWallet(walletData);
@@ -74,9 +77,12 @@ const Home = () => {
         setRecentWithdrawals(Array.isArray(withdrawalsData) ? withdrawalsData : []);
         setUser(profileData);
         setPaymentEnabled(profileData.paymentEnabled !== false);
+        setDepositCommission(parseFloat(settingsData.depositcommissionpercent) || 0);
 
         if (tether?.inr) {
           setUsdtRate(parseFloat(tether.inr));
+        } else if (settingsData?.usdtrate) {
+          setUsdtRate(parseFloat(settingsData.usdtrate));
         } else if (walletData?.usdtRate) {
           setUsdtRate(parseFloat(walletData.usdtRate));
         }
@@ -112,9 +118,13 @@ const Home = () => {
     const intervalId = setInterval(async () => {
       try {
         const walletRes = await walletAPI.getWallet();
+        const settingsRes = await adminAPI.getSettings();
         const walletData = walletRes?.data || walletRes || null;
+        const settingsData = settingsRes?.data || settingsRes || {};
         setWallet(walletData);
-        if (walletData?.usdtRate) {
+        if (settingsData?.usdtrate) {
+          setUsdtRate(parseFloat(settingsData.usdtrate));
+        } else if (walletData?.usdtRate) {
           setUsdtRate(parseFloat(walletData.usdtRate));
         }
       } catch (error) {
@@ -169,7 +179,10 @@ const Home = () => {
   const getRewardValue = () => parseFloat(wallet?.tokenbalance || 0) * parseFloat(wallet?.tokenRate || wallet?.tokenrate || 0.01);
   const getTokenRate = () => parseFloat(wallet?.tokenRate || wallet?.tokenrate || 0.01);
   const getJTokenCommission = () => parseFloat(wallet?.commissionPercent || wallet?.referralPercent || 4);
-  const getUsdtCommission = () => parseFloat(wallet?.usdtCommissionPercent || 0);
+  const getUsdtCommission = () => {
+    const settings = wallet?.settings;
+    return parseFloat(settings?.usdtcommissionpercent || 0);
+  };
 
   const getTodayVolume = () => {
     const today = new Date().toISOString().split('T')[0];
@@ -336,6 +349,10 @@ const Home = () => {
             <div className="rounded-2xl border border-[#1d1d1d] bg-[#0b0b0b] p-3">
               <p className="text-xs text-gray-400">USDT Commission</p>
               <p className="mt-1 text-lg font-bold text-white">{getUsdtCommission().toFixed(0)}%</p>
+            </div>
+            <div className="rounded-2xl border border-[#1d1d1d] bg-[#0b0b0b] p-3">
+              <p className="text-xs text-gray-400">Deposit Commission</p>
+              <p className="mt-1 text-lg font-bold text-white">{depositCommission.toFixed(0)}%</p>
             </div>
           </div>
         </div>
