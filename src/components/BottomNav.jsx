@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store';
-import { FaHome, FaExchangeAlt, FaUserCog, FaUsers, FaUserPlus, FaMoneyBillWave, FaCog, FaUserShield } from 'react-icons/fa';
+import { FaHome, FaExchangeAlt, FaUserCog, FaUsers, FaUserPlus, FaCog } from 'react-icons/fa';
 import { IoWalletOutline } from 'react-icons/io5';
 
 const BottomNav = () => {
@@ -20,7 +20,7 @@ const BottomNav = () => {
     { path: '/admin/dashboard', label: 'Home', Icon: FaHome },
     { path: '/admin/users', label: 'Users', Icon: FaUsers },
     { path: '/admin/deposits', label: 'Deposits', Icon: FaUserPlus },
-    { path: '/admin/withdrawals', label: 'Withdraw', Icon: FaMoneyBillWave },
+    { path: '/admin/exchange', label: 'Exchange', Icon: FaExchangeAlt },
     { path: '/admin/settings', label: 'Settings', Icon: FaCog },
   ];
 

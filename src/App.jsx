@@ -21,6 +21,7 @@ import AdminUsers from './pages/admin/AdminUsers';
 import AdminActiveUsers from './pages/admin/AdminActiveUsers';
 import AdminDeposits from './pages/admin/AdminDeposits';
 import AdminWithdrawals from './pages/admin/AdminWithdrawals';
+import AdminExchange from './pages/admin/AdminExchange';
 import AdminUpiApps from './pages/admin/AdminUpiApps';
 import AdminCrypto from './pages/admin/AdminCrypto';
 import AdminSettings from './pages/admin/AdminSettings';
@@ -160,6 +161,11 @@ function App() {
         <Route path="/admin/jtoken-requests" element={
           <ProtectedRoute roles={['ADMIN', 'SUBADMIN']}>
             <Layout><AdminJTokenRequests /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/exchange" element={
+          <ProtectedRoute roles={['ADMIN', 'SUBADMIN']}>
+            <Layout><AdminExchange /></Layout>
           </ProtectedRoute>
         } />
 
