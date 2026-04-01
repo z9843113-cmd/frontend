@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { userAPI, walletAPI, adminAPI } from '../../services/api';
 import BottomNav from '../../components/BottomNav';
 import RequestStatusModal from '../../components/RequestStatusModal';
-import { FaGamepad, FaRandom, FaClock, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaGamepad, FaRandom, FaClock, FaCheck, FaTimes, FaHistory } from 'react-icons/fa';
 
 const Exchange = () => {
   const [wallet, setWallet] = useState(null);
@@ -19,6 +19,8 @@ const Exchange = () => {
   const [usdtRate, setUsdtRate] = useState(0);
   const [usdtCommission, setUsdtCommission] = useState(0);
   const [exchangeRates, setExchangeRates] = useState({ gamingRate: 103, mixRate: 108, minAmount: 100, maxAmount: 50000 });
+  const [exchangeHistory, setExchangeHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,9 +45,25 @@ const Exchange = () => {
         setLoading(false);
       }
     };
+
+    const fetchHistory = async () => {
+      try {
+        const res = await userAPI.getMyExchangeRequests();
+        const requests = res?.data?.requests || res?.requests || res?.data || [];
+        setExchangeHistory(Array.isArray(requests) ? requests : []);
+      } catch (err) {
+        console.error('Failed to fetch exchange history', err);
+        setExchangeHistory([]);
+      } finally {
+        setHistoryLoading(false);
+      }
+    };
+
     fetchData();
+    fetchHistory();
     const interval = setInterval(fetchData, 2000);
-    return () => clearInterval(interval);
+    const historyInterval = setInterval(fetchHistory, 3000);
+    return () => { clearInterval(interval); clearInterval(historyInterval); };
   }, []);
 
   const showError = (msg) => {
@@ -145,8 +163,8 @@ const Exchange = () => {
                 </div>
                 {selectedRate === option.id && (
                   <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#D4AF37] flex items-center justify-center">
-                    <svg className="w-3 h-3 sm:w-4 sm:h-4 text-black" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                 )}
@@ -165,73 +183,103 @@ const Exchange = () => {
           </svg>
           SELL USDT
         </button>
-      </div>
 
-      {showTradeModal && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] w-full max-w-md rounded-2xl sm:rounded-3xl p-4 sm:p-6 max-h-[85vh] overflow-y-auto border border-[#D4AF37]/30 shadow-2xl shadow-black/50">
-            <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <div>
-                <h3 className="text-lg sm:text-xl font-bold text-white">SELL USDT</h3>
-                <p className="text-gray-500 text-xs sm:text-sm">Rate: ₹{selectedRate === 'GAMING' ? exchangeRates.gamingRate : selectedRate === 'MIX' ? exchangeRates.mixRate : usdtRate}/USDT</p>
-              </div>
-              <button onClick={() => setShowTradeModal(false)} className="p-2 sm:p-3 rounded-xl bg-[#1a1a1a] hover:bg-[#252525] transition-colors">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="space-y-3 sm:space-y-4">
-              <div>
-                <label className="block text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2 font-medium">Amount (USDT)</label>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder={`Min: $${exchangeRates.minAmount}`}
-                  className="w-full bg-gradient-to-br from-[#0a0a0a] to-[#151515] border border-[#2a2a2a] rounded-xl sm:rounded-2xl px-3 sm:px-4 py-3 sm:py-4 text-white placeholder-gray-600 focus:border-[#D4AF37] focus:outline-none text-base sm:text-lg font-medium"
-                />
-                <p className="text-gray-500 text-xs mt-1">Min: ${exchangeRates.minAmount} USDT</p>
+        {showTradeModal && (
+          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-3 sm:p-4">
+            <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] w-full max-w-md rounded-2xl sm:rounded-3xl p-4 sm:p-6 max-h-[85vh] overflow-y-auto border border-[#D4AF37]/30 shadow-2xl shadow-black/50">
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <div>
+                  <h3 className="text-lg sm:text-xl font-bold text-white">SELL USDT</h3>
+                  <p className="text-gray-500 text-xs sm:text-sm">Rate: ₹{selectedRate === 'GAMING' ? exchangeRates.gamingRate : selectedRate === 'MIX' ? exchangeRates.mixRate : usdtRate}/USDT</p>
+                </div>
+                <button onClick={() => setShowTradeModal(false)} className="p-2 sm:p-3 rounded-xl bg-[#1a1a1a] hover:bg-[#252525] transition-colors">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
 
-              {amount && (() => {
-                const usdtAmount = parseFloat(amount);
-                const selectedRateValue = selectedRate === 'GAMING' ? exchangeRates.gamingRate : selectedRate === 'MIX' ? exchangeRates.mixRate : usdtRate;
-                const inrValue = usdtAmount * selectedRateValue;
-                const commissionAmount = inrValue * (usdtCommission / 100);
-                const afterCommission = inrValue + commissionAmount;
-                return (
-                  <div className="p-3 sm:p-5 border border-green-500/30 bg-gradient-to-r from-green-500/20 to-emerald-500/10 rounded-xl sm:rounded-2xl">
-                    <p className="text-gray-400 text-xs sm:text-sm">Rate: ₹{selectedRateValue}/USDT</p>
-                    <p className="text-green-400 text-sm font-medium mt-1">Total: ₹{inrValue.toFixed(2)} INR</p>
-                    {usdtCommission > 0 ? (
-                      <>
-                        <p className="text-yellow-400 text-xs mt-1">Commission ({usdtCommission}%): +₹{commissionAmount.toFixed(2)}</p>
+              <div className="space-y-3 sm:space-y-4">
+                <div>
+                  <label className="block text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2 font-medium">Amount (USDT)</label>
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder={`Min: $${exchangeRates.minAmount}`}
+                    className="w-full bg-gradient-to-br from-[#0a0a0a] to-[#151515] border border-[#2a2a2a] rounded-xl sm:rounded-2xl px-3 sm:px-4 py-3 sm:py-4 text-white placeholder-gray-600 focus:border-[#D4AF37] focus:outline-none text-base sm:text-lg font-medium"
+                  />
+                  <p className="text-gray-500 text-xs mt-1">Min: ${exchangeRates.minAmount} USDT</p>
+                </div>
+
+                {amount && (() => {
+                  const usdtAmount = parseFloat(amount);
+                  const selectedRateValue = selectedRate === 'GAMING' ? exchangeRates.gamingRate : selectedRate === 'MIX' ? exchangeRates.mixRate : usdtRate;
+                  const inrValue = usdtAmount * selectedRateValue;
+                  const commissionAmount = inrValue * (usdtCommission / 100);
+                  const afterCommission = inrValue + commissionAmount;
+                  return (
+                    <div className="p-3 sm:p-5 border border-green-500/30 bg-gradient-to-r from-green-500/20 to-emerald-500/10 rounded-xl sm:rounded-2xl">
+                      <p className="text-gray-400 text-xs sm:text-sm">Rate: ₹{selectedRateValue}/USDT</p>
+                      <p className="text-green-400 text-sm font-medium mt-1">Total: ₹{inrValue.toFixed(2)} INR</p>
+                      {usdtCommission > 0 ? (
+                        <>
+                          <p className="text-yellow-400 text-xs mt-1">Commission ({usdtCommission}%): +₹{commissionAmount.toFixed(2)}</p>
+                          <p className="font-bold text-lg sm:text-xl mt-1 sm:mt-2 text-white">
+                            You will get: ₹{afterCommission.toFixed(2)}
+                          </p>
+                        </>
+                      ) : (
                         <p className="font-bold text-lg sm:text-xl mt-1 sm:mt-2 text-white">
-                          You will get: ₹{afterCommission.toFixed(2)}
+                          You will get: ₹{inrValue.toFixed(2)}
                         </p>
-                      </>
-                    ) : (
-                      <p className="font-bold text-lg sm:text-xl mt-1 sm:mt-2 text-white">
-                        You will get: ₹{inrValue.toFixed(2)}
-                      </p>
-                    )}
-                  </div>
-                );
-              })()}
+                      )}
+                    </div>
+                  );
+                })()}
 
-              <button
-                onClick={handleTrade}
-                disabled={processing || !amount}
-                className="w-full py-4 sm:py-5 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-bold rounded-xl sm:rounded-2xl text-base sm:text-lg shadow-lg shadow-red-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
-              >
-                {processing ? 'Processing...' : 'Submit Request'}
-              </button>
+                <button
+                  onClick={handleTrade}
+                  disabled={processing || !amount}
+                  className="w-full py-4 sm:py-5 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-bold rounded-xl sm:rounded-2xl text-base sm:text-lg shadow-lg shadow-red-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                >
+                  {processing ? 'Processing...' : 'Submit Request'}
+                </button>
+              </div>
             </div>
           </div>
+        )}
+
+        <div className="bg-gradient-to-br from-[#1a1a1a] via-[#151515] to-[#1a1a1a] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] shadow-xl">
+          <div className="flex items-center gap-2 mb-4">
+            <FaHistory className="text-[#D4AF37]" />
+            <h3 className="text-white font-bold text-base sm:text-lg">My Exchange History</h3>
+          </div>
+          
+          {historyLoading ? (
+            <div className="space-y-3">
+              {[1,2,3].map(i => <div key={i} className="h-16 bg-[#0a0a0a] rounded-xl animate-pulse"></div>)}
+            </div>
+          ) : exchangeHistory.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">No exchange history</p>
+          ) : (
+            <div className="space-y-3 max-h-64 overflow-y-auto">
+              {exchangeHistory.slice(0, 10).map((req) => (
+                <div key={req.id} className="p-3 bg-[#0a0a0a] rounded-xl flex justify-between items-center">
+                  <div>
+                    <p className="text-[#D4AF37] font-bold text-sm">${parseFloat(req.amount || 0).toFixed(2)} USDT</p>
+                    <p className="text-gray-500 text-xs">{req.ratetype} @ ₹{req.rate}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className={`px-2 py-1 rounded-lg text-xs font-medium ${req.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : req.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{req.status}</span>
+                    <p className="text-gray-500 text-xs mt-1">₹{(parseFloat(req.amount || 0) * parseFloat(req.rate || 0)).toFixed(2)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {showSuccessPopup && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
