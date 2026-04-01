@@ -243,14 +243,18 @@ const Deposit = () => {
                 const commissionAmount = inrValue * (depositCommission / 100);
                 const afterCommission = inrValue - commissionAmount;
                 return (
-                  <p className="text-gray-500 text-xs mt-2">
-                    ≈ ₹{inrValue.toFixed(2)} INR
-                    {depositCommission > 0 && (
-                      <span className="text-yellow-400 ml-1">
-                        (You will get: ₹{afterCommission.toFixed(2)} after {depositCommission}% commission)
-                      </span>
+                  <div className="mt-2 space-y-1 bg-[#0a0a0a] p-3 rounded-xl border border-[#2a2a2a]">
+                    <p className="text-gray-400 text-xs">Exchange Rate: ₹{usdtRate}/USDT</p>
+                    <p className="text-green-400 text-sm font-medium">Total: ₹{inrValue.toFixed(2)} INR</p>
+                    {depositCommission > 0 ? (
+                      <>
+                        <p className="text-yellow-400 text-xs">Commission ({depositCommission}%): -₹{commissionAmount.toFixed(2)}</p>
+                        <p className="text-white text-sm font-bold">You will get: ₹{afterCommission.toFixed(2)}</p>
+                      </>
+                    ) : (
+                      <p className="text-white text-sm font-bold">You will get: ₹{inrValue.toFixed(2)}</p>
                     )}
-                  </p>
+                  </div>
                 );
               })()}
             </div>
