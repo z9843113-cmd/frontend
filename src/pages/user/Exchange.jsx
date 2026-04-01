@@ -78,12 +78,10 @@ const Exchange = () => {
       const newRequest = res?.data || res;
       if (newRequest?.id) {
         setPendingRequest({ id: newRequest.id, type: 'EXCHANGE', title: 'USDT Sell Request' });
+        setShowTradeModal(false);
+        setAmount('');
+        setSelectedRate(null);
       }
-      setShowTradeModal(false);
-      setAmount('');
-      setSelectedRate(null);
-      setSuccessMessage('Request submitted! Waiting for admin approval.');
-      setShowSuccessPopup(true);
     } catch (err) {
       showError(err?.message || 'Failed to submit request');
     } finally {
