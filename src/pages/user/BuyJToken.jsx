@@ -18,6 +18,7 @@ const BuyJToken = () => {
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [utr, setUtr] = useState('');
   const [screenshot, setScreenshot] = useState('');
+  const [paymentTimeLeft, setPaymentTimeLeft] = useState(600); // 10 minutes in seconds
   const getStatusDisplay = (status) => {
     const statusMap = {
       'APPROVED': 'SUCCESS',
@@ -115,8 +116,19 @@ const BuyJToken = () => {
     if (request?.status === 'PAYMENT_STARTED' || request?.status === 'READY_TO_PAY') {
       setShowWaitPopup(false);
       setShowPaymentPopup(true);
+      setPaymentTimeLeft(600); // Reset timer to 10 minutes when popup opens
     }
   }, [request?.status]);
+
+  // Timer countdown for payment
+  useEffect(() => {
+    if (showPaymentPopup && paymentTimeLeft > 0) {
+      const timer = setInterval(() => {
+        setPaymentTimeLeft(prev => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [showPaymentPopup, paymentTimeLeft]);
 
   const handleCreate = async () => {
     if (!amount || parseFloat(amount) < 10) {
@@ -414,14 +426,14 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
       )}
 
       {showPaymentPopup && request && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4 pb-20 sm:pb-4">
-          <div className="bg-gradient-to-b from-[#1f1f1f] via-[#141414] to-[#0a0a0a] rounded-2xl sm:rounded-3xl p-4 sm:p-6 w-full sm:max-w-md max-h-[85vh] sm:max-h-[90vh] overflow-y-auto shadow-2xl border border-[#333]">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center">
+          <div className="bg-gradient-to-b from-[#1f1f1f] via-[#141414] to-[#0a0a0a] rounded-t-3xl sm:rounded-3xl p-4 sm:p-6 w-full sm:max-w-md max-h-[90vh] sm:max-h-[85vh] overflow-y-auto shadow-2xl border-t sm:border border-[#333]">
             <div className="flex justify-between items-center mb-4 pb-3 border-b border-[#2a2a2a]">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-[#D4AF37] animate-pulse"></div>
                 <h3 className="text-white font-bold text-lg">Payment Details</h3>
               </div>
-              <button onClick={() => setShowPaymentPopup(false)} className="text-gray-400 hover:text-white p-1">
+              <button onClick={() => { setShowPaymentPopup(false); setPaymentTimeLeft(600); }} className="text-gray-400 hover:text-white p-1">
                 <FaTimes />
               </button>
             </div>
@@ -436,6 +448,13 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
                 </div>
                 <p className="text-gray-300 text-xs">Please complete your payment within the next <span className="text-white font-bold">10 minutes</span>. Failure to do so may result in transaction delays or potential losses, for which the company will not be held responsible.</p>
                 <p className="text-gray-400 text-xs mt-2">Kindly ensure timely completion to avoid any inconvenience.</p>
+              </div>
+              
+              <div className={`rounded-xl p-4 text-center border ${paymentTimeLeft <= 60 ? 'bg-red-500/20 border-red-500' : paymentTimeLeft <= 180 ? 'bg-yellow-500/20 border-yellow-500' : 'bg-green-500/20 border-green-500'}`}>
+                <p className="text-gray-400 text-xs">Time Remaining</p>
+                <p className={`text-2xl font-bold ${paymentTimeLeft <= 60 ? 'text-red-400' : paymentTimeLeft <= 180 ? 'text-yellow-400' : 'text-green-400'}`}>
+                  {Math.floor(paymentTimeLeft / 60).toString().padStart(2, '0')}:{(paymentTimeLeft % 60).toString().padStart(2, '0')}
+                </p>
               </div>
               
               <div className="bg-gradient-to-r from-[#D4AF37]/15 via-[#D4AF37]/10 to-transparent rounded-xl p-5 text-center border border-[#D4AF37]/20">
@@ -543,7 +562,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               </div>
               
               <div className="flex gap-2 sm:gap-3 mt-3 sm:mt-4">
-                <button onClick={() => setShowPaymentPopup(false)} className="flex-1 py-2 sm:py-3 bg-gray-600 text-white rounded-xl font-semibold text-sm sm:text-base">
+                <button onClick={() => { setShowPaymentPopup(false); setPaymentTimeLeft(600); }} className="flex-1 py-2 sm:py-3 bg-gray-600 text-white rounded-xl font-semibold text-sm sm:text-base">
                   Cancel
                 </button>
                 <button onClick={async () => {
