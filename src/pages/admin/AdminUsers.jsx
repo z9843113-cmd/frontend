@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../../services/api';
 import { useAuthStore } from '../../store';
@@ -8,6 +8,7 @@ const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -17,9 +18,7 @@ const AdminUsers = () => {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
 
-  useEffect(() => { fetchUsers(); }, [page, search]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try { 
       const res = await adminAPI.getUsers({ page, limit: 20, search }); 
@@ -29,7 +28,16 @@ const AdminUsers = () => {
     }
     catch { console.error('Failed to fetch users'); }
     finally { setLoading(false); }
-  };
+  }, [page, search]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
   const handleBlockToggle = async (userId, isBlocked) => {
     try { 
@@ -413,7 +421,7 @@ const AdminUsers = () => {
             <h2 className="text-white font-semibold">All Users</h2>
             <span className="text-xs sm:text-sm text-gray-500">{users.length} users</span>
           </div>
-          <input type="text" placeholder="Search email or referral code..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none text-sm sm:text-base" />
+          <input type="text" placeholder="Search email or referral code..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none text-sm sm:text-base" />
           {loading ? (
             <div className="animate-pulse space-y-3 mt-4">
               {[1,2,3,4,5].map(i => <div key={i} className="h-20 sm:h-16 bg-[#0a0a0a] rounded-2xl"></div>)}
