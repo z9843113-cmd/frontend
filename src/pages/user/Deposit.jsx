@@ -19,7 +19,6 @@ const Deposit = () => {
   const [cryptoAddresses, setCryptoAddresses] = useState([]);
   const [pendingRequest, setPendingRequest] = useState(null);
   const [usdtRate, setUsdtRate] = useState(0);
-  const [depositCommission, setDepositCommission] = useState(0);
   const [usdtCommission, setUsdtCommission] = useState(0);
   const navigate = useNavigate();
 
@@ -40,7 +39,6 @@ const Deposit = () => {
     adminAPI.getSettings().then((res) => {
       const settings = res?.data || res || {};
       setUsdtRate(parseFloat(settings.usdtrate) || 0);
-      setDepositCommission(parseFloat(settings.depositcommissionpercent) || 0);
       setUsdtCommission(parseFloat(settings.usdtcommissionpercent) || 0);
     }).catch(console.error);
 
@@ -243,17 +241,16 @@ const Deposit = () => {
               {amount && (() => {
                 const inrValue = parseFloat(amount) * usdtRate;
                 const selectedMethod = cryptoAddresses.find(a => a.id === method);
-                const isUsdtMethod = selectedMethod?.coin?.toUpperCase().includes('USDT') || selectedMethod?.coin?.toUpperCase().includes('CRYPTO');
-                const commissionPercent = isUsdtMethod ? usdtCommission : depositCommission;
-                const commissionAmount = inrValue * (commissionPercent / 100);
+                const inrValue = parseFloat(amount) * usdtRate;
+                const commissionAmount = inrValue * (usdtCommission / 100);
                 const afterCommission = inrValue - commissionAmount;
                 return (
                   <div className="mt-2 space-y-1 bg-[#0a0a0a] p-3 rounded-xl border border-[#2a2a2a]">
                     <p className="text-gray-400 text-xs">Exchange Rate: ₹{usdtRate}/USDT</p>
                     <p className="text-green-400 text-sm font-medium">Total: ₹{inrValue.toFixed(2)} INR</p>
-                    {commissionPercent > 0 ? (
+                    {usdtCommission > 0 ? (
                       <>
-                        <p className="text-yellow-400 text-xs">Commission ({commissionPercent}%): -₹{commissionAmount.toFixed(2)}</p>
+                        <p className="text-yellow-400 text-xs">Commission ({usdtCommission}%): -₹{commissionAmount.toFixed(2)}</p>
                         <p className="text-white text-sm font-bold">You will get: ₹{afterCommission.toFixed(2)}</p>
                       </>
                     ) : (

@@ -32,7 +32,6 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [usdtRate, setUsdtRate] = useState(0);
   const [tokenRate, setTokenRate] = useState(0);
-  const [depositCommission, setDepositCommission] = useState(0);
   const [usdtCommission, setUsdtCommission] = useState(0);
   const [jTokenCommission, setJTokenCommission] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -80,7 +79,6 @@ const Home = () => {
         setRecentWithdrawals(Array.isArray(withdrawalsData) ? withdrawalsData : []);
         setUser(profileData);
         setPaymentEnabled(profileData.paymentEnabled !== false);
-        setDepositCommission(parseFloat(settingsData?.depositcommissionpercent) || 0);
         setUsdtCommission(parseFloat(settingsData?.usdtcommissionpercent) || 0);
         setJTokenCommission(parseFloat(settingsData?.jtokencommissionpercent) || 0);
         setTokenRate(parseFloat(settingsData?.tokenrate) || 0);
@@ -355,10 +353,6 @@ const Home = () => {
             <div className="rounded-2xl border border-[#1d1d1d] bg-[#0b0b0b] p-3">
               <p className="text-xs text-gray-400">USDT Commission</p>
               <p className="mt-1 text-lg font-bold text-white">{usdtCommission.toFixed(0)}%</p>
-            </div>
-            <div className="rounded-2xl border border-[#1d1d1d] bg-[#0b0b0b] p-3">
-              <p className="text-xs text-gray-400">Deposit Commission</p>
-              <p className="mt-1 text-lg font-bold text-white">{depositCommission.toFixed(0)}%</p>
             </div>
           </div>
         </div>

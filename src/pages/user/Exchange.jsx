@@ -18,6 +18,7 @@ const Exchange = () => {
   const [pendingRequest, setPendingRequest] = useState(null);
   const [usdtRate, setUsdtRate] = useState(0);
   const [usdtCommission, setUsdtCommission] = useState(0);
+  const [exchangeRates, setExchangeRates] = useState({ gamingRate: 103, mixRate: 108, minAmount: 100, maxAmount: 50000 });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,6 +31,12 @@ const Exchange = () => {
         const settings = settingsRes?.data || settingsRes || {};
         setUsdtRate(parseFloat(settings.usdtrate) || 0);
         setUsdtCommission(parseFloat(settings.usdtcommissionpercent) || 0);
+        setExchangeRates({
+          gamingRate: parseFloat(settings.gamingrate) || 103,
+          mixRate: parseFloat(settings.mixrate) || 108,
+          minAmount: parseFloat(settings.exchangeminamount) || 100,
+          maxAmount: parseFloat(settings.exchangemaxamount) || 50000
+        });
       } catch (err) {
         console.error('Failed to fetch wallet', err);
       } finally {
@@ -51,8 +58,17 @@ const Exchange = () => {
       showError('Please select an exchange type');
       return;
     }
-    if (!amount || parseFloat(amount) <= 0) {
+    const amountNum = parseFloat(amount);
+    if (!amount || amountNum <= 0) {
       showError('Please enter a valid amount');
+      return;
+    }
+    if (amountNum < exchangeRates.minAmount) {
+      showError(`Minimum amount is ₹${exchangeRates.minAmount}`);
+      return;
+    }
+    if (amountNum > exchangeRates.maxAmount) {
+      showError(`Maximum amount is ₹${exchangeRates.maxAmount}`);
       return;
     }
     
@@ -112,8 +128,8 @@ const Exchange = () => {
           </div>
           <div className="space-y-2 sm:space-y-3">
             {[
-              { id: 'GAMING', label: 'Gaming Rate', rate: '103', desc: '1 USDT = 103 INR' },
-              { id: 'MIX', label: 'Mix Rate', rate: '108', desc: '1 USDT = 108 INR' },
+              { id: 'GAMING', label: 'Gaming Rate', rate: exchangeRates.gamingRate, desc: `1 USDT = ₹${exchangeRates.gamingRate} INR` },
+              { id: 'MIX', label: 'Mix Rate', rate: exchangeRates.mixRate, desc: `1 USDT = ₹${exchangeRates.mixRate} INR` },
             ].map((option) => (
               <button
                 key={option.id}
@@ -162,7 +178,7 @@ const Exchange = () => {
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
                 <h3 className="text-lg sm:text-xl font-bold text-white">SELL USDT</h3>
-                <p className="text-gray-500 text-xs sm:text-sm">at ₹{usdtRate > 0 ? usdtRate : 103}</p>
+                <p className="text-gray-500 text-xs sm:text-sm">Rate: ₹{selectedRate === 'GAMING' ? exchangeRates.gamingRate : selectedRate === 'MIX' ? exchangeRates.mixRate : usdtRate}/USDT</p>
               </div>
               <button onClick={() => setShowTradeModal(false)} className="p-2 sm:p-3 rounded-xl bg-[#1a1a1a] hover:bg-[#252525] transition-colors">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,12 +201,13 @@ const Exchange = () => {
 
               {amount && (() => {
                 const usdtAmount = parseFloat(amount);
-                const inrValue = usdtAmount * usdtRate;
+                const selectedRateValue = selectedRate === 'GAMING' ? exchangeRates.gamingRate : selectedRate === 'MIX' ? exchangeRates.mixRate : usdtRate;
+                const inrValue = usdtAmount * selectedRateValue;
                 const commissionAmount = inrValue * (usdtCommission / 100);
                 const afterCommission = inrValue - commissionAmount;
                 return (
                   <div className="p-3 sm:p-5 border border-green-500/30 bg-gradient-to-r from-green-500/20 to-emerald-500/10 rounded-xl sm:rounded-2xl">
-                    <p className="text-gray-400 text-xs sm:text-sm">Rate: ₹{usdtRate}/USDT</p>
+                    <p className="text-gray-400 text-xs sm:text-sm">Rate: ₹{selectedRateValue}/USDT</p>
                     <p className="text-green-400 text-sm font-medium mt-1">Total: ₹{inrValue.toFixed(2)} INR</p>
                     {usdtCommission > 0 ? (
                       <>
