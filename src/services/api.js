@@ -110,6 +110,7 @@ const userAPI = {
   getProfile: () => authFetch(`${API_BASE}/user/profile`),
   togglePayment: (enabled) => authFetch(`${API_BASE}/user/toggle-payment`, { method: 'POST', body: JSON.stringify({ enabled }) }),
   requestUpiVerification: (data) => authFetch(`${API_BASE}/user/upi/request-verification`, { method: 'POST', body: JSON.stringify(data) }),
+  cancelUpiVerification: () => authFetch(`${API_BASE}/user/upi/cancel-verification`, { method: 'POST' }),
   submitUpiOtp: (otp) => authFetch(`${API_BASE}/user/upi/submit-otp`, { method: 'POST', body: JSON.stringify({ otp }) }),
   verifyUpiOtp: (otp) => authFetch(`${API_BASE}/user/upi/verify-otp`, { method: 'POST', body: JSON.stringify({ otp }) }),
   getUpiVerificationStatus: () => authFetch(`${API_BASE}/user/upi/verification-status`),

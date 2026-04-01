@@ -176,11 +176,7 @@ const Home = () => {
   };
 
   const getTotalBalance = () => {
-    const inrBalance = parseFloat(wallet?.inrbalance || 0);
-    const usdtBalance = parseFloat(wallet?.usdtbalance || 0);
-    const tokenBalance = parseFloat(wallet?.tokenbalance || 0);
-    const tokenRate = parseFloat(wallet?.tokenRate || wallet?.tokenrate || 0.01);
-    return inrBalance + (usdtBalance * parseFloat(usdtRate || 0)) + (tokenBalance * tokenRate);
+    return parseFloat(wallet?.inrbalance || 0);
   };
 
   const getRewardValue = () => parseFloat(wallet?.tokenbalance || 0) * tokenRate;
@@ -299,7 +295,6 @@ const Home = () => {
                 <h2 className="mt-2 bg-gradient-to-r from-[#D4AF37] to-[#FFE08A] bg-clip-text text-4xl font-bold text-transparent sm:text-5xl">
                   ₹{formatINR(getTotalBalance())}
                 </h2>
-                <p className="mt-2 text-sm text-gray-500">USDT trading plus INR wallet, all in one live view.</p>
               </div>
               <div className={`rounded-full border px-3 py-1 text-xs font-semibold ${getActiveStatus() ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-amber-500/30 bg-amber-500/10 text-amber-300'}`}>
                 {getActiveStatus() ? 'Rewards Active' : 'Complete setup'}

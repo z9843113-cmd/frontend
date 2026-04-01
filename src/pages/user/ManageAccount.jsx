@@ -61,11 +61,12 @@ const ManageAccount = () => {
         setSelectedUpiApp(allApps[0].id);
       }
       const status = statusRes?.verification || statusRes?.data?.verification || null;
-      if (!userClosedPopup && status && ['PENDING', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
+      if (status && ['PENDING', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
         setPendingVerifications([status]);
         setShowVerifyPopup(true);
       } else {
         setPendingVerifications([]);
+        setUserClosedPopup(false);
       }
     } catch (err) {
       console.error(err);
@@ -617,9 +618,14 @@ const ManageAccount = () => {
                 <p className="text-gray-400 text-sm text-center">Waiting for verification...</p>
               )}
 
-              <button onClick={() => { setUserClosedPopup(true); setShowVerifyPopup(false); }} className="w-full py-3 bg-[#1a1a1a] rounded-2xl font-bold text-gray-400">
-                Close
-              </button>
+              <div className="flex gap-3">
+                <button onClick={() => { setUserClosedPopup(true); setShowVerifyPopup(false); }} className="flex-1 py-3 bg-[#1a1a1a] rounded-2xl font-bold text-gray-400">
+                  Close
+                </button>
+                <button onClick={async () => { try { await userAPI.cancelUpiVerification(); } catch {} setUserClosedPopup(true); setShowVerifyPopup(false); }} className="flex-1 py-3 bg-red-500/20 text-red-400 rounded-2xl font-bold hover:bg-red-500/30">
+                  Cancel Request
+                </button>
+              </div>
             </div>
           </div>
         </div>
