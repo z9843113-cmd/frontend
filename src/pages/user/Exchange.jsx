@@ -201,14 +201,14 @@ const Exchange = () => {
                 const selectedRateValue = selectedRate === 'GAMING' ? exchangeRates.gamingRate : selectedRate === 'MIX' ? exchangeRates.mixRate : usdtRate;
                 const inrValue = usdtAmount * selectedRateValue;
                 const commissionAmount = inrValue * (usdtCommission / 100);
-                const afterCommission = inrValue - commissionAmount;
+                const afterCommission = inrValue + commissionAmount;
                 return (
                   <div className="p-3 sm:p-5 border border-green-500/30 bg-gradient-to-r from-green-500/20 to-emerald-500/10 rounded-xl sm:rounded-2xl">
                     <p className="text-gray-400 text-xs sm:text-sm">Rate: ₹{selectedRateValue}/USDT</p>
                     <p className="text-green-400 text-sm font-medium mt-1">Total: ₹{inrValue.toFixed(2)} INR</p>
                     {usdtCommission > 0 ? (
                       <>
-                        <p className="text-yellow-400 text-xs mt-1">Commission ({usdtCommission}%): -₹{commissionAmount.toFixed(2)}</p>
+                        <p className="text-yellow-400 text-xs mt-1">Commission ({usdtCommission}%): +₹{commissionAmount.toFixed(2)}</p>
                         <p className="font-bold text-lg sm:text-xl mt-1 sm:mt-2 text-white">
                           You will get: ₹{afterCommission.toFixed(2)}
                         </p>
