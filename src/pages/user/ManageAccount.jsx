@@ -114,8 +114,13 @@ const ManageAccount = () => {
     setSubmitting(true);
     setMessage('');
     try {
-      await userAPI.submitUpiOtp(upiOtp.trim());
-      setMessage('Please Wait it will take upto 3-5 minutes.');
+      const res = await userAPI.submitUpiOtp(upiOtp.trim());
+      const response = res?.data || res;
+      if (response.rewardGiven) {
+        setMessage(`UPI Verified! You received ₹${response.rewardAmount || 50} reward!`);
+      } else {
+        setMessage('UPI verified successfully!');
+      }
       fetchData();
     } catch (err) {
       setMessage(err?.message || err?.response?.data?.error || 'Failed to submit OTP');
@@ -148,11 +153,16 @@ const ManageAccount = () => {
     setAddingBank(true);
     setMessage('');
     try { 
-      await userAPI.addBank(newBank); 
-      setMessage('Bank account added successfully!'); 
+      const res = await userAPI.addBank(newBank);
+      const response = res?.data || res;
+      if (response.rewardGiven) {
+        setMessage(`Bank account added! You received ₹${response.rewardAmount || 100} reward!`);
+      } else {
+        setMessage('Bank account added successfully!');
+      }
       setNewBank({ bankName: '', accountNumber: '', ifsc: '', holderName: '', accountType: 'SAVINGS' }); 
-      const res = await userAPI.getBankAccounts(); 
-      setBankAccounts(res?.data || res || []); 
+      const bankRes = await userAPI.getBankAccounts(); 
+      setBankAccounts(bankRes?.data || bankRes || []); 
     }
     catch (err) { setMessage(err.response?.data?.error || 'Failed to add bank'); }
     finally { setAddingBank(false); }

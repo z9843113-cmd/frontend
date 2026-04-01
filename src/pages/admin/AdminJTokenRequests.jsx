@@ -200,7 +200,7 @@ const AdminJTokenRequests = () => {
                 <h4 className="mb-3 font-semibold text-[#D4AF37]">Wallet</h4>
                 <div className="grid gap-3 sm:grid-cols-4 text-center text-sm">
                   <div className="rounded-xl bg-[#0b0b0b] p-3"><p className="text-gray-500">INR</p><p className="mt-1 text-white">₹{parseFloat(userDetails.wallet?.inrbalance || 0).toFixed(2)}</p></div>
-                  <div className="rounded-xl bg-[#0b0b0b] p-3"><p className="text-gray-500">USDT</p><p className="mt-1 text-white">{parseFloat(userDetails.wallet?.usdtbalance || 0).toFixed(2)}</p></div>
+                  <div className="rounded-xl bg-[#0b0b0b] p-3"><p className="text-gray-500">USDT</p><p className="mt-1 text-white">{parseFloat(userDetails.wallet?.usdtbalance || 0).toFixed(4)} USDT</p></div>
                   <div className="rounded-xl bg-[#0b0b0b] p-3"><p className="text-gray-500">J Token</p><p className="mt-1 text-white">{parseFloat(userDetails.wallet?.tokenbalance || 0).toFixed(2)}</p></div>
                   <div className="rounded-xl bg-[#0b0b0b] p-3"><p className="text-gray-500">Referral</p><p className="mt-1 text-white">₹{parseFloat(userDetails.wallet?.referralbalance || 0).toFixed(2)}</p></div>
                 </div>

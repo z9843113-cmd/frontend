@@ -352,7 +352,7 @@ const AdminUpiVerifications = () => {
                 </div>
                 <div className="rounded-lg bg-[#0a0a0a] p-3 text-center">
                   <p className="text-xs text-gray-500">USDT</p>
-                  <p className="text-lg font-bold text-blue-400">${parseFloat(userDetails.wallet?.usdtbalance || 0).toFixed(2)}</p>
+                  <p className="text-lg font-bold text-emerald-400">{parseFloat(userDetails.wallet?.usdtbalance || 0).toFixed(4)} USDT</p>
                 </div>
                 <div className="rounded-lg bg-[#0a0a0a] p-3 text-center">
                   <p className="text-xs text-gray-500">Token</p>

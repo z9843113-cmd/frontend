@@ -110,7 +110,7 @@ const Wallet = () => {
         <div className="grid grid-cols-3 gap-4">
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
             <p className="text-gray-400 text-sm mb-2">USDT</p>
-            <p className="text-xl md:text-2xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent">{parseFloat(wallet?.usdtbalance || 0).toFixed(2)}</p>
+            <p className="text-xl md:text-2xl font-bold text-emerald-400">{parseFloat(wallet?.usdtbalance || 0).toFixed(4)} USDT</p>
             <p className="text-gray-500 text-xs mt-2">Rate: ₹{wallet?.usdtrate || 83}</p>
           </div>
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">

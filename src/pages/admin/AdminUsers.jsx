@@ -203,7 +203,7 @@ const AdminUsers = () => {
                     </div>
                     <div className="bg-[#0a0a0a] rounded-xl p-3 text-center">
                       <p className="text-gray-500 text-xs">USDT</p>
-                      <p className="text-blue-400 font-bold text-lg">${parseFloat(userDetails.wallet?.usdtbalance || 0).toFixed(2)}</p>
+                      <p className="text-emerald-400 font-bold text-lg">{parseFloat(userDetails.wallet?.usdtbalance || 0).toFixed(4)} USDT</p>
                     </div>
                     <div className="bg-[#0a0a0a] rounded-xl p-3 text-center">
                       <p className="text-gray-500 text-xs">J Token</p>

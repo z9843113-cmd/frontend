@@ -603,7 +603,7 @@ const Profile = () => {
               <span className="text-3xl font-bold text-white">₹{(parseFloat(wallet?.inrbalance) || 0).toFixed(2)}</span>
               <span className="text-gray-500 text-sm">INR</span>
             </div>
-            <p className="text-gray-500 text-sm mt-2">≈ ${(parseFloat(wallet?.usdtbalance) || 0).toFixed(2)} USDT</p>
+            <p className="text-gray-500 text-sm mt-2">≈ {(parseFloat(wallet?.usdtbalance) || 0).toFixed(4)} USDT @ ₹{wallet?.usdtrate || 83}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-3 mb-4">

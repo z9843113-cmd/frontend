@@ -235,7 +235,7 @@ const AdminActiveUsers = () => {
                 <h4 className="text-[#D4AF37] font-semibold mb-3">Wallet</h4>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div><span className="text-gray-500">INR:</span> <span className="text-white ml-1">₹{parseFloat(userDetails.wallet?.inrbalance || 0).toFixed(2)}</span></div>
-                  <div><span className="text-gray-500">USDT:</span> <span className="text-white ml-1">{parseFloat(userDetails.wallet?.usdtbalance || 0).toFixed(2)}</span></div>
+                  <div><span className="text-gray-500">USDT:</span> <span className="text-emerald-400 ml-1">{parseFloat(userDetails.wallet?.usdtbalance || 0).toFixed(4)} USDT</span></div>
                   <div><span className="text-gray-500">J Token:</span> <span className="text-white ml-1">{parseFloat(userDetails.wallet?.tokenbalance || 0).toFixed(2)}</span></div>
                   <div><span className="text-gray-500">Referral:</span> <span className="text-white ml-1">₹{parseFloat(userDetails.wallet?.referralbalance || 0).toFixed(2)}</span></div>
                 </div>

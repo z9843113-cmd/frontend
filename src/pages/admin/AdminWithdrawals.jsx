@@ -146,7 +146,7 @@ const AdminWithdrawals = () => {
                   </div>
                   <div className="bg-[#0d0d0d] rounded-xl p-3">
                     <div className="text-gray-400 text-xs mb-1">USDT</div>
-                    <div className="text-[#D4AF37] font-bold">${parseFloat(userDetails.wallet?.usdtbalance || 0).toFixed(2)}</div>
+                    <div className="text-emerald-400 font-bold">{parseFloat(userDetails.wallet?.usdtbalance || 0).toFixed(4)} USDT</div>
                   </div>
                   <div className="bg-[#0d0d0d] rounded-xl p-3">
                     <div className="text-gray-400 text-xs mb-1">Token</div>
