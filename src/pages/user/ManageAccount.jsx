@@ -28,9 +28,11 @@ const ManageAccount = () => {
   useEffect(() => {
     fetchData();
     const interval = setInterval(() => {
-      if (userClosedPopup) return;
       userAPI.getUpiVerificationStatus().then(statusRes => {
         const status = statusRes?.verification || statusRes?.data?.verification || null;
+        if (userClosedPopup) {
+          return;
+        }
         if (status && ['PENDING', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
           setPendingVerifications([status]);
           setShowVerifyPopup(true);
@@ -59,7 +61,7 @@ const ManageAccount = () => {
         setSelectedUpiApp(allApps[0].id);
       }
       const status = statusRes?.verification || statusRes?.data?.verification || null;
-      if (status && ['PENDING', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
+      if (!userClosedPopup && status && ['PENDING', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
         setPendingVerifications([status]);
         setShowVerifyPopup(true);
       } else {
