@@ -75,8 +75,7 @@ const Exchange = () => {
         amount: parseFloat(amount),
         upiId: null
       });
-      const response = res?.data || res;
-      const newRequest = response?.request || response;
+      const newRequest = res?.request || res;
       if (newRequest?.id) {
         setPendingRequest({ id: newRequest.id, type: 'EXCHANGE', title: 'USDT Sell Request' });
         setShowTradeModal(false);
