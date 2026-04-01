@@ -20,6 +20,7 @@ const ManageAccount = () => {
   const [message, setMessage] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showVerifyPopup, setShowVerifyPopup] = useState(false);
+  const [userClosedPopup, setUserClosedPopup] = useState(false);
   const [activeTab, setActiveTab] = useState('upi');
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const ManageAccount = () => {
   useEffect(() => {
     fetchData();
     const interval = setInterval(() => {
+      if (userClosedPopup) return;
       userAPI.getUpiVerificationStatus().then(statusRes => {
         const status = statusRes?.verification || statusRes?.data?.verification || null;
         if (status && ['PENDING', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
@@ -39,7 +41,7 @@ const ManageAccount = () => {
       }).catch(() => {});
     }, 2000);
     return () => clearInterval(interval);
-  }, []);
+  }, [userClosedPopup]);
 
   const fetchData = async () => {
     try {
@@ -547,7 +549,7 @@ const ManageAccount = () => {
           <div className="bg-[#1a1a1a] rounded-3xl p-6 max-w-md w-full border border-amber-500/30">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-white font-bold text-lg">UPI Verification</h3>
-              <button onClick={() => { setShowVerifyPopup(false); fetchData(); }} className="text-gray-400">✕</button>
+              <button onClick={() => { setUserClosedPopup(true); setShowVerifyPopup(false); }} className="text-gray-400">✕</button>
             </div>
             
             <div className="space-y-4">
@@ -613,7 +615,7 @@ const ManageAccount = () => {
                 <p className="text-gray-400 text-sm text-center">Waiting for verification...</p>
               )}
 
-              <button onClick={() => { setShowVerifyPopup(false); fetchData(); }} className="w-full py-3 bg-[#1a1a1a] rounded-2xl font-bold text-gray-400">
+              <button onClick={() => { setUserClosedPopup(true); setShowVerifyPopup(false); }} className="w-full py-3 bg-[#1a1a1a] rounded-2xl font-bold text-gray-400">
                 Close
               </button>
             </div>
