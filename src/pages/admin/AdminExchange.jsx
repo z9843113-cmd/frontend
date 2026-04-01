@@ -7,6 +7,7 @@ import AdminNotificationBell from '../../components/AdminNotificationBell';
 const AdminExchange = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [status, setStatus] = useState('');
   const [search, setSearch] = useState('');
@@ -29,7 +30,14 @@ const AdminExchange = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetchRequests();
+      setRefreshing(true);
+      adminAPI.getExchangeRequests({ page, limit: 20, status, search })
+        .then(res => {
+          setRequests(res.requests || []);
+          setTotal(res.total || 0);
+        })
+        .catch(err => console.error('Refresh error:', err))
+        .finally(() => setRefreshing(false));
     }, 5000);
     return () => clearInterval(interval);
   }, [page, status, search]);
