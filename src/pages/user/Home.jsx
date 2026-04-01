@@ -84,6 +84,9 @@ const Home = () => {
         setUsdtCommission(parseFloat(settingsData?.usdtcommissionpercent) || 0);
         setJTokenCommission(parseFloat(settingsData?.jtokencommissionpercent) || 0);
         setTokenRate(parseFloat(settingsData?.tokenrate) || 0);
+        
+        console.log('Settings Data:', settingsData);
+        console.log('JToken Commission from settings:', settingsData?.jtokencommissionpercent);
 
         if (tether?.inr) {
           setUsdtRate(parseFloat(tether.inr));
@@ -347,7 +350,7 @@ const Home = () => {
             </div>
             <div className="rounded-2xl border border-[#1d1d1d] bg-[#0b0b0b] p-3">
               <p className="text-xs text-gray-400">J Token Commission</p>
-              <p className="mt-1 text-lg font-bold text-white">{jTokenCommission.toFixed(0)}%</p>
+              <p className="mt-1 text-lg font-bold text-white">{jTokenCommission > 0 ? `${jTokenCommission.toFixed(1)}%` : '0%'}</p>
             </div>
             <div className="rounded-2xl border border-[#1d1d1d] bg-[#0b0b0b] p-3">
               <p className="text-xs text-gray-400">USDT Commission</p>
