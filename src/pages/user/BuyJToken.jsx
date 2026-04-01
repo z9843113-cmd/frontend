@@ -425,6 +425,17 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
             </div>
             
             <div className="space-y-4">
+              <div className="bg-gradient-to-r from-red-500/20 via-red-500/10 to-transparent rounded-xl p-4 border border-red-500/30">
+                <div className="flex items-center gap-2 mb-2">
+                  <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-red-400 font-bold text-sm">⚠️ URGENT NOTICE</p>
+                </div>
+                <p className="text-gray-300 text-xs">Please complete your payment within the next <span className="text-white font-bold">10 minutes</span>. Failure to do so may result in transaction delays or potential losses, for which the company will not be held responsible.</p>
+                <p className="text-gray-400 text-xs mt-2">Kindly ensure timely completion to avoid any inconvenience.</p>
+              </div>
+              
               <div className="bg-gradient-to-r from-[#D4AF37]/15 via-[#D4AF37]/10 to-transparent rounded-xl p-5 text-center border border-[#D4AF37]/20">
                 <p className="text-gray-300 text-sm font-medium mb-1">Amount to Pay</p>
                 <p className="text-[#D4AF37] font-bold text-3xl">₹{parseFloat(request.amount || 0).toFixed(2)}</p>
