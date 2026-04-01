@@ -32,6 +32,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [usdtRate, setUsdtRate] = useState(0);
   const [depositCommission, setDepositCommission] = useState(0);
+  const [usdtCommission, setUsdtCommission] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [showUpiWarning, setShowUpiWarning] = useState(() => {
@@ -77,12 +78,15 @@ const Home = () => {
         setRecentWithdrawals(Array.isArray(withdrawalsData) ? withdrawalsData : []);
         setUser(profileData);
         setPaymentEnabled(profileData.paymentEnabled !== false);
-        setDepositCommission(parseFloat(settingsData.depositcommissionpercent) || 0);
+        setDepositCommission(parseFloat(settingsData?.depositcommissionpercent) || 0);
+        setUsdtCommission(parseFloat(settingsData?.usdtcommissionpercent) || 0);
 
         if (tether?.inr) {
           setUsdtRate(parseFloat(tether.inr));
         } else if (settingsData?.usdtrate) {
           setUsdtRate(parseFloat(settingsData.usdtrate));
+        } else if (walletData?.usdtrate) {
+          setUsdtRate(parseFloat(walletData.usdtrate));
         } else if (walletData?.usdtRate) {
           setUsdtRate(parseFloat(walletData.usdtRate));
         }
@@ -118,14 +122,12 @@ const Home = () => {
     const intervalId = setInterval(async () => {
       try {
         const walletRes = await walletAPI.getWallet();
-        const settingsRes = await adminAPI.getSettings();
         const walletData = walletRes?.data || walletRes || null;
-        const settingsData = settingsRes?.data || settingsRes || {};
         setWallet(walletData);
-        if (settingsData?.usdtrate) {
-          setUsdtRate(parseFloat(settingsData.usdtrate));
-        } else if (walletData?.usdtRate) {
+        if (walletData?.usdtRate) {
           setUsdtRate(parseFloat(walletData.usdtRate));
+        } else if (walletData?.usdtrate) {
+          setUsdtRate(parseFloat(walletData.usdtrate));
         }
       } catch (error) {
         console.error('Failed to refresh wallet', error);
@@ -179,10 +181,7 @@ const Home = () => {
   const getRewardValue = () => parseFloat(wallet?.tokenbalance || 0) * parseFloat(wallet?.tokenRate || wallet?.tokenrate || 0.01);
   const getTokenRate = () => parseFloat(wallet?.tokenRate || wallet?.tokenrate || 0.01);
   const getJTokenCommission = () => parseFloat(wallet?.commissionPercent || wallet?.referralPercent || 4);
-  const getUsdtCommission = () => {
-    const settings = wallet?.settings;
-    return parseFloat(settings?.usdtcommissionpercent || 0);
-  };
+  const getUsdtCommission = () => usdtCommission;
 
   const getTodayVolume = () => {
     const today = new Date().toISOString().split('T')[0];
