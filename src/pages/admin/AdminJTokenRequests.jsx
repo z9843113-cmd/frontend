@@ -345,7 +345,7 @@ const AdminJTokenRequests = () => {
       </div>
 
       <div className="mx-auto max-w-5xl space-y-5 px-4 py-5">
-        <input type="text" placeholder="Search by email..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
+        <input type="text" placeholder="Search by email or user ID..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
         <div className="flex flex-wrap gap-3">
           {FILTERS.map((filter) => <button key={filter || 'ALL'} onClick={() => { setStatus(filter); setPage(1); }} className={`rounded-2xl px-4 py-3 text-sm font-semibold ${status === filter ? 'bg-[#D4AF37] text-black' : 'bg-[#171717] text-gray-400'}`}>{filter || 'All'}</button>)}
         </div>

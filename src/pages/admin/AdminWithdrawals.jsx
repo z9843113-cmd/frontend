@@ -6,11 +6,9 @@ import AdminNotificationBell from '../../components/AdminNotificationBell';
 
 const AdminWithdrawals = () => {
   const [withdrawals, setWithdrawals] = useState([]);
-  const [exchangeRequests, setExchangeRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [status, setStatus] = useState('');
-  const [tab, setTab] = useState('withdrawals');
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
@@ -30,23 +28,17 @@ const AdminWithdrawals = () => {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  useEffect(() => { fetchData(); }, [page, status, search, tab]);
+  useEffect(() => { fetchWithdrawals(); }, [page, status, search]);
 
-  const fetchData = async () => {
+  const fetchWithdrawals = async () => {
     setLoading(true);
     setError('');
     try {
-      if (tab === 'withdrawals') {
-        const res = await adminAPI.getWithdrawals({ page, limit: 20, status, search });
-        setWithdrawals(res.withdrawals || []);
-        setTotal(res.total || 0);
-      } else {
-        const res = await adminAPI.getExchangeRequests({ page, limit: 20, status, search });
-        setExchangeRequests(res.requests || []);
-        setTotal(res.total || 0);
-      }
+      const res = await adminAPI.getWithdrawals({ page, limit: 20, status, search });
+      setWithdrawals(res.withdrawals || []);
+      setTotal(res.total || 0);
     } catch (err) {
-      setError(err?.message || 'Failed to load data');
+      setError(err?.message || 'Failed to load withdrawals');
     } finally {
       setLoading(false);
     }
@@ -65,39 +57,29 @@ const AdminWithdrawals = () => {
     }
   };
 
-  const handleApprove = async (id) => {
-    if (!window.confirm(tab === 'withdrawals' ? 'Approve this withdrawal?' : 'Approve this exchange request?')) return;
-    setProcessingId(id);
+  const handleApprove = async (withdrawalId) => {
+    if (!window.confirm('Approve this withdrawal?')) return;
+    setProcessingId(withdrawalId);
     try {
-      if (tab === 'withdrawals') {
-        await adminAPI.approveWithdrawal(id);
-        alert('Withdrawal approved!');
-      } else {
-        await adminAPI.approveExchangeRequest(id);
-        alert('Exchange request approved! INR added to user wallet.');
-      }
-      fetchData();
+      await adminAPI.approveWithdrawal(withdrawalId);
+      alert('Withdrawal approved!');
+      fetchWithdrawals();
     } catch (err) {
-      alert('Failed: ' + (err.message || 'Unknown error'));
+      alert('Failed to approve: ' + (err.message || 'Unknown error'));
     } finally {
       setProcessingId(null);
     }
   };
 
-  const handleReject = async (id) => {
-    if (!window.confirm(tab === 'withdrawals' ? 'Reject this withdrawal? Balance will be refunded.' : 'Reject this exchange request?')) return;
-    setProcessingId(id);
+  const handleReject = async (withdrawalId) => {
+    if (!window.confirm('Reject this withdrawal? Balance will be refunded.')) return;
+    setProcessingId(withdrawalId);
     try {
-      if (tab === 'withdrawals') {
-        await adminAPI.rejectWithdrawal(id);
-        alert('Withdrawal rejected! Balance refunded.');
-      } else {
-        await adminAPI.rejectExchangeRequest(id);
-        alert('Exchange request rejected.');
-      }
-      fetchData();
+      await adminAPI.rejectWithdrawal(withdrawalId);
+      alert('Withdrawal rejected! Balance refunded.');
+      fetchWithdrawals();
     } catch (err) {
-      alert('Failed: ' + (err.message || 'Unknown error'));
+      alert('Failed to reject: ' + (err.message || 'Unknown error'));
     } finally {
       setProcessingId(null);
     }
@@ -308,11 +290,7 @@ const AdminWithdrawals = () => {
         </div>
       </div>
       <div className="p-4 space-y-4">
-        <div className="flex gap-2">
-          <button onClick={() => setTab('withdrawals')} className={`flex-1 py-3 rounded-xl font-semibold ${tab === 'withdrawals' ? 'bg-[#D4AF37] text-black' : 'bg-[#1a1a1a] text-gray-400'}`}>Withdrawals</button>
-          <button onClick={() => setTab('exchange')} className={`flex-1 py-3 rounded-xl font-semibold ${tab === 'exchange' ? 'bg-[#D4AF37] text-black' : 'bg-[#1a1a1a] text-gray-400'}`}>Exchange</button>
-        </div>
-        <input type="text" placeholder="Search by email..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
+        <input type="text" placeholder="Search by email or user ID..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
         <div className="overflow-x-auto flex gap-2 pb-2">
           {['', 'PENDING', 'APPROVED', 'REJECTED'].map((s) => (
             <button key={s} onClick={() => { setStatus(s); setPage(1); }} className={`px-3 py-2 rounded-xl text-xs whitespace-nowrap ${status === s ? 'bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-semibold' : 'bg-[#1a1a1a] text-gray-400 border border-[#2a2a2a]'}`}>{s || 'All'}</button>
@@ -326,13 +304,11 @@ const AdminWithdrawals = () => {
             <div className="p-4 space-y-3">
               {[1,2,3,4,5].map(i => <div key={i} className="h-20 bg-[#0a0a0a] rounded-xl animate-pulse"></div>)}
             </div>
-          ) : tab === 'withdrawals' && withdrawals.length === 0 ? (
+          ) : withdrawals.length === 0 ? (
             <div className="p-8 text-center text-gray-500">No withdrawals found</div>
-          ) : tab === 'exchange' && exchangeRequests.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">No exchange requests found</div>
           ) : (
             <div className="divide-y divide-[#1a1a1a]">
-              {tab === 'withdrawals' ? withdrawals.map((w) => (
+              {withdrawals.map((w) => (
                 <div key={w.id} className="p-4">
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-3">
@@ -355,30 +331,6 @@ const AdminWithdrawals = () => {
                       <div className="flex gap-2">
                         <button onClick={() => handleApprove(w.id)} disabled={processingId === w.id} className="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg text-xs font-medium hover:bg-green-500/30 disabled:opacity-50">Approve</button>
                         <button onClick={() => handleReject(w.id)} disabled={processingId === w.id} className="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-xs font-medium hover:bg-red-500/30 disabled:opacity-50">Reject</button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )) : exchangeRequests.map((e) => (
-                <div key={e.id} className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <p className="text-white font-medium text-sm">{e.email || 'N/A'}</p>
-                        <p className="text-gray-500 text-xs">{formatDate(e.createdat)}</p>
-                        <p className="text-gray-400 text-xs mt-1">Rate: ₹{e.rate} | Type: {e.ratetype}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 rounded-lg text-xs font-medium ${e.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : e.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{e.status}</span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <p className="text-[#D4AF37] font-bold text-lg">${parseFloat(e.amount || 0).toFixed(2)} USDT</p>
-                    {e.status === 'PENDING' && (
-                      <div className="flex gap-2">
-                        <button onClick={() => handleApprove(e.id)} disabled={processingId === e.id} className="px-3 py-1.5 bg-green-500/20 text-green-400 rounded-lg text-xs font-medium hover:bg-green-500/30 disabled:opacity-50">Approve</button>
-                        <button onClick={() => handleReject(e.id)} disabled={processingId === e.id} className="px-3 py-1.5 bg-red-500/20 text-red-400 rounded-lg text-xs font-medium hover:bg-red-500/30 disabled:opacity-50">Reject</button>
                       </div>
                     )}
                   </div>

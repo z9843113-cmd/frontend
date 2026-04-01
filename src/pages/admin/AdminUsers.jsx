@@ -422,7 +422,7 @@ const AdminUsers = () => {
             <h2 className="text-white font-semibold">All Users</h2>
             <span className="text-xs sm:text-sm text-gray-500">{users.length} users</span>
           </div>
-          <input type="text" placeholder="Search email or referral code..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none text-sm sm:text-base" />
+          <input type="text" placeholder="Search by email or user ID..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none text-sm sm:text-base" />
           {loading ? (
             <div className="animate-pulse space-y-3 mt-4">
               {[1,2,3,4,5].map(i => <div key={i} className="h-20 sm:h-16 bg-[#0a0a0a] rounded-2xl"></div>)}

@@ -290,7 +290,7 @@ const AdminDeposits = () => {
         </div>
       </div>
       <div className="p-4 space-y-4">
-        <input type="text" placeholder="Search by email..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
+        <input type="text" placeholder="Search by email or user ID..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
         <div className="overflow-x-auto flex gap-2 pb-2">
           {['', 'PENDING', 'APPROVED', 'REJECTED'].map((s) => (
             <button key={s} onClick={() => { setStatus(s); setPage(1); }} className={`px-3 py-2 rounded-xl text-xs whitespace-nowrap ${status === s ? 'bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-semibold' : 'bg-[#1a1a1a] text-gray-400 border border-[#2a2a2a]'}`}>{s || 'All'}</button>
