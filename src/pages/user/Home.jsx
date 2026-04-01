@@ -31,8 +31,10 @@ const Home = () => {
   const [recentWithdrawals, setRecentWithdrawals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [usdtRate, setUsdtRate] = useState(0);
+  const [tokenRate, setTokenRate] = useState(0);
   const [depositCommission, setDepositCommission] = useState(0);
   const [usdtCommission, setUsdtCommission] = useState(0);
+  const [jTokenCommission, setJTokenCommission] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [showUpiWarning, setShowUpiWarning] = useState(() => {
@@ -80,6 +82,8 @@ const Home = () => {
         setPaymentEnabled(profileData.paymentEnabled !== false);
         setDepositCommission(parseFloat(settingsData?.depositcommissionpercent) || 0);
         setUsdtCommission(parseFloat(settingsData?.usdtcommissionpercent) || 0);
+        setJTokenCommission(parseFloat(settingsData?.jtokencommissionpercent) || 0);
+        setTokenRate(parseFloat(settingsData?.tokenrate) || 0);
 
         if (tether?.inr) {
           setUsdtRate(parseFloat(tether.inr));
@@ -178,9 +182,9 @@ const Home = () => {
     return inrBalance + (usdtBalance * parseFloat(usdtRate || 0)) + (tokenBalance * tokenRate);
   };
 
-  const getRewardValue = () => parseFloat(wallet?.tokenbalance || 0) * parseFloat(wallet?.tokenRate || wallet?.tokenrate || 0.01);
-  const getTokenRate = () => parseFloat(wallet?.tokenRate || wallet?.tokenrate || 0.01);
-  const getJTokenCommission = () => parseFloat(wallet?.commissionPercent || wallet?.referralPercent || 4);
+  const getRewardValue = () => parseFloat(wallet?.tokenbalance || 0) * tokenRate;
+  const getTokenRate = () => tokenRate;
+  const getJTokenCommission = () => jTokenCommission;
   const getUsdtCommission = () => usdtCommission;
 
   const getTodayVolume = () => {
@@ -335,19 +339,19 @@ const Home = () => {
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-2xl border border-[#1d1d1d] bg-[#0b0b0b] p-3">
               <p className="text-xs text-gray-400">USDT Rate</p>
-              <p className="mt-1 text-lg font-bold text-emerald-400">₹{parseFloat(usdtRate || 0).toFixed(2)}</p>
+              <p className="mt-1 text-lg font-bold text-emerald-400">{usdtRate > 0 ? `₹${usdtRate.toFixed(2)}` : '-'}</p>
             </div>
             <div className="rounded-2xl border border-[#1d1d1d] bg-[#0b0b0b] p-3">
               <p className="text-xs text-gray-400">J Token Rate</p>
-              <p className="mt-1 text-lg font-bold text-[#D4AF37]">₹{formatINR(getTokenRate())}</p>
+              <p className="mt-1 text-lg font-bold text-[#D4AF37]">{tokenRate > 0 ? `₹${tokenRate.toFixed(2)}` : '-'}</p>
             </div>
             <div className="rounded-2xl border border-[#1d1d1d] bg-[#0b0b0b] p-3">
               <p className="text-xs text-gray-400">J Token Commission</p>
-              <p className="mt-1 text-lg font-bold text-white">{getJTokenCommission().toFixed(0)}%</p>
+              <p className="mt-1 text-lg font-bold text-white">{jTokenCommission.toFixed(0)}%</p>
             </div>
             <div className="rounded-2xl border border-[#1d1d1d] bg-[#0b0b0b] p-3">
               <p className="text-xs text-gray-400">USDT Commission</p>
-              <p className="mt-1 text-lg font-bold text-white">{getUsdtCommission().toFixed(0)}%</p>
+              <p className="mt-1 text-lg font-bold text-white">{usdtCommission.toFixed(0)}%</p>
             </div>
             <div className="rounded-2xl border border-[#1d1d1d] bg-[#0b0b0b] p-3">
               <p className="text-xs text-gray-400">Deposit Commission</p>
