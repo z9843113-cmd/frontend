@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { depositAPI, publicAPI, uploadToCloudinary } from '../../services/api';
+import { depositAPI, publicAPI, uploadToCloudinary, adminAPI } from '../../services/api';
 import BottomNav from '../../components/BottomNav';
 import RequestStatusModal from '../../components/RequestStatusModal';
 
@@ -18,6 +18,8 @@ const Deposit = () => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [cryptoAddresses, setCryptoAddresses] = useState([]);
   const [pendingRequest, setPendingRequest] = useState(null);
+  const [usdtRate, setUsdtRate] = useState(83);
+  const [depositCommission, setDepositCommission] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,6 +34,12 @@ const Deposit = () => {
       if (addresses.length > 0) {
         setMethod(addresses[0].id);
       }
+    }).catch(console.error);
+    
+    adminAPI.getSettings().then((res) => {
+      const settings = res?.data || res || {};
+      setUsdtRate(parseFloat(settings.usdtrate) || 83);
+      setDepositCommission(parseFloat(settings.depositcommissionpercent) || 0);
     }).catch(console.error);
 
     const interval = setInterval(() => {
@@ -230,9 +238,21 @@ const Deposit = () => {
                 className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
                 required
               />
-              {amount && (
-                <p className="text-gray-500 text-xs mt-2">≈ ₹{parseFloat(amount * 83).toFixed(2)} INR</p>
-              )}
+              {amount && (() => {
+                const inrValue = parseFloat(amount) * usdtRate;
+                const commissionAmount = inrValue * (depositCommission / 100);
+                const afterCommission = inrValue - commissionAmount;
+                return (
+                  <p className="text-gray-500 text-xs mt-2">
+                    ≈ ₹{inrValue.toFixed(2)} INR
+                    {depositCommission > 0 && (
+                      <span className="text-yellow-400 ml-1">
+                        (You will get: ₹{afterCommission.toFixed(2)} after {depositCommission}% commission)
+                      </span>
+                    )}
+                  </p>
+                );
+              })()}
             </div>
 
             {method && (
