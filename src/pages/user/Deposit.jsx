@@ -38,7 +38,7 @@ const Deposit = () => {
     
     adminAPI.getSettings().then((res) => {
       const settings = res?.data || res || {};
-      setUsdtRate(parseFloat(settings.usdtrate) || 83);
+      setUsdtRate(parseFloat(settings.usdtrate) || 0);
       setDepositCommission(parseFloat(settings.depositcommissionpercent) || 0);
     }).catch(console.error);
 

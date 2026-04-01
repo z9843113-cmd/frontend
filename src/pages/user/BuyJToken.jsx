@@ -45,8 +45,10 @@ const BuyJToken = () => {
           walletAPI.getWallet().catch(() => null),
           jTokenPurchaseAPI.getMyRequests().catch(() => ({ data: { purchases: [] } })),
           userAPI.getUpiAccounts().catch(() => []),
-          adminAPI.getSettings().catch(() => ({}))
+          adminAPI.getSettings().catch((e) => { console.log('Settings error:', e); return {}; })
         ]);
+        
+        console.log('Settings response:', settingsRes);
         
         setWallet(walletRes?.data || walletRes || null);
         const allRequests = requestsRes?.data?.purchases || requestsRes?.purchases || requestsRes?.data || requestsRes || [];
@@ -57,7 +59,9 @@ const BuyJToken = () => {
         
         setUserUpiAccounts(userUpiRes?.data || userUpiRes || []);
         
-        const settings = settingsRes?.data || settingsRes || {};
+        const settings = (settingsRes?.data || settingsRes || {});
+        console.log('Settings loaded:', settings);
+        console.log('JToken Commission:', settings.jtokencommissionpercent);
         setTokenRate(parseFloat(settings.tokenrate) || 1);
         setJTokenCommission(parseFloat(settings.jtokencommissionpercent) || 0);
       } catch (err) {
