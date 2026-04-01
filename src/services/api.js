@@ -211,7 +211,7 @@ const adminAPI = {
   getExchangeRequests: (params) => authFetch(`${API_BASE}/admin/exchange-requests?${new URLSearchParams(params || {})}`),
   approveExchangeRequest: (requestId) => authFetch(`${API_BASE}/admin/exchange-request/${requestId}/approve`, { method: 'POST' }),
   rejectExchangeRequest: (requestId, data) => authFetch(`${API_BASE}/admin/exchange-request/${requestId}/reject`, { method: 'POST', body: JSON.stringify(data || {}) }),
-  resetDatabase: (adminPassword) => authFetch(`${API_BASE}/admin/reset-non-admins`, { method: 'POST', body: JSON.stringify({ adminPassword }) })
+  resetDatabase: (adminPassword, confirmPassword) => authFetch(`${API_BASE}/admin/reset-non-admins`, { method: 'POST', body: JSON.stringify({ adminPassword, confirmPassword }) })
 };
 
 export { authAPI, userAPI, walletAPI, depositAPI, withdrawalAPI, referralAPI, jTokenPurchaseAPI, publicAPI, adminAPI, uploadToCloudinary };

@@ -76,7 +76,7 @@ const AdminSettings = () => {
     setShowPasswordModal(false);
     setDeleting(true);
     try {
-      await adminAPI.resetDatabase(passwordInput);
+      await adminAPI.resetDatabase(passwordInput, confirmPasswordInput);
       alert('All users deleted successfully!');
     } catch (err) {
       alert(err.response?.data?.error || 'Failed to delete users');
