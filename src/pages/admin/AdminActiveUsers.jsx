@@ -129,7 +129,18 @@ const AdminActiveUsers = () => {
                         <div>
                           <p className="text-white font-medium">{user.name || 'N/A'}</p>
                           <p className="text-gray-500 text-xs">{user.email}</p>
-                          <p className="text-gray-600 text-xs">ID: {user.id}</p>
+                          <div className="flex items-center gap-1 mt-1">
+                            <p className="text-gray-600 text-xs font-mono">ID: {user.id}</p>
+                            <button 
+                              onClick={() => { navigator.clipboard.writeText(user.id); }}
+                              className="p-1 bg-[#1a1a1a] hover:bg-[#252525] rounded text-gray-400 hover:text-[#D4AF37]"
+                              title="Copy ID"
+                            >
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       </td>
                       <td className="py-3 text-gray-300">{user.mobile || 'N/A'}</td>
@@ -163,7 +174,18 @@ const AdminActiveUsers = () => {
                     <div>
                       <p className="text-white font-medium text-lg">{user.name || 'N/A'}</p>
                       <p className="text-gray-400 text-sm">{user.email}</p>
-                      <p className="text-gray-600 text-xs">ID: {user.id}</p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <p className="text-gray-600 text-xs font-mono">ID: {user.id}</p>
+                        <button 
+                          onClick={() => { navigator.clipboard.writeText(user.id); }}
+                          className="p-1 bg-[#252525] hover:bg-[#303030] rounded text-gray-400 hover:text-[#D4AF37]"
+                          title="Copy ID"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                     <span className={`px-2 py-1 rounded-lg text-xs ${user.isblocked ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
                       {user.isblocked ? 'Blocked' : 'Active'}
