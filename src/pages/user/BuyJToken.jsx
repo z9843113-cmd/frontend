@@ -200,16 +200,28 @@ const BuyJToken = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white font-bold">Active Request</p>
-                <p className="text-gray-400 text-sm">₹{parseFloat(request.amount || 0).toFixed(2)} • {request.status}</p>
+                <p className="text-gray-400 text-sm">₹{parseFloat(request.amount || 0).toFixed(2)} • {
+request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROCESSING' :
+                request.status === 'PAYMENT_SUBMITTED' ? 'PAYMENT SUBMITTED' :
+                request.status === 'READY_TO_PAY' ? 'PAYMENT READY' :
+                request.status === 'PAYMENT_STARTED' ? 'IN PROGRESS' :
+                request.status
+              }</p>
               </div>
               <div className="text-right">
                 <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                   request.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' :
+                  request.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' :
                   request.status === 'PAYMENT_SUBMITTED' ? 'bg-yellow-500/20 text-yellow-400' :
                   request.status === 'PAYMENT_STARTED' ? 'bg-blue-500/20 text-blue-400' :
+                  request.status === 'READY_TO_PAY' ? 'bg-blue-500/20 text-blue-400' :
                   'bg-gray-500/20 text-gray-400'
                 }`}>
-                  {request.status}
+                  {request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PENDING' :
+                   request.status === 'PAYMENT_SUBMITTED' ? 'SUBMITTED' :
+                   request.status === 'READY_TO_PAY' ? 'PAYMENT READY' :
+                   request.status === 'PAYMENT_STARTED' ? 'IN PROGRESS' :
+                   request.status}
                 </span>
                 <p className="text-[#D4AF37] text-xs mt-1">Tap to view →</p>
               </div>
@@ -317,7 +329,7 @@ const BuyJToken = () => {
               </div>
             )}
 
-            {(request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' || request.status === 'READY_TO_PAY' || request.status === 'PAYMENT_STARTED') && (
+            {(request.status === 'READY_TO_PAY' || request.status === 'PAYMENT_STARTED') && (
               <button onClick={handleCancel} disabled={submitting} className="w-full py-3 bg-red-500/20 text-red-400 rounded-2xl font-semibold mt-3 disabled:opacity-50">
                 Cancel Request
               </button>
