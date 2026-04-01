@@ -240,8 +240,6 @@ const Deposit = () => {
               />
               {amount && (() => {
                 const inrValue = parseFloat(amount) * usdtRate;
-                const selectedMethod = cryptoAddresses.find(a => a.id === method);
-                const inrValue = parseFloat(amount) * usdtRate;
                 const commissionAmount = inrValue * (usdtCommission / 100);
                 const afterCommission = inrValue - commissionAmount;
                 return (
