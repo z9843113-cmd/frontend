@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { userAPI, walletAPI } from '../../services/api';
+import { userAPI, walletAPI, adminAPI } from '../../services/api';
 import BottomNav from '../../components/BottomNav';
 import RequestStatusModal from '../../components/RequestStatusModal';
 import { FaGamepad, FaRandom, FaClock, FaCheck, FaTimes } from 'react-icons/fa';
@@ -16,12 +16,20 @@ const Exchange = () => {
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [pendingRequest, setPendingRequest] = useState(null);
+  const [usdtRate, setUsdtRate] = useState(0);
+  const [usdtCommission, setUsdtCommission] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const wal = await walletAPI.getWallet();
+        const [wal, settingsRes] = await Promise.all([
+          walletAPI.getWallet(),
+          adminAPI.getSettings().catch(() => ({}))
+        ]);
         setWallet(wal?.data || wal || null);
+        const settings = settingsRes?.data || settingsRes || {};
+        setUsdtRate(parseFloat(settings.usdtrate) || 0);
+        setUsdtCommission(parseFloat(settings.usdtcommissionpercent) || 0);
       } catch (err) {
         console.error('Failed to fetch wallet', err);
       } finally {
@@ -154,7 +162,7 @@ const Exchange = () => {
             <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
                 <h3 className="text-lg sm:text-xl font-bold text-white">SELL USDT</h3>
-                <p className="text-gray-500 text-xs sm:text-sm">at ₹{selectedRate === 'GAMING' ? '103' : '108'}</p>
+                <p className="text-gray-500 text-xs sm:text-sm">at ₹{usdtRate > 0 ? usdtRate : 103}</p>
               </div>
               <button onClick={() => setShowTradeModal(false)} className="p-2 sm:p-3 rounded-xl bg-[#1a1a1a] hover:bg-[#252525] transition-colors">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,7 +173,7 @@ const Exchange = () => {
 
             <div className="space-y-3 sm:space-y-4">
               <div>
-                <label className="block text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2 font-medium">Amount (INR)</label>
+                <label className="block text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2 font-medium">Amount (USDT)</label>
                 <input
                   type="number"
                   value={amount}
@@ -175,14 +183,30 @@ const Exchange = () => {
                 />
               </div>
 
-              {amount && (
-                <div className="p-3 sm:p-5 border border-red-500/30 bg-gradient-to-r from-red-500/20 to-orange-500/10 rounded-xl sm:rounded-2xl">
-                  <p className="text-gray-400 text-xs sm:text-sm">Rate: ₹{selectedRate === 'GAMING' ? '103' : '108'} per USDT</p>
-                  <p className="font-bold text-lg sm:text-xl mt-1 sm:mt-2 text-red-400">
-                    You will get: <span className="text-white">₹{amount}</span>
-                  </p>
-                </div>
-              )}
+              {amount && (() => {
+                const usdtAmount = parseFloat(amount);
+                const inrValue = usdtAmount * usdtRate;
+                const commissionAmount = inrValue * (usdtCommission / 100);
+                const afterCommission = inrValue - commissionAmount;
+                return (
+                  <div className="p-3 sm:p-5 border border-green-500/30 bg-gradient-to-r from-green-500/20 to-emerald-500/10 rounded-xl sm:rounded-2xl">
+                    <p className="text-gray-400 text-xs sm:text-sm">Rate: ₹{usdtRate}/USDT</p>
+                    <p className="text-green-400 text-sm font-medium mt-1">Total: ₹{inrValue.toFixed(2)} INR</p>
+                    {usdtCommission > 0 ? (
+                      <>
+                        <p className="text-yellow-400 text-xs mt-1">Commission ({usdtCommission}%): -₹{commissionAmount.toFixed(2)}</p>
+                        <p className="font-bold text-lg sm:text-xl mt-1 sm:mt-2 text-white">
+                          You will get: ₹{afterCommission.toFixed(2)}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="font-bold text-lg sm:text-xl mt-1 sm:mt-2 text-white">
+                        You will get: ₹{inrValue.toFixed(2)}
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
 
               <button
                 onClick={handleTrade}
