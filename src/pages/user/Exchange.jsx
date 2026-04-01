@@ -271,7 +271,7 @@ const Exchange = () => {
                     <p className="text-gray-500 text-xs">{req.ratetype} @ ₹{req.rate}</p>
                   </div>
                   <div className="text-right">
-                    <span className={`px-2 py-1 rounded-lg text-xs font-medium ${req.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : req.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{req.status}</span>
+                    <span className={`px-2 py-1 rounded-lg text-xs font-medium ${req.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : req.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{req.status === 'APPROVED' ? 'SUCCESS' : req.status}</span>
                     <p className="text-gray-500 text-xs mt-1">₹{(parseFloat(req.amount || 0) * parseFloat(req.rate || 0)).toFixed(2)}</p>
                   </div>
                 </div>

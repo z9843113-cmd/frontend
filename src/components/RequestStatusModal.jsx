@@ -60,7 +60,7 @@ const RequestStatusModal = ({ isOpen, onClose, type, requestId, title }) => {
   };
 
   const getStatusMessage = () => {
-    if (status === 'APPROVED' || status === 'COMPLETED') return 'Request Approved!';
+    if (status === 'APPROVED' || status === 'COMPLETED') return 'Success!';
     if (status === 'REJECTED' || status === 'CANCELLED') return 'Request Rejected';
     return 'Waiting for approval...';
   };
