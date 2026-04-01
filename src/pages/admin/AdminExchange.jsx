@@ -88,6 +88,8 @@ const AdminExchange = () => {
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' });
   };
 
+  const handleLogout = () => { logout(); navigate('/login'); };
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] pb-24 lg:pb-8 font-['Ubuntu',sans-serif]">
       <div className="sticky top-0 z-30 bg-[#0d0d0d] border-b border-[#1a1a1a]">
