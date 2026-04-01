@@ -159,7 +159,8 @@ const Exchange = () => {
 
         <button
           onClick={() => setShowTradeModal(true)}
-          className="w-full py-4 sm:py-5 bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37] hover:from-[#E5C158] hover:via-[#FFE44D] hover:to-[#E5C158] text-black font-bold rounded-xl sm:rounded-2xl text-base sm:text-lg shadow-lg shadow-[#D4AF37]/30 transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+          disabled={!selectedRate}
+          className="w-full py-4 sm:py-5 bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37] hover:from-[#E5C158] hover:via-[#FFE44D] hover:to-[#E5C158] text-black font-bold rounded-xl sm:rounded-2xl text-base sm:text-lg shadow-lg shadow-[#D4AF37]/30 transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
