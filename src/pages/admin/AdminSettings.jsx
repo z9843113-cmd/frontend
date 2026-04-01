@@ -18,6 +18,10 @@ const AdminSettings = () => {
   const [bannerMessage, setBannerMessage] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const { logout } = useAuthStore();
   const navigate = useNavigate();
 
@@ -52,12 +56,27 @@ const AdminSettings = () => {
     finally { setSavingBanner(false); }
   };
 
-  const handleDeleteAllData = async (e) => {
+  const handleDeleteClick = (e) => {
     e.preventDefault();
-    if (!window.confirm('This will DELETE ALL USERS except admins. Are you sure?')) return;
+    setPasswordInput('');
+    setConfirmPasswordInput('');
+    setPasswordError('');
+    setShowPasswordModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!passwordInput) {
+      setPasswordError('Please enter password');
+      return;
+    }
+    if (passwordInput !== confirmPasswordInput) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+    setShowPasswordModal(false);
     setDeleting(true);
     try {
-      await adminAPI.resetDatabase();
+      await adminAPI.resetDatabase(passwordInput);
       alert('All users deleted successfully!');
     } catch (err) {
       alert(err.response?.data?.error || 'Failed to delete users');
@@ -260,8 +279,54 @@ const AdminSettings = () => {
         <div className="bg-gradient-to-br from-red-900/30 to-[#0d0d0d] rounded-3xl p-6 border border-red-500/30">
           <h3 className="text-lg font-semibold text-red-400 mb-2">Danger Zone</h3>
           <p className="text-gray-400 text-sm mb-4">Delete all non-admin users and their data. This action cannot be undone!</p>
-          <button onClick={handleDeleteAllData} disabled={deleting} className="w-full py-4 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700 disabled:opacity-50">{deleting ? 'Deleting...' : 'Delete All Users'}</button>
+          <button onClick={handleDeleteClick} disabled={deleting} className="w-full py-4 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700 disabled:opacity-50">{deleting ? 'Deleting...' : 'Delete All Users'}</button>
         </div>
+
+        {showPasswordModal && (
+          <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+            <div className="bg-[#1a1a1a] rounded-3xl p-6 w-full max-w-md border border-[#2a2a2a]">
+              <h3 className="text-xl font-bold text-white mb-4">Confirm Delete</h3>
+              <p className="text-gray-400 text-sm mb-4">Enter your admin password twice to confirm deletion of all non-admin users.</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-gray-400 text-sm mb-2">Admin Password</label>
+                  <input 
+                    type="password" 
+                    value={passwordInput}
+                    onChange={(e) => setPasswordInput(e.target.value)}
+                    className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+                    placeholder="Enter password"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 text-sm mb-2">Confirm Password</label>
+                  <input 
+                    type="password" 
+                    value={confirmPasswordInput}
+                    onChange={(e) => setConfirmPasswordInput(e.target.value)}
+                    className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+                    placeholder="Enter password again"
+                  />
+                </div>
+                {passwordError && <p className="text-red-400 text-sm">{passwordError}</p>}
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button 
+                  onClick={() => setShowPasswordModal(false)}
+                  className="flex-1 py-4 bg-[#2a2a2a] text-white font-bold rounded-2xl hover:bg-[#3a3a3a]"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleConfirmDelete}
+                  className="flex-1 py-4 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 bg-[#0d0d0d]/95 backdrop-blur-2xl border-t border-[#1a1a1a] lg:hidden z-50">
