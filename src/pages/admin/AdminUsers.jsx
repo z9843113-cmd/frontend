@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../../services/api';
 import { useAuthStore } from '../../store';
@@ -18,18 +18,6 @@ const AdminUsers = () => {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
 
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    try { 
-      const res = await adminAPI.getUsers({ page, limit: 20, search }); 
-      const data = res?.data || res; 
-      setUsers(data?.users || []); 
-      setTotalPages(data?.totalPages || 1); 
-    }
-    catch { console.error('Failed to fetch users'); }
-    finally { setLoading(false); }
-  }, [page, search]);
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearch(searchInput);
@@ -37,7 +25,20 @@ const AdminUsers = () => {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  useEffect(() => { fetchUsers(); }, [fetchUsers]);
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try { 
+        const res = await adminAPI.getUsers({ page, limit: 20, search }); 
+        const data = res?.data || res; 
+        setUsers(data?.users || []); 
+        setTotalPages(data?.totalPages || 1); 
+      }
+      catch { console.log('Failed to fetch users'); }
+      finally { setLoading(false); }
+    };
+    fetchUsers();
+  }, [page, search]);
 
   const handleBlockToggle = async (userId, isBlocked) => {
     try { 
