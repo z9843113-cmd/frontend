@@ -176,7 +176,9 @@ const Home = () => {
   };
 
   const getTotalBalance = () => {
-    return parseFloat(wallet?.inrbalance || 0);
+    const inrBalance = parseFloat(wallet?.inrbalance || 0);
+    const usdtBalance = parseFloat(wallet?.usdtbalance || 0);
+    return inrBalance + (usdtBalance * usdtRate);
   };
 
   const getRewardValue = () => parseFloat(wallet?.tokenbalance || 0) * tokenRate;
