@@ -9,6 +9,8 @@ const AdminWithdrawals = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [status, setStatus] = useState('');
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [processingId, setProcessingId] = useState(null);
@@ -19,13 +21,20 @@ const AdminWithdrawals = () => {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
 
-  useEffect(() => { fetchWithdrawals(); }, [page, status]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => { fetchWithdrawals(); }, [page, status, search]);
 
   const fetchWithdrawals = async () => {
     setLoading(true);
     setError('');
     try {
-      const res = await adminAPI.getWithdrawals({ page, limit: 20, status });
+      const res = await adminAPI.getWithdrawals({ page, limit: 20, status, search });
       setWithdrawals(res.withdrawals || []);
       setTotal(res.total || 0);
     } catch (err) {
@@ -281,6 +290,7 @@ const AdminWithdrawals = () => {
         </div>
       </div>
       <div className="p-4 space-y-4">
+        <input type="text" placeholder="Search by email..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
         <div className="overflow-x-auto flex gap-2 pb-2">
           {['', 'PENDING', 'APPROVED', 'REJECTED'].map((s) => (
             <button key={s} onClick={() => { setStatus(s); setPage(1); }} className={`px-3 py-2 rounded-xl text-xs whitespace-nowrap ${status === s ? 'bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-semibold' : 'bg-[#1a1a1a] text-gray-400 border border-[#2a2a2a]'}`}>{s || 'All'}</button>

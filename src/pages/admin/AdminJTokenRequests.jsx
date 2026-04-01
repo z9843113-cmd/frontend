@@ -11,6 +11,8 @@ const AdminJTokenRequests = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [status, setStatus] = useState('');
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState('');
   const [selected, setSelected] = useState(null);
@@ -26,18 +28,17 @@ const AdminJTokenRequests = () => {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
 
-  const menuItems = [
-    { label: 'Home', path: '/admin/dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v-6a1 1 0 00-1-1h-3m-9 16v2a1 1 0 001 1h2' },
-    { label: 'J Token', path: '/admin/jtoken', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
-    { label: 'Requests', path: '/admin/jtoken-requests', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
-    { label: 'History', path: '/admin/jtoken-history', icon: 'M4 6h16M4 12h16M4 18h10' },
-    { label: 'Settings', path: '/admin/settings', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z' }
-  ];
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   const fetchRequests = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await adminAPI.getJTokenPurchases({ page, limit: 20, status });
+      const res = await adminAPI.getJTokenPurchases({ page, limit: 20, status, search });
       const data = res?.data || res;
       setRequests(data?.purchases || []);
       setTotalPages(data?.totalPages || 1);
@@ -46,7 +47,7 @@ const AdminJTokenRequests = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, status]);
+  }, [page, status, search]);
 
   useEffect(() => {
     fetchRequests();
@@ -344,6 +345,7 @@ const AdminJTokenRequests = () => {
       </div>
 
       <div className="mx-auto max-w-5xl space-y-5 px-4 py-5">
+        <input type="text" placeholder="Search by email..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
         <div className="flex flex-wrap gap-3">
           {FILTERS.map((filter) => <button key={filter || 'ALL'} onClick={() => { setStatus(filter); setPage(1); }} className={`rounded-2xl px-4 py-3 text-sm font-semibold ${status === filter ? 'bg-[#D4AF37] text-black' : 'bg-[#171717] text-gray-400'}`}>{filter || 'All'}</button>)}
         </div>

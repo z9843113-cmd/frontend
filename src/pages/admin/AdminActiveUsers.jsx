@@ -8,6 +8,7 @@ const AdminActiveUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -15,6 +16,13 @@ const AdminActiveUsers = () => {
   const [userDetails, setUserDetails] = useState(null);
   const { logout } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   useEffect(() => { fetchUsers(); }, [page, search]);
 
@@ -26,7 +34,7 @@ const AdminActiveUsers = () => {
       setUsers(data?.users || []); 
       setTotalPages(data?.totalPages || 1); 
     }
-    catch { console.error('Failed to fetch users'); }
+    catch { console.log('Failed to fetch users'); }
     finally { setLoading(false); }
   };
 
@@ -93,7 +101,7 @@ const AdminActiveUsers = () => {
 
         <div className="p-4">
           <div className="mb-4">
-            <input type="text" placeholder="Search by email or user ID" value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#242424] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
+            <input type="text" placeholder="Search by email or user ID" value={searchInput} onChange={(e) => { setSearchInput(e.target.value); setPage(1); }} className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#242424] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
           </div>
 
           <div className="hidden lg:block overflow-x-auto">
