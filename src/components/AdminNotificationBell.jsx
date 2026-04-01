@@ -64,7 +64,7 @@ const AdminNotificationBell = () => {
       try {
         const [notifRes, exchangeRes] = await Promise.all([
           adminAPI.getNotifications(),
-          adminAPI.getExchangeRequests({ page: 1, limit: 10, status: 'PENDING' }).catch(() => ({ requests: [] }))
+          adminAPI.getExchangeRequests({ page: 1, limit: 10, status: 'PENDING' }).catch(() => ({ data: { requests: [] } }))
         ]);
         
         const data = notifRes?.data || notifRes || { totalUnread: 0, items: [] };
@@ -162,7 +162,14 @@ const AdminNotificationBell = () => {
               <button
                 key={item.id}
                 onClick={() => {
-                  navigate(item.path);
+                  let path = '/admin/dashboard';
+                  if (item.type === 'DEPOSIT') path = '/admin/deposits';
+                  else if (item.type === 'WITHDRAWAL') path = '/admin/withdrawals';
+                  else if (item.type === 'JTOKEN' || item.type === 'JTOKEN_PURCHASE') path = '/admin/jtoken-requests';
+                  else if (item.type === 'EXCHANGE') path = '/admin/withdrawals';
+                  else if (item.path && item.path.startsWith('/admin/')) path = item.path;
+                  
+                  navigate(path, { replace: true });
                   setOpen(false);
                 }}
                 className={`w-full rounded-2xl border p-3 text-left hover:border-[#D4AF37]/40 ${notifications.unreadIds.includes(item.id) ? 'border-[#D4AF37]/40 bg-[#16120a]' : 'border-[#1d1d1d] bg-[#111]'}`}

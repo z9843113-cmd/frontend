@@ -101,7 +101,7 @@ const AdminActiveUsers = () => {
 
         <div className="p-4">
           <div className="mb-4">
-            <input type="text" placeholder="Search by email or user ID..." value={searchInput} onChange={(e) => { setSearchInput(e.target.value); setPage(1); }} className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#242424] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
+            <input type="text" placeholder="Search by email, ID or referral code..." value={searchInput} onChange={(e) => { setSearchInput(e.target.value); setPage(1); }} className="w-full px-4 py-3 bg-[#1a1a1a] border border-[#242424] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
           </div>
 
           <div className="hidden lg:block overflow-x-auto">

@@ -422,7 +422,7 @@ const AdminUsers = () => {
             <h2 className="text-white font-semibold">All Users</h2>
             <span className="text-xs sm:text-sm text-gray-500">{users.length} users</span>
           </div>
-          <input type="text" placeholder="Search by email or user ID..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none text-sm sm:text-base" />
+          <input type="text" placeholder="Search by email, ID or referral code..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 sm:py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none text-sm sm:text-base" />
           {loading ? (
             <div className="animate-pulse space-y-3 mt-4">
               {[1,2,3,4,5].map(i => <div key={i} className="h-20 sm:h-16 bg-[#0a0a0a] rounded-2xl"></div>)}
@@ -434,9 +434,21 @@ const AdminUsers = () => {
               {users.map((user) => (
                 <div key={user.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-[#0a0a0a] rounded-2xl border border-[#1a1a1a] gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-white font-medium truncate">{user?.email || 'N/A'}</p>
                       {user.mobile && <span className="text-gray-500 text-xs">📱 {user.mobile}</span>}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-gray-500 text-xs sm:text-sm">ID: <span className="text-gray-400 font-mono text-xs">{user.id}</span></p>
+                      <button 
+                        onClick={() => { navigator.clipboard.writeText(user.id); }}
+                        className="p-1.5 bg-[#1a1a1a] hover:bg-[#252525] rounded-lg text-gray-400 hover:text-[#D4AF37] transition-colors"
+                        title="Copy ID"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </button>
                     </div>
                     <p className="text-gray-500 text-sm">Ref: {user.referralcode}</p>
                     <p className="text-gray-600 text-xs mt-1">{user.createdat ? new Date(user.createdat).toLocaleDateString() : ''}</p>
