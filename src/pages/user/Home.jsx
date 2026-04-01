@@ -310,7 +310,7 @@ const Home = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-white/5 bg-black/20 p-4">
                 <p className="text-xs text-gray-500">INR Wallet</p>
                 <p className="mt-2 text-xl font-semibold text-white">₹{formatINR(wallet?.inrbalance || 0)}</p>
@@ -318,10 +318,6 @@ const Home = () => {
               <div className="rounded-2xl border border-white/5 bg-black/20 p-4">
                 <p className="text-xs text-gray-500">USDT Wallet</p>
                 <p className="mt-2 text-xl font-semibold text-white">{parseFloat(wallet?.usdtbalance || 0).toFixed(4)}</p>
-              </div>
-              <div className="col-span-2 rounded-2xl border border-white/5 bg-black/20 p-4 sm:col-span-1">
-                <p className="text-xs text-gray-500">J Token Balance</p>
-                <p className="mt-2 text-xl font-semibold text-white">{formatToken(wallet?.tokenbalance || 0)} J Token</p>
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between rounded-2xl bg-[#0b0b0b] px-4 py-3">
