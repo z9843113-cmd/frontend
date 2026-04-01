@@ -261,6 +261,9 @@ const AdminJTokenRequests = () => {
               <div className="rounded-2xl bg-[#111] p-4 text-sm text-gray-300">
                 <p>{selected.email}</p>
                 <p className="mt-1 text-[#D4AF37]">₹{parseFloat(selected.amount || 0).toFixed(2)} / {parseFloat(selected.tokenamount || 0).toFixed(2)} J Token</p>
+                {selected.commission > 0 && (
+                  <p className="text-xs text-yellow-400 mt-1">Including ₹{selected.commission.toFixed(2)} commission ({selected.commissionPercent}%)</p>
+                )}
               </div>
               
               {/* Payment Method Selection */}

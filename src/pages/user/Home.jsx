@@ -492,27 +492,30 @@ const Home = () => {
               </div>
             )}
 
-            {recentActivity.map((item, index) => (
-              <div key={`${item.id || index}-${item.createdat || index}`} className="flex items-center justify-between rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] p-4">
-                <div className="flex items-center gap-3">
-                  <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${item.entryType === 'deposit' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}>
-                    {item.entryType === 'deposit' ? <FaArrowDown className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">{item.method || (item.entryType === 'deposit' ? 'Deposit' : 'Withdrawal')}</p>
-                    <p className="text-xs text-gray-500">{item.createdat ? new Date(item.createdat).toLocaleString() : 'Pending time'}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className={`text-sm font-bold ${item.entryType === 'deposit' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {item.entryType === 'deposit' ? '+' : '-'}₹{formatINR(item.amount || 0)}
-                  </p>
-                  <p className={`text-xs font-medium ${item.status === 'APPROVED' ? 'text-emerald-400' : item.status === 'REJECTED' ? 'text-rose-400' : 'text-amber-400'}`}>
-                    {item.status === 'APPROVED' ? 'SUCCESS' : item.status === 'REJECTED' ? 'FAILED' : item.status || 'PENDING'}
-                  </p>
-                </div>
-              </div>
-            ))}
+            {recentActivity.map((item, index) => {
+                    const isUSDT = (item.method || '').toUpperCase().includes('USDT') || (item.type || '').toUpperCase().includes('USDT');
+                    return (
+                      <div key={`${item.id || index}-${item.createdat || index}`} className="flex items-center justify-between rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] p-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${item.entryType === 'deposit' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}>
+                            {item.entryType === 'deposit' ? <FaArrowDown className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-white">{item.method || (item.entryType === 'deposit' ? 'Deposit' : 'Withdrawal')}</p>
+                            <p className="text-xs text-gray-500">{item.createdat ? new Date(item.createdat).toLocaleString() : 'Pending time'}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className={`text-sm font-bold ${item.entryType === 'deposit' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {item.entryType === 'deposit' ? '+' : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(item.amount || 0)}`}
+                          </p>
+                          <p className={`text-xs font-medium ${item.status === 'APPROVED' ? 'text-emerald-400' : item.status === 'REJECTED' ? 'text-rose-400' : 'text-amber-400'}`}>
+                            {item.status === 'APPROVED' ? 'SUCCESS' : item.status === 'REJECTED' ? 'FAILED' : item.status || 'PENDING'}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
           </div>
         </div>
       </div>
