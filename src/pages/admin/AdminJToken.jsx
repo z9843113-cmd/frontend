@@ -112,7 +112,7 @@ const AdminJToken = () => {
       const refreshed = refresh?.data || refresh;
       setSelectedUser({ ...selectedUser, wallet: refreshed.wallet });
     } catch (error) {
-      setMessage(error?.message || 'Failed to update J Token');
+      setMessage(error?.response?.data?.error || 'Failed to update balance');
     } finally {
       setSaving(false);
     }
