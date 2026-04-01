@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/BottomNav';
-import { jTokenPurchaseAPI, walletAPI, uploadToCloudinary, userAPI } from '../../services/api';
+import { jTokenPurchaseAPI, walletAPI, uploadToCloudinary, userAPI, adminAPI } from '../../services/api';
 import { FaArrowLeft, FaCopy, FaTimes } from 'react-icons/fa';
 
 const BuyJToken = () => {
@@ -22,6 +22,8 @@ const BuyJToken = () => {
   const [uploading, setUploading] = useState(false);
   const [selectedUpi, setSelectedUpi] = useState('');
   const [userUpiAccounts, setUserUpiAccounts] = useState([]);
+  const [tokenRate, setTokenRate] = useState(1);
+  const [jTokenCommission, setJTokenCommission] = useState(0);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -39,9 +41,12 @@ const BuyJToken = () => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const walletRes = await walletAPI.getWallet().catch(() => null);
-        const requestsRes = await jTokenPurchaseAPI.getMyRequests().catch(() => ({ data: { purchases: [] } }));
-        const userUpiRes = await userAPI.getUpiAccounts().catch(() => []);
+        const [walletRes, requestsRes, userUpiRes, settingsRes] = await Promise.all([
+          walletAPI.getWallet().catch(() => null),
+          jTokenPurchaseAPI.getMyRequests().catch(() => ({ data: { purchases: [] } })),
+          userAPI.getUpiAccounts().catch(() => []),
+          adminAPI.getSettings().catch(() => ({}))
+        ]);
         
         setWallet(walletRes?.data || walletRes || null);
         const allRequests = requestsRes?.data?.purchases || requestsRes?.purchases || requestsRes?.data || requestsRes || [];
@@ -51,6 +56,10 @@ const BuyJToken = () => {
         else setRequest(null);
         
         setUserUpiAccounts(userUpiRes?.data || userUpiRes || []);
+        
+        const settings = settingsRes?.data || settingsRes || {};
+        setTokenRate(parseFloat(settings.tokenrate) || 1);
+        setJTokenCommission(parseFloat(settings.jtokencommissionpercent) || 0);
       } catch (err) {
         console.error('Load error:', err);
       } finally {
@@ -242,6 +251,26 @@ const BuyJToken = () => {
                 placeholder="Enter amount"
                 className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none"
               />
+              {amount && (() => {
+                const inrValue = parseFloat(amount);
+                const commissionAmount = inrValue * (jTokenCommission / 100);
+                const afterCommission = inrValue - commissionAmount;
+                const tokens = afterCommission / tokenRate;
+                return (
+                  <div className="mt-2 space-y-1 bg-[#0a0a0a] p-3 rounded-xl border border-[#2a2a2a]">
+                    <p className="text-gray-400 text-xs">Token Rate: ₹{tokenRate}/JToken</p>
+                    <p className="text-green-400 text-sm font-medium">Total: ₹{inrValue.toFixed(2)}</p>
+                    {jTokenCommission > 0 ? (
+                      <>
+                        <p className="text-yellow-400 text-xs">Commission ({jTokenCommission}%): -₹{commissionAmount.toFixed(2)}</p>
+                        <p className="text-white text-sm font-bold">You will get: ₹{afterCommission.toFixed(2)} = {tokens.toFixed(2)} JToken</p>
+                      </>
+                    ) : (
+                      <p className="text-white text-sm font-bold">You will get: ₹{inrValue.toFixed(2)} = {(inrValue/tokenRate).toFixed(2)} JToken</p>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
 
             <button onClick={handleCreate} disabled={submitting || !selectedUpi || !amount} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">
