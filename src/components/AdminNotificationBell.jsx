@@ -62,13 +62,30 @@ const AdminNotificationBell = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const res = await adminAPI.getNotifications();
-        const data = res?.data || res || { totalUnread: 0, items: [] };
-        const currentIds = (data.items || []).map((item) => item.id);
+        const [notifRes, exchangeRes] = await Promise.all([
+          adminAPI.getNotifications(),
+          adminAPI.getExchangeRequests({ page: 1, limit: 10, status: 'PENDING' }).catch(() => ({ requests: [] }))
+        ]);
+        
+        const data = notifRes?.data || notifRes || { totalUnread: 0, items: [] };
+        const exchangeData = exchangeRes?.data || exchangeRes || { requests: [] };
+        
+        const exchangeNotifications = (exchangeData.requests || []).map(req => ({
+          id: 'exchange-' + req.id,
+          title: 'Exchange Request',
+          description: `${req.amount} USDT @ ₹${req.rate}`,
+          type: 'EXCHANGE',
+          requestId: req.id,
+          createdat: req.createdat
+        }));
+        
+        const allItems = [...(data.items || []), ...exchangeNotifications].sort((a, b) => new Date(b.createdat) - new Date(a.createdat));
+        
+        const currentIds = allItems.map((item) => item.id);
         const previousIds = JSON.parse(localStorage.getItem(LAST_IDS_KEY) || '[]');
         const readIds = JSON.parse(localStorage.getItem(READ_IDS_KEY) || '[]');
         const dismissedIds = JSON.parse(localStorage.getItem(DISMISSED_IDS_KEY) || '[]');
-        const visibleItems = (data.items || []).filter((item) => !dismissedIds.includes(item.id));
+        const visibleItems = allItems.filter((item) => !dismissedIds.includes(item.id));
         const visibleIds = visibleItems.map((item) => item.id);
         const unreadIds = visibleIds.filter((id) => !readIds.includes(id));
 
