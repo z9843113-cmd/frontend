@@ -126,13 +126,20 @@ const Home = () => {
     const timeoutId = setTimeout(loadHome, 0);
     const intervalId = setInterval(async () => {
       try {
-        const walletRes = await walletAPI.getWallet();
+        const [walletRes, settingsRes] = await Promise.all([
+          walletAPI.getWallet(),
+          adminAPI.getSettings().catch(() => ({}))
+        ]);
         const walletData = walletRes?.data || walletRes || null;
         setWallet(walletData);
         if (walletData?.usdtRate) {
           setUsdtRate(parseFloat(walletData.usdtRate));
         } else if (walletData?.usdtrate) {
           setUsdtRate(parseFloat(walletData.usdtrate));
+        }
+        const settingsData = settingsRes?.data || settingsRes || {};
+        if (settingsData?.usdtrate && !walletData?.usdtRate) {
+          setUsdtRate(parseFloat(settingsData.usdtrate));
         }
       } catch (error) {
         console.error('Failed to refresh wallet', error);
