@@ -18,6 +18,29 @@ const BuyJToken = () => {
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [utr, setUtr] = useState('');
   const [screenshot, setScreenshot] = useState('');
+  const getStatusDisplay = (status) => {
+    const statusMap = {
+      'APPROVED': 'SUCCESS',
+      'REJECTED': 'FAILED',
+      'CANCELLED': 'CANCELLED',
+      'EXPIRED': 'EXPIRED',
+      'PENDING': 'PENDING',
+      'WAITING_ADMIN': 'PENDING',
+      'WAITING_ORDER': 'PENDING',
+      'PAYMENT_STARTED': 'PENDING',
+      'PAYMENT_SUBMITTED': 'PENDING',
+      'READY_TO_PAY': 'PENDING'
+    };
+    return statusMap[status] || status;
+  };
+
+  const getStatusColor = (status) => {
+    if (status === 'APPROVED') return 'bg-green-500/20 text-green-400';
+    if (status === 'REJECTED') return 'bg-red-500/20 text-red-400';
+    if (status === 'CANCELLED' || status === 'EXPIRED') return 'bg-gray-500/20 text-gray-400';
+    return 'bg-yellow-500/20 text-yellow-400';
+  };
+
   const [screenshotPreview, setScreenshotPreview] = useState('');
   const [uploading, setUploading] = useState(false);
   const [selectedUpi, setSelectedUpi] = useState('');
@@ -209,19 +232,8 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               }</p>
               </div>
               <div className="text-right">
-                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                  request.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' :
-                  request.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' :
-                  request.status === 'PAYMENT_SUBMITTED' ? 'bg-yellow-500/20 text-yellow-400' :
-                  request.status === 'PAYMENT_STARTED' ? 'bg-blue-500/20 text-blue-400' :
-                  request.status === 'READY_TO_PAY' ? 'bg-blue-500/20 text-blue-400' :
-                  'bg-gray-500/20 text-gray-400'
-                }`}>
-                  {request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PENDING' :
-                   request.status === 'PAYMENT_SUBMITTED' ? 'SUBMITTED' :
-                   request.status === 'READY_TO_PAY' ? 'PAYMENT READY' :
-                   request.status === 'PAYMENT_STARTED' ? 'IN PROGRESS' :
-                   request.status}
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(request.status)}`}>
+                  {getStatusDisplay(request.status)}
                 </span>
                 <p className="text-[#D4AF37] text-xs mt-1">Tap to view →</p>
               </div>
@@ -310,13 +322,8 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               </div>
               <div className="flex justify-between">
                 <p className="text-gray-400">Status</p>
-                <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                  request.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' :
-                  request.status === 'PAYMENT_SUBMITTED' ? 'bg-yellow-500/20 text-yellow-400' :
-                  request.status === 'PAYMENT_STARTED' ? 'bg-blue-500/20 text-blue-400' :
-                  'bg-gray-500/20 text-gray-400'
-                }`}>
-                  {request.status}
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(request.status)}`}>
+                  {getStatusDisplay(request.status)}
                 </span>
               </div>
             </div>
@@ -347,13 +354,8 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
                     <p className="text-white font-medium">₹{parseFloat(item.amount || 0).toFixed(2)}</p>
                     <p className="text-gray-500 text-xs">{formatDate(item.createdat)}</p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    item.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' :
-                    item.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' :
-                    item.status === 'CANCELLED' ? 'bg-gray-500/20 text-gray-400' :
-                    'bg-yellow-500/20 text-yellow-400'
-                  }`}>
-                    {item.status}
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(item.status)}`}>
+                    {getStatusDisplay(item.status)}
                   </span>
                 </div>
               ))}
