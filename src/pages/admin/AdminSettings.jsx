@@ -17,10 +17,6 @@ const AdminSettings = () => {
   const [supportMessage, setSupportMessage] = useState('');
   const [bannerMessage, setBannerMessage] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deletePassword, setDeletePassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [deleteError, setDeleteError] = useState('');
   const [deleting, setDeleting] = useState(false);
   const { logout } = useAuthStore();
   const navigate = useNavigate();
@@ -58,24 +54,13 @@ const AdminSettings = () => {
 
   const handleDeleteAllData = async (e) => {
     e.preventDefault();
-    setDeleteError('');
-    if (deletePassword !== confirmPassword) {
-      setDeleteError('Passwords do not match!');
-      return;
-    }
-    if (deletePassword.length < 6) {
-      setDeleteError('Password must be at least 6 characters!');
-      return;
-    }
+    if (!window.confirm('This will DELETE ALL USERS except admins. Are you sure?')) return;
     setDeleting(true);
     try {
-      await adminAPI.cleanupDatabase({ adminPassword: deletePassword });
-      setShowDeleteModal(false);
-      setDeletePassword('');
-      setConfirmPassword('');
-      alert('All non-admin data deleted successfully!');
+      await adminAPI.resetDatabase();
+      alert('All users deleted successfully!');
     } catch (err) {
-      setDeleteError(err.response?.data?.error || 'Failed to delete data');
+      alert(err.response?.data?.error || 'Failed to delete users');
     } finally {
       setDeleting(false);
     }
@@ -275,33 +260,10 @@ const AdminSettings = () => {
         <div className="bg-gradient-to-br from-red-900/30 to-[#0d0d0d] rounded-3xl p-6 border border-red-500/30">
           <h3 className="text-lg font-semibold text-red-400 mb-2">Danger Zone</h3>
           <p className="text-gray-400 text-sm mb-4">Delete all non-admin users and their data. This action cannot be undone!</p>
-          <button onClick={() => setShowDeleteModal(true)} className="w-full py-4 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700">Delete All Data</button>
+          <button onClick={handleDeleteAllData} disabled={deleting} className="w-full py-4 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700 disabled:opacity-50">{deleting ? 'Deleting...' : 'Delete All Users'}</button>
         </div>
       </div>
 
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setShowDeleteModal(false)}>
-          <div className="bg-[#0d0d0d] rounded-3xl p-6 w-full max-w-md border border-red-500/30" onClick={e => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-red-400 mb-4">Delete All Data</h3>
-            <p className="text-gray-400 text-sm mb-4">This will delete all users except admins. Enter password twice to confirm.</p>
-            {deleteError && <div className="mb-4 px-4 py-2 bg-red-500/20 text-red-400 rounded-xl text-sm">{deleteError}</div>}
-            <form onSubmit={handleDeleteAllData} className="space-y-4">
-              <div>
-                <label className="block text-gray-400 text-sm mb-2">Enter Admin Password</label>
-                <input type="password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-red-500 focus:outline-none" required />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-2">Confirm Password</label>
-                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-red-500 focus:outline-none" required />
-              </div>
-              <div className="flex gap-3">
-                <button type="button" onClick={() => setShowDeleteModal(false)} className="flex-1 py-4 bg-[#1a1a1a] text-white font-bold rounded-2xl">Cancel</button>
-                <button type="submit" disabled={deleting} className="flex-1 py-4 bg-red-600 text-white font-bold rounded-2xl disabled:opacity-50">{deleting ? 'Deleting...' : 'Delete All'}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
       <div className="fixed bottom-0 left-0 right-0 bg-[#0d0d0d]/95 backdrop-blur-2xl border-t border-[#1a1a1a] lg:hidden z-50">
         <div className="flex items-center justify-around py-2 px-1">
           <button onClick={() => navigate('/admin/dashboard')} className="flex flex-col items-center gap-1.5 p-2 text-gray-500"><div className="w-10 h-10 rounded-2xl bg-[#1a1a1a] flex items-center justify-center"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /></svg></div><span className="text-xs font-medium">Home</span></button>
