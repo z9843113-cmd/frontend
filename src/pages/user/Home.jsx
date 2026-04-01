@@ -509,7 +509,7 @@ const Home = () => {
                     {item.entryType === 'deposit' ? '+' : '-'}₹{formatINR(item.amount || 0)}
                   </p>
                   <p className={`text-xs font-medium ${item.status === 'APPROVED' ? 'text-emerald-400' : item.status === 'REJECTED' ? 'text-rose-400' : 'text-amber-400'}`}>
-                    {item.status || 'PENDING'}
+                    {item.status === 'APPROVED' ? 'SUCCESS' : item.status === 'REJECTED' ? 'FAILED' : item.status || 'PENDING'}
                   </p>
                 </div>
               </div>
