@@ -27,6 +27,13 @@ const AdminExchange = () => {
 
   useEffect(() => { fetchRequests(); }, [page, status, search]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchRequests();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [page, status, search]);
+
   const fetchRequests = async () => {
     setLoading(true);
     setError('');
