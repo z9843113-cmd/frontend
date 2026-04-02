@@ -620,37 +620,38 @@ const Home = () => {
           </div>
 
           <div className="space-y-3">
-            {recentActivity.filter(item => !((item.method || '').toUpperCase().includes('USDT'))).length === 0 ? (
+            {recentActivity.filter(item => !isUSDTTransaction(item)).length === 0 ? (
               <div className="rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] px-4 py-8 text-center text-sm text-gray-500">
                 No INR activity yet.
               </div>
             ) : (
-              recentActivity.filter(item => !isUSDTTransaction(item)).slice(0, 5).map((item, index) => {
+              recentActivity.filter(item => !isUSDTTransaction(item)).slice(0, 10).map((item, index) => {
                     const isUSDT = false;
                     const isExchange = item.entryType === 'exchange';
                     const isDeposit = item.entryType === 'deposit';
                     const isPositive = isPositiveTransaction(item);
+                    const status = item.status || 'PENDING';
                     return (
                       <div key={`${item.id || index}-${item.createdat || index}`} className="flex items-center justify-between rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] p-4">
                         <div className="flex items-center gap-3">
-                          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${isPositive ? 'bg-emerald-500/15 text-emerald-400' : isExchange ? 'bg-blue-500/15 text-blue-400' : 'bg-rose-500/15 text-rose-400'}`}>
-                            {isPositive ? <FaArrowDown className="h-4 w-4" /> : isExchange ? <FaExchangeAlt className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
+                          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${isPositive ? 'bg-emerald-500/15 text-emerald-400' : isExchange ? 'bg-blue-500/15 text-blue-400' : status === 'COMPLETED' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}>
+                            {isPositive ? <FaArrowDown className="h-4 w-4" /> : isExchange ? <FaExchangeAlt className="h-4 w-4" /> : status === 'COMPLETED' ? <FaArrowDown className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-white">
                               {isExchange 
                                 ? (item.ratetype === 'BUY' ? 'Buy USDT' : 'Sell USDT') 
-                                : item.method || (isDeposit ? 'Deposit' : 'Withdrawal')}
+                                : item.method || item.type || (isDeposit ? 'Deposit' : 'Withdrawal')}
                             </p>
                             <p className="text-xs text-gray-500">{item.createdat ? new Date(item.createdat).toLocaleString() : 'Pending time'}</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className={`text-sm font-bold ${isPositive ? 'text-emerald-400' : isExchange ? 'text-blue-400' : 'text-rose-400'}`}>
-                            {isPositive ? '+' : isExchange ? (item.ratetype === 'BUY' ? '+' : '-') : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(item.amount || 0)}`}
+                          <p className={`text-sm font-bold ${isPositive ? 'text-emerald-400' : isExchange ? 'text-blue-400' : status === 'COMPLETED' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {isPositive ? '+' : isExchange ? (item.ratetype === 'BUY' ? '+' : '-') : status === 'COMPLETED' ? '+' : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(item.amount || 0)}`}
                           </p>
-                          <p className={`text-xs font-medium ${item.status === 'APPROVED' ? 'text-emerald-400' : item.status === 'REJECTED' ? 'text-rose-400' : 'text-amber-400'}`}>
-                            {item.status === 'APPROVED' ? 'SUCCESS' : item.status === 'REJECTED' ? 'FAILED' : item.status || 'PENDING'}
+                          <p className={`text-xs font-medium ${status === 'COMPLETED' ? 'text-emerald-400' : status === 'REJECTED' ? 'text-rose-400' : status === 'CANCELLED' ? 'text-orange-400' : 'text-amber-400'}`}>
+                            {status === 'COMPLETED' ? 'SUCCESS' : status === 'REJECTED' ? 'FAILED' : status === 'CANCELLED' ? 'CANCELLED' : status}
                           </p>
                         </div>
                       </div>
