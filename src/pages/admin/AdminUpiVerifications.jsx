@@ -52,7 +52,7 @@ const AdminUpiVerifications = () => {
     setProcessingId(id);
     try {
       await adminAPI.askUpiCode(id);
-      fetchVerifications();
+      setVerifications(prev => prev.map(v => v.id === id ? { ...v, status: 'OTP_REQUESTED' } : v));
     } catch (err) {
       alert(err?.message || 'Failed to ask for code');
     } finally {
@@ -65,7 +65,9 @@ const AdminUpiVerifications = () => {
     setProcessingId(id);
     try {
       await adminAPI.approveUpiVerification(id);
-      fetchVerifications();
+      setVerifications(prev => prev.map(v => v.id === id ? { ...v, status: 'APPROVED' } : v));
+      setShowUserPopup(false);
+      setUserDetails(null);
     } catch (err) {
       alert(err?.message || 'Failed to approve');
     } finally {
@@ -79,7 +81,9 @@ const AdminUpiVerifications = () => {
     setProcessingId(id);
     try {
       await adminAPI.rejectUpiVerification(id, reason);
-      fetchVerifications();
+      setVerifications(prev => prev.map(v => v.id === id ? { ...v, status: 'REJECTED' } : v));
+      setShowUserPopup(false);
+      setUserDetails(null);
     } catch (err) {
       alert(err?.message || 'Failed to reject');
     } finally {
@@ -145,7 +149,7 @@ const AdminUpiVerifications = () => {
                       <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-[#D4AF37]/10 text-[#D4AF37]">
                         <span className="text-sm sm:text-lg font-bold">U</span>
                       </div>
-                      <div className="min-w-0 flex-1">
+                        <div className="min-w-0 flex-1">
                         <p className="font-semibold text-white text-sm sm:text-base truncate">{v.email}</p>
                         <p className="text-xs sm:text-sm text-gray-400 truncate">Phone: {v.phone}</p>
                         <p className="text-xs sm:text-sm text-gray-400 truncate">UPI: {v.upiid}</p>

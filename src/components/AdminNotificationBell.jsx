@@ -167,6 +167,7 @@ const AdminNotificationBell = () => {
                   else if (item.type === 'WITHDRAWAL') path = '/admin/withdrawals';
                   else if (item.type === 'JTOKEN' || item.type === 'JTOKEN_PURCHASE') path = '/admin/jtoken-requests';
                   else if (item.type === 'EXCHANGE') path = '/admin/exchange';
+                  else if (item.type === 'UPI_VERIFICATION') path = '/admin/upi-verifications';
                   else if (item.path && item.path.startsWith('/admin/')) path = item.path;
                   
                   navigate(path, { replace: true });
