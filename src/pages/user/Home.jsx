@@ -68,9 +68,16 @@ const Home = () => {
       '+91876***7788', '+91654***9900', '+91956***1122', '+91789***3344'
     ];
     const actions = ['Bought', 'Deposited', 'Sold', 'Transferred'];
+    const UsdtIcon = () => (
+      <svg viewBox="0 0 32 32" className="w-5 h-5" fill="none">
+        <circle cx="16" cy="16" r="14" fill="#10B981" fillOpacity="0.2"/>
+        <path d="M22.5 16.5L20 18L14.5 13.5L11.5 16.5L14.5 19.5L20 15L22.5 16.5Z" fill="#10B981"/>
+        <path d="M14.5 16.5L20 21L22.5 15.5L20 14L14.5 19L11.5 16L14.5 16.5Z" fill="#10B981" fillOpacity="0.6"/>
+      </svg>
+    );
     const types = [
       { name: 'JToken', color: '#D4AF37', icon: <FaCoins /> },
-      { name: 'USDT', color: '#10B981', icon: <FaRupeeSign /> },
+      { name: 'USDT', color: '#10B981', icon: <UsdtIcon /> },
       { name: 'Gaming', color: '#EF4444', icon: <FaGamepad /> },
       { name: 'MIX', color: '#8B5CF6', icon: <FaExchangeAlt /> }
     ];
@@ -565,7 +572,7 @@ const Home = () => {
         <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="rounded-[28px] border border-[#242424] bg-gradient-to-br from-[#171717] via-[#121212] to-[#0c0c0c] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.32)]">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#D4AF37]">Live Activity</p>
-            <h3 className="mt-2 text-2xl font-bold text-white">What's Happening Now</h3>
+            <h3 className="mt-2 text-2xl font-bold text-white">Real Time Order Flow</h3>
             
             <div className="mt-5 overflow-hidden rounded-2xl">
               <div className="relative h-[320px] overflow-hidden rounded-2xl bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] border border-[#2a2a2a] shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
