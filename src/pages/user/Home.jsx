@@ -298,6 +298,7 @@ const Home = () => {
     if (item.type === 'SOLD_TOKENS') return true;
     if (item.type === 'TRANSFER') return true;
     if (item.type === 'ADMIN_CREDIT') return true;
+    if (item.type === 'DEBIT') return false;
     return false;
   };
 
@@ -655,8 +656,8 @@ const Home = () => {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className={`text-sm font-bold ${isPositive ? 'text-emerald-400' : isExchange ? 'text-blue-400' : status === 'COMPLETED' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                            {isPositive ? '+' : isExchange ? (item.ratetype === 'BUY' ? '+' : '-') : status === 'COMPLETED' ? '+' : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(item.amount || 0)}`}
+                          <p className={`text-sm font-bold ${isPositive ? 'text-emerald-400' : isExchange ? 'text-blue-400' : 'text-rose-400'}`}>
+                            {isPositive ? '+' : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(Math.abs(item.amount || 0))}`}
                           </p>
                           <p className={`text-xs font-medium ${status === 'COMPLETED' ? 'text-emerald-400' : status === 'REJECTED' ? 'text-rose-400' : status === 'CANCELLED' ? 'text-orange-400' : 'text-amber-400'}`}>
                             {status === 'COMPLETED' ? 'SUCCESS' : status === 'REJECTED' ? 'FAILED' : status === 'CANCELLED' ? 'CANCELLED' : status}

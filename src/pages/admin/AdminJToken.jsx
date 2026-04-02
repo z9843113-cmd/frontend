@@ -277,18 +277,17 @@ const AdminJToken = () => {
                   </div>
                   <div>
                     <label className="block text-sm text-gray-400 mb-2">Status Type</label>
-                    <select value={note} onChange={(e) => setNote(e.target.value)} className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white focus:border-[#D4AF37] focus:outline-none">
-                      <option value="">Select status type</option>
+                    <select value={statusType} onChange={(e) => setStatusType(e.target.value)} className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white focus:border-[#D4AF37] focus:outline-none">
                       <option value="REWARD">Reward</option>
                       <option value="COMMISSION">Commission</option>
                       <option value="SOLD_TOKENS">Sold Tokens</option>
                       <option value="TRANSFER">Transfer</option>
                     </select>
                   </div>
-                  <input type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="J Token amount" className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
-                  <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Reason or note" rows={4} className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
+                  <input type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="INR amount" className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
+                  <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Reason or note (optional)" rows={3} className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
                   <button type="submit" disabled={saving} className="w-full rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#FFD700] py-4 font-bold text-black disabled:opacity-50">
-                    {saving ? 'Updating...' : `${action === 'CREDIT' ? 'Credit' : 'Debit'} J Token`}
+                    {saving ? 'Updating...' : `${action === 'CREDIT' ? 'Credit' : 'Debit'} INR`}
                   </button>
                 </form>
               </>
