@@ -114,13 +114,13 @@ const Home = () => {
           setUsdtRate(parseFloat(walletData.usdtRate));
         }
 
-        if (profileData.bannerEnabled !== undefined) {
+        if (settingsData.bannerEnabled !== undefined || settingsData.bannerTitle) {
           setBanner({
-            enabled: profileData.bannerEnabled !== false,
-            title: profileData.bannerTitle || 'Welcome Bonus',
-            subtitle: profileData.bannerSubtitle || 'Get 50% extra on first deposit',
-            buttonText: profileData.bannerButtonText || 'Claim Now',
-            link: profileData.bannerLink || '/deposit'
+            enabled: settingsData.bannerEnabled !== false,
+            title: settingsData.bannerTitle || 'Welcome Bonus',
+            subtitle: settingsData.bannerSubtitle || 'Get 50% extra on first deposit',
+            buttonText: settingsData.bannerButtonText || 'Claim Now',
+            link: settingsData.bannerLink || '/deposit'
           });
         }
 
