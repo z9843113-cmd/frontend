@@ -286,6 +286,9 @@ const Home = () => {
   };
 
   const isPositiveTransaction = (item) => {
+    const amount = parseFloat(item.amount || 0);
+    if (amount < 0) return false;
+    if (amount > 0) return true;
     if (item.entryType === 'deposit') return true;
     if (item.entryType === 'exchange' && item.ratetype === 'BUY') return true;
     if (item.entryType === 'exchange' && item.ratetype === 'SELL') return false;
@@ -297,9 +300,6 @@ const Home = () => {
     if (item.type === 'COMMISSION') return true;
     if (item.type === 'SOLD_TOKENS') return true;
     if (item.type === 'TRANSFER') return true;
-    if (item.type === 'ADMIN_CREDIT') return true;
-    if (item.type === 'ADMIN_DEBIT') return false;
-    if (item.type === 'DEBIT') return false;
     return false;
   };
 
@@ -647,8 +647,6 @@ const Home = () => {
                             <p className="text-sm font-semibold text-white">
                               {isExchange 
                                 ? (item.ratetype === 'BUY' ? 'Buy USDT' : 'Sell USDT') 
-                                : item.type === 'ADMIN_CREDIT' ? 'Admin Credit'
-                                : item.type === 'ADMIN_DEBIT' ? 'Admin Debit'
                                 : item.type === 'REWARD' ? 'Reward' 
                                 : item.type === 'COMMISSION' ? 'Commission'
                                 : item.type === 'SOLD_TOKENS' ? 'Sold Tokens'
