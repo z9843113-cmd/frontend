@@ -29,6 +29,7 @@ const Home = () => {
   const [wallet, setWallet] = useState(null);
   const [recentDeposits, setRecentDeposits] = useState([]);
   const [recentWithdrawals, setRecentWithdrawals] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [usdtRate, setUsdtRate] = useState(0);
   const [tokenRate, setTokenRate] = useState(0);
@@ -53,7 +54,7 @@ const Home = () => {
   useEffect(() => {
     const loadHome = async () => {
       try {
-        const [walletRes, depositsRes, withdrawalsRes, profileRes, upiRes, bankRes, ratesRes, settingsRes] = await Promise.all([
+        const [walletRes, depositsRes, withdrawalsRes, profileRes, upiRes, bankRes, ratesRes, settingsRes, transRes] = await Promise.all([
           walletAPI.getWallet(),
           depositAPI.getHistory(),
           withdrawalAPI.getHistory(),
@@ -61,7 +62,8 @@ const Home = () => {
           userAPI.getUpiAccounts(),
           userAPI.getBankAccounts ? userAPI.getBankAccounts() : Promise.resolve({ data: [] }),
           publicAPI.getCryptoRates(),
-          adminAPI.getSettings()
+          adminAPI.getSettings(),
+          userAPI.getTransactions().catch(() => ({ data: [] }))
         ]);
 
         const walletData = walletRes?.data || walletRes || null;
@@ -69,6 +71,7 @@ const Home = () => {
         const withdrawalsData = withdrawalsRes?.data || withdrawalsRes || [];
         const profileData = profileRes?.data || profileRes || {};
         const upiData = upiRes?.data || upiRes || [];
+        const transData = transRes?.data || transRes || [];
         const bankData = bankRes?.data || bankRes || [];
         const ratesData = ratesRes?.data || ratesRes || [];
         const settingsData = settingsRes?.data || settingsRes || {};
@@ -77,6 +80,7 @@ const Home = () => {
         setWallet(walletData);
         setRecentDeposits(Array.isArray(depositsData) ? depositsData : []);
         setRecentWithdrawals(Array.isArray(withdrawalsData) ? withdrawalsData : []);
+        setTransactions(Array.isArray(transData) ? transData : []);
         setUser(profileData);
         setPaymentEnabled(profileData.paymentEnabled !== false);
         setUsdtCommission(parseFloat(settingsData?.usdtcommissionpercent) || 0);
@@ -195,19 +199,30 @@ const Home = () => {
 
   const getTodayVolume = () => {
     const today = new Date().toISOString().split('T')[0];
-    return recentDeposits
-      .filter((deposit) => deposit.createdat && deposit.createdat.startsWith(today) && deposit.status === 'APPROVED')
-      .reduce((sum, deposit) => sum + parseFloat(deposit.amount || 0), 0);
+    return transactions
+      .filter((t) => t.createdat && t.createdat.startsWith(today) && t.status === 'COMPLETED' && ['DEPOSIT', 'USDT_DEPOSIT', 'JTOKEN_PURCHASE'].includes(t.type))
+      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
   };
 
-  const getTotalVolume = () => recentDeposits
-    .filter((deposit) => deposit.status === 'APPROVED')
-    .reduce((sum, deposit) => sum + parseFloat(deposit.amount || 0), 0);
+  const getTotalVolume = () => transactions
+    .filter((t) => t.status === 'COMPLETED' && ['DEPOSIT', 'USDT_DEPOSIT', 'JTOKEN_PURCHASE'].includes(t.type))
+    .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
 
   const getTodayVolumeUsdt = () => getTodayVolume() / parseFloat(usdtRate || 83);
   const getTotalVolumeUsdt = () => getTotalVolume() / parseFloat(usdtRate || 83);
-  const getTodayProfit = () => parseFloat(wallet?.todayProfitLoss || 0);
-  const getTotalProfit = () => parseFloat(wallet?.referralEarnings || 0) + getRewardValue();
+  
+  const getTodayProfit = () => {
+    const today = new Date().toISOString().split('T')[0];
+    return transactions
+      .filter((t) => t.createdat && t.createdat.startsWith(today) && t.status === 'COMPLETED' && ['REWARD', 'ADMIN_CREDIT', 'REFERRAL'].includes(t.type))
+      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+  };
+  
+  const getTotalProfit = () => {
+    return transactions
+      .filter((t) => t.status === 'COMPLETED' && ['REWARD', 'ADMIN_CREDIT', 'REFERRAL'].includes(t.type))
+      .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+  };
 
   const getRecentActivity = () => {
     const depositItems = recentDeposits.map((item) => ({ ...item, entryType: 'deposit' }));

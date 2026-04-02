@@ -131,7 +131,8 @@ const userAPI = {
   updatePassword: (data) => authFetch(`${API_BASE}/user/update-password`, { method: 'POST', body: JSON.stringify(data) }),
   getSupportLinks: () => authFetch(`${API_BASE}/user/support-links`),
   createExchangeRequest: (data) => authFetch(`${API_BASE}/user/exchange-request`, { method: 'POST', body: JSON.stringify(data) }),
-  getMyExchangeRequests: () => authFetch(`${API_BASE}/user/exchange-requests`)
+  getMyExchangeRequests: () => authFetch(`${API_BASE}/user/exchange-requests`),
+  getTransactions: () => authFetch(`${API_BASE}/user/transactions`)
 };
 
 const walletAPI = { 
