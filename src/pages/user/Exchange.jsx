@@ -79,8 +79,14 @@ const Exchange = () => {
       return;
     }
     const amountNum = parseFloat(amount);
+    const usdtBalance = parseFloat(wallet?.usdtbalance || 0);
+    
     if (!amount || amountNum <= 0) {
       showError('Please enter a valid amount');
+      return;
+    }
+    if (amountNum > usdtBalance) {
+      showError(`Insufficient USDT balance. You have ${usdtBalance.toFixed(4)} USDT`);
       return;
     }
     if (amountNum < exchangeRates.minAmount) {
@@ -176,7 +182,14 @@ const Exchange = () => {
         </div>
 
         <button
-          onClick={() => setShowTradeModal(true)}
+          onClick={() => {
+            const usdtBalance = parseFloat(wallet?.usdtbalance || 0);
+            if (usdtBalance <= 0) {
+              showError('Insufficient USDT balance. Please deposit USDT first.');
+              return;
+            }
+            setShowTradeModal(true);
+          }}
           disabled={!selectedRate}
           className="w-full py-4 sm:py-5 bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37] hover:from-[#E5C158] hover:via-[#FFE44D] hover:to-[#E5C158] text-black font-bold rounded-xl sm:rounded-2xl text-base sm:text-lg shadow-lg shadow-[#D4AF37]/30 transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
