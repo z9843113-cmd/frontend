@@ -11,6 +11,7 @@ const AdminJToken = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [amount, setAmount] = useState('');
   const [action, setAction] = useState('CREDIT');
+  const [statusType, setStatusType] = useState('REWARD');
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
   const [limitSaving, setLimitSaving] = useState(false);
@@ -95,6 +96,10 @@ const AdminJToken = () => {
       setMessage('Enter a valid J Token amount');
       return;
     }
+    if (!statusType) {
+      setMessage('Select status type (Reward/Commission/Sold Tokens/Transfer)');
+      return;
+    }
 
     setSaving(true);
     setMessage('');
@@ -102,12 +107,14 @@ const AdminJToken = () => {
       const res = await adminAPI.updateUserJToken(selectedUser.id, {
         action,
         amount: parseFloat(amount),
+        statusType,
         note: note.trim()
       });
       const data = res?.data || res;
       setMessage(data?.message || 'J Token updated successfully');
       setAmount('');
       setNote('');
+      setStatusType('REWARD');
       const refresh = await adminAPI.getUserDetails(selectedUser.id);
       const refreshed = refresh?.data || refresh;
       setSelectedUser({ ...selectedUser, wallet: refreshed.wallet });
@@ -267,6 +274,16 @@ const AdminJToken = () => {
                     <button type="button" onClick={() => setAction('DEBIT')} className={`rounded-2xl py-4 font-bold ${action === 'DEBIT' ? 'bg-gradient-to-r from-red-500 to-rose-600 text-white' : 'border border-[#2a2a2a] bg-[#0a0a0a] text-gray-400'}`}>
                       Debit
                     </button>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">Status Type</label>
+                    <select value={note} onChange={(e) => setNote(e.target.value)} className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white focus:border-[#D4AF37] focus:outline-none">
+                      <option value="">Select status type</option>
+                      <option value="REWARD">Reward</option>
+                      <option value="COMMISSION">Commission</option>
+                      <option value="SOLD_TOKENS">Sold Tokens</option>
+                      <option value="TRANSFER">Transfer</option>
+                    </select>
                   </div>
                   <input type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="J Token amount" className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />
                   <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Reason or note" rows={4} className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />

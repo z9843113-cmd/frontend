@@ -287,13 +287,17 @@ const Home = () => {
 
   const isPositiveTransaction = (item) => {
     if (item.entryType === 'deposit') return true;
-    if (item.entryType === 'exchange' && item.ratetype === 'BUY') return true; // Buy USDT is positive
-    if (item.entryType === 'exchange' && item.ratetype === 'SELL') return false; // Sell USDT is negative
+    if (item.entryType === 'exchange' && item.ratetype === 'BUY') return true;
+    if (item.entryType === 'exchange' && item.ratetype === 'SELL') return false;
     if (item.method === 'REWARD') return true;
     if (item.method === 'USDT_DEPOSIT') return true;
-    if (item.method === 'JTOKEN_PURCHASE') return true; // Show as positive for user
+    if (item.method === 'JTOKEN_PURCHASE') return true;
     if (item.type === 'REWARD') return true;
     if (item.type === 'JTOKEN_PURCHASE') return true;
+    if (item.type === 'COMMISSION') return true;
+    if (item.type === 'SOLD_TOKENS') return true;
+    if (item.type === 'TRANSFER') return true;
+    if (item.type === 'ADMIN_CREDIT') return true;
     return false;
   };
 
@@ -641,6 +645,10 @@ const Home = () => {
                             <p className="text-sm font-semibold text-white">
                               {isExchange 
                                 ? (item.ratetype === 'BUY' ? 'Buy USDT' : 'Sell USDT') 
+                                : item.type === 'REWARD' ? 'Reward' 
+                                : item.type === 'COMMISSION' ? 'Commission'
+                                : item.type === 'SOLD_TOKENS' ? 'Sold Tokens'
+                                : item.type === 'TRANSFER' ? 'Transfer'
                                 : item.method || item.type || (isDeposit ? 'Deposit' : 'Withdrawal')}
                             </p>
                             <p className="text-xs text-gray-500">{item.createdat ? new Date(item.createdat).toLocaleString() : 'Pending time'}</p>
