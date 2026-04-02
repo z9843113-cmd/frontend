@@ -50,8 +50,8 @@ const AdminJTokenHistory = () => {
   const getTypeStyles = (type) => {
     if (type === 'DEPOSIT') return 'bg-emerald-500/10 text-emerald-400';
     if (type === 'WITHDRAWAL') return 'bg-rose-500/10 text-rose-400';
-    if (type === 'JTOKEN_REQUEST') return 'bg-sky-500/10 text-sky-400';
-    if (type === 'JTOKEN_CREDIT' || type === 'JTOKEN_PURCHASE') return 'bg-[#D4AF37]/10 text-[#D4AF37]';
+    if (type === 'JTOKEN_REQUEST' || type === 'JTOKEN_PURCHASE') return 'bg-sky-500/10 text-sky-400';
+    if (type === 'JTOKEN_CREDIT' || type === 'REWARD' || type === 'COMMISSION' || type === 'SOLD_TOKENS' || type === 'TRANSFER') return 'bg-[#D4AF37]/10 text-[#D4AF37]';
     if (type === 'JTOKEN_DEBIT' || type === 'JTOKEN_TRADE') return 'bg-orange-500/10 text-orange-400';
     return 'bg-[#1a1a1a] text-gray-300';
   };
@@ -64,7 +64,13 @@ const AdminJTokenHistory = () => {
       JTOKEN_CREDIT: 'J Token Credit',
       JTOKEN_DEBIT: 'J Token Debit',
       JTOKEN_TRADE: 'J Token Redeem',
-      JTOKEN_PURCHASE: 'J Token Purchase'
+      JTOKEN_PURCHASE: 'J Token Purchase',
+      REWARD: 'Reward',
+      COMMISSION: 'Commission',
+      SOLD_TOKENS: 'Sold Tokens',
+      TRANSFER: 'Transfer',
+      ADMIN_CREDIT: 'Admin Credit',
+      ADMIN_DEBIT: 'Admin Debit'
     };
     return labels[type] || type;
   };
@@ -127,7 +133,7 @@ const AdminJTokenHistory = () => {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          {['ALL', 'DEPOSIT', 'WITHDRAWAL', 'JTOKEN_REQUEST', 'JTOKEN_CREDIT', 'JTOKEN_DEBIT', 'JTOKEN_TRADE', 'JTOKEN_PURCHASE'].map((type) => (
+          {['ALL', 'DEPOSIT', 'WITHDRAWAL', 'JTOKEN_REQUEST', 'JTOKEN_PURCHASE', 'JTOKEN_CREDIT', 'REWARD', 'COMMISSION', 'SOLD_TOKENS', 'TRANSFER', 'ADMIN_CREDIT', 'ADMIN_DEBIT'].map((type) => (
             <button key={type} onClick={() => { setFilter(type); setPage(1); }} className={`rounded-2xl px-4 py-3 text-sm font-semibold ${filter === type ? 'bg-[#D4AF37] text-black' : 'bg-[#171717] text-gray-400'}`}>
               {type === 'ALL' ? 'All Activity' : getTypeLabel(type)}
             </button>
