@@ -426,8 +426,8 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
       )}
 
       {showPaymentPopup && request && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-gradient-to-b from-[#1f1f1f] via-[#141414] to-[#0a0a0a] rounded-2xl sm:rounded-3xl p-4 sm:p-6 w-full max-w-md max-h-[95vh] sm:max-h-[85vh] overflow-y-auto shadow-2xl border border-[#333]">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center pb-6 sm:pb-4">
+          <div className="bg-gradient-to-b from-[#1f1f1f] via-[#141414] to-[#0a0a0a] rounded-t-3xl sm:rounded-3xl p-4 sm:p-6 w-full max-w-md max-h-[85vh] sm:max-h-[80vh] overflow-y-auto shadow-2xl border-t sm:border border-[#333]">
             <div className="flex justify-between items-center mb-4 pb-3 border-b border-[#2a2a2a]">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-[#D4AF37] animate-pulse"></div>
