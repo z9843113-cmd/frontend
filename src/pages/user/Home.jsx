@@ -199,9 +199,11 @@ const Home = () => {
 
   const getTodayVolume = () => {
     const today = new Date().toISOString().split('T')[0];
-    return transactions
+    const vol = transactions
       .filter((t) => t.createdat && t.createdat.startsWith(today) && t.status === 'COMPLETED' && ['DEPOSIT', 'USDT_DEPOSIT', 'JTOKEN_PURCHASE'].includes(t.type))
       .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+    console.log('Today Volume:', vol, 'Transactions:', transactions.filter(t => t.status === 'COMPLETED' && ['DEPOSIT', 'USDT_DEPOSIT', 'JTOKEN_PURCHASE'].includes(t.type)));
+    return vol;
   };
 
   const getTotalVolume = () => transactions
