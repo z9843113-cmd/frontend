@@ -226,35 +226,28 @@ const Home = () => {
       entryType: 'exchange',
       method: item.ratetype === 'BUY' ? 'Buy USDT' : 'Sell USDT'
     }));
-    const transactionItems = recentTransactions.map((item) => ({ 
-      ...item, 
-      entryType: 'transaction',
-      method: item.type || 'Transaction'
-    }));
     
-    // Combine and remove duplicates (keep deposit items, remove transaction duplicates)
-    const combined = [...depositItems, ...withdrawalItems, ...exchangeItems];
+    // Only add non-USDT transactions to avoid duplicates
+    const transactionItems = recentTransactions
+      .filter(item => item.type !== 'USDT_DEPOSIT')
+      .map((item) => ({ 
+        ...item, 
+        entryType: 'transaction',
+        method: item.type || 'Transaction'
+      }));
     
-    // Add transaction items that aren't duplicates (type not USDT_DEPOSIT)
-    transactionItems.forEach(item => {
-      const isDuplicate = combined.some(existing => 
-        existing.id === item.id || 
-        (existing.method === 'USDT_DEPOSIT' && item.method === 'USDT_DEPOSIT')
-      );
-      if (!isDuplicate) {
-        combined.push(item);
-      }
-    });
-    
-    return combined
+    return [...depositItems, ...withdrawalItems, ...exchangeItems, ...transactionItems]
       .sort((a, b) => new Date(b.createdat || 0) - new Date(a.createdat || 0))
       .slice(0, 6);
   };
 
   const isPositiveTransaction = (item) => {
     if (item.entryType === 'deposit') return true;
+    if (item.entryType === 'exchange' && item.ratetype === 'BUY') return true; // Buy USDT is positive
+    if (item.entryType === 'exchange' && item.ratetype === 'SELL') return false; // Sell USDT is negative
     if (item.method === 'REWARD') return true;
     if (item.method === 'USDT_DEPOSIT') return true;
+    if (item.method === 'JTOKEN_PURCHASE') return false; // Spending INR
     return false;
   };
 
