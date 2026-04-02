@@ -217,11 +217,19 @@ const Home = () => {
   const getRecentActivity = () => {
     const depositItems = recentDeposits.map((item) => ({ ...item, entryType: 'deposit' }));
     const withdrawalItems = recentWithdrawals.map((item) => ({ ...item, entryType: 'withdrawal' }));
-    const exchangeItems = recentExchanges.map((item) => ({ ...item, entryType: 'exchange' }));
+    const exchangeItems = recentExchanges.map((item) => ({ 
+      ...item, 
+      entryType: 'exchange',
+      method: item.ratetype === 'BUY' ? 'Buy USDT' : 'Sell USDT'
+    }));
     return [...depositItems, ...withdrawalItems, ...exchangeItems]
       .sort((a, b) => new Date(b.createdat || 0) - new Date(a.createdat || 0))
       .slice(0, 6);
   };
+
+  console.log('Recent Deposits:', recentDeposits);
+  console.log('Recent Withdrawals:', recentWithdrawals);
+  console.log('Recent Exchanges:', recentExchanges);
 
   if (loading) {
     return (
