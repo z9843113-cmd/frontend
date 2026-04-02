@@ -291,7 +291,9 @@ const Home = () => {
     if (item.entryType === 'exchange' && item.ratetype === 'SELL') return false; // Sell USDT is negative
     if (item.method === 'REWARD') return true;
     if (item.method === 'USDT_DEPOSIT') return true;
-    if (item.method === 'JTOKEN_PURCHASE') return false; // Spending INR
+    if (item.method === 'JTOKEN_PURCHASE') return true; // Show as positive for user
+    if (item.type === 'REWARD') return true;
+    if (item.type === 'JTOKEN_PURCHASE') return true;
     return false;
   };
 
