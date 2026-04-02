@@ -639,13 +639,13 @@ const Home = () => {
                     const status = item.status || 'PENDING';
                     const isNegative = !isPositive && !isExchange;
                     return (
-                      <div key={`${item.id || index}-${item.createdat || index}`} className="flex items-center justify-between rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] p-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${isPositive ? 'bg-emerald-500/15 text-emerald-400' : isNegative ? 'bg-rose-500/15 text-rose-400' : isExchange ? 'bg-blue-500/15 text-blue-400' : 'bg-rose-500/15 text-rose-400'}`}>
-                            {isPositive ? <FaArrowDown className="h-4 w-4" /> : isNegative ? <FaArrowUp className="h-4 w-4" /> : isExchange ? <FaExchangeAlt className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
+                      <div key={`${item.id || index}-${item.createdat || index}`} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] p-3 sm:p-4">
+                        <div className="flex items-start gap-3 w-full">
+                          <div className={`flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-xl ${isPositive ? 'bg-emerald-500/15 text-emerald-400' : isNegative ? 'bg-rose-500/15 text-rose-400' : isExchange ? 'bg-blue-500/15 text-blue-400' : 'bg-rose-500/15 text-rose-400'}`}>
+                            {isPositive ? <FaArrowDown className="h-3 w-3 sm:h-4 sm:w-4" /> : isNegative ? <FaArrowUp className="h-3 w-3 sm:h-4 sm:w-4" /> : isExchange ? <FaExchangeAlt className="h-3 w-3 sm:h-4 sm:w-4" /> : <FaArrowUp className="h-3 w-3 sm:h-4 sm:w-4" />}
                           </div>
-                          <div>
-                            <p className="text-sm font-semibold text-white">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-white truncate">
                               {isExchange 
                                 ? (item.ratetype === 'BUY' ? 'Buy USDT' : 'Sell USDT') 
                                 : item.type === 'REWARD' ? 'Reward' 
@@ -653,12 +653,12 @@ const Home = () => {
                                 : item.type === 'SOLD_TOKENS' ? 'Sold Tokens'
                                 : item.type === 'TRANSFER' ? 'Transfer'
                                 : item.method || item.type || (isDeposit ? 'Deposit' : 'Withdrawal')}
-                              {item.note && <span className="text-xs text-gray-500 ml-1">({item.note})</span>}
                             </p>
-                            <p className="text-xs text-gray-500">{item.createdat ? new Date(item.createdat).toLocaleString() : 'Pending time'}</p>
+                            {item.note && <p className="text-xs text-gray-500 truncate max-w-[200px] sm:max-w-[250px]">{item.note}</p>}
+                            <p className="text-xs text-gray-500 hidden sm:block">{item.createdat ? new Date(item.createdat).toLocaleString() : 'Pending time'}</p>
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right w-full sm:w-auto flex justify-between sm:flex-col sm:items-end gap-1 ml-12 sm:ml-0">
                           <p className={`text-sm font-bold ${isPositive ? 'text-emerald-400' : isNegative ? 'text-rose-400' : isExchange ? 'text-blue-400' : 'text-emerald-400'}`}>
                             {isPositive ? '+' : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(Math.abs(item.amount || 0))}`}
                           </p>
