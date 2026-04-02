@@ -232,11 +232,21 @@ const Home = () => {
       method: item.type || 'Transaction'
     }));
     
-    console.log('All items for INR:', transactionItems);
-    
     return [...depositItems, ...withdrawalItems, ...exchangeItems, ...transactionItems]
       .sort((a, b) => new Date(b.createdat || 0) - new Date(a.createdat || 0))
       .slice(0, 6);
+  };
+
+  const isPositiveTransaction = (item) => {
+    if (item.entryType === 'deposit') return true;
+    if (item.method === 'REWARD') return true;
+    if (item.method === 'USDT_DEPOSIT') return true;
+    return false;
+  };
+
+  const isUSDTTransaction = (item) => {
+    return (item.method || '').toUpperCase().includes('USDT') || 
+           (item.type || '').toUpperCase().includes('USDT');
   };
 
   console.log('Recent Deposits:', recentDeposits);
@@ -513,15 +523,16 @@ const Home = () => {
                 No USDT activity yet.
               </div>
             ) : (
-              recentActivity.filter(item => (item.method || '').toUpperCase().includes('USDT')).slice(0, 5).map((item, index) => {
+              recentActivity.filter(item => isUSDTTransaction(item)).slice(0, 5).map((item, index) => {
                     const isUSDT = true;
                     const isExchange = item.entryType === 'exchange';
                     const isDeposit = item.entryType === 'deposit';
+                    const isPositive = isPositiveTransaction(item);
                     return (
                       <div key={`${item.id || index}-${item.createdat || index}`} className="flex items-center justify-between rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] p-4">
                         <div className="flex items-center gap-3">
-                          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${isDeposit ? 'bg-emerald-500/15 text-emerald-400' : isExchange ? 'bg-blue-500/15 text-blue-400' : 'bg-rose-500/15 text-rose-400'}`}>
-                            {isDeposit ? <FaArrowDown className="h-4 w-4" /> : isExchange ? <FaExchangeAlt className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
+                          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${isPositive ? 'bg-emerald-500/15 text-emerald-400' : isExchange ? 'bg-blue-500/15 text-blue-400' : 'bg-rose-500/15 text-rose-400'}`}>
+                            {isPositive ? <FaArrowDown className="h-4 w-4" /> : isExchange ? <FaExchangeAlt className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-white">
@@ -533,8 +544,8 @@ const Home = () => {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className={`text-sm font-bold ${isDeposit ? 'text-emerald-400' : isExchange ? 'text-blue-400' : 'text-rose-400'}`}>
-                            {isDeposit ? '+' : isExchange ? (item.ratetype === 'BUY' ? '+' : '-') : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(item.amount || 0)}`}
+                          <p className={`text-sm font-bold ${isPositive ? 'text-emerald-400' : isExchange ? 'text-blue-400' : 'text-rose-400'}`}>
+                            {isPositive ? '+' : isExchange ? (item.ratetype === 'BUY' ? '+' : '-') : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(item.amount || 0)}`}
                           </p>
                           <p className={`text-xs font-medium ${item.status === 'APPROVED' ? 'text-emerald-400' : item.status === 'REJECTED' ? 'text-rose-400' : 'text-amber-400'}`}>
                             {item.status === 'APPROVED' ? 'SUCCESS' : item.status === 'REJECTED' ? 'FAILED' : item.status || 'PENDING'}
@@ -561,15 +572,16 @@ const Home = () => {
                 No INR activity yet.
               </div>
             ) : (
-              recentActivity.filter(item => !((item.method || '').toUpperCase().includes('USDT'))).slice(0, 5).map((item, index) => {
+              recentActivity.filter(item => !isUSDTTransaction(item)).slice(0, 5).map((item, index) => {
                     const isUSDT = false;
                     const isExchange = item.entryType === 'exchange';
                     const isDeposit = item.entryType === 'deposit';
+                    const isPositive = isPositiveTransaction(item);
                     return (
                       <div key={`${item.id || index}-${item.createdat || index}`} className="flex items-center justify-between rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] p-4">
                         <div className="flex items-center gap-3">
-                          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${isDeposit ? 'bg-emerald-500/15 text-emerald-400' : isExchange ? 'bg-blue-500/15 text-blue-400' : 'bg-rose-500/15 text-rose-400'}`}>
-                            {isDeposit ? <FaArrowDown className="h-4 w-4" /> : isExchange ? <FaExchangeAlt className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
+                          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${isPositive ? 'bg-emerald-500/15 text-emerald-400' : isExchange ? 'bg-blue-500/15 text-blue-400' : 'bg-rose-500/15 text-rose-400'}`}>
+                            {isPositive ? <FaArrowDown className="h-4 w-4" /> : isExchange ? <FaExchangeAlt className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-white">
@@ -581,8 +593,8 @@ const Home = () => {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className={`text-sm font-bold ${isDeposit ? 'text-emerald-400' : isExchange ? 'text-blue-400' : 'text-rose-400'}`}>
-                            {isDeposit ? '+' : isExchange ? (item.ratetype === 'BUY' ? '+' : '-') : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(item.amount || 0)}`}
+                          <p className={`text-sm font-bold ${isPositive ? 'text-emerald-400' : isExchange ? 'text-blue-400' : 'text-rose-400'}`}>
+                            {isPositive ? '+' : isExchange ? (item.ratetype === 'BUY' ? '+' : '-') : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(item.amount || 0)}`}
                           </p>
                           <p className={`text-xs font-medium ${item.status === 'APPROVED' ? 'text-emerald-400' : item.status === 'REJECTED' ? 'text-rose-400' : 'text-amber-400'}`}>
                             {item.status === 'APPROVED' ? 'SUCCESS' : item.status === 'REJECTED' ? 'FAILED' : item.status || 'PENDING'}
