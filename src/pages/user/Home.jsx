@@ -25,12 +25,12 @@ import {
   FaGamepad,
   FaUniversity,
   FaMoneyBillWave,
-  FaBitcoin
+  FaRupeeSign
 } from 'react-icons/fa';
 
 const Home = () => {
   const navigate = useNavigate();
-  const { setUser } = useAuthStore();
+  const { setUser, user } = useAuthStore();
   const [wallet, setWallet] = useState(null);
   const [recentDeposits, setRecentDeposits] = useState([]);
   const [recentWithdrawals, setRecentWithdrawals] = useState([]);
@@ -70,7 +70,7 @@ const Home = () => {
     const actions = ['Bought', 'Deposited', 'Sold', 'Transferred'];
     const types = [
       { name: 'JToken', color: '#D4AF37', icon: <FaCoins /> },
-      { name: 'USDT', color: '#10B981', icon: <FaBitcoin /> },
+      { name: 'USDT', color: '#10B981', icon: <FaRupeeSign /> },
       { name: 'Gaming', color: '#EF4444', icon: <FaGamepad /> },
       { name: 'MIX', color: '#8B5CF6', icon: <FaExchangeAlt /> }
     ];
@@ -390,9 +390,14 @@ const Home = () => {
       <div className={`fixed top-0 left-0 z-50 h-full w-80 transform bg-[#0d0d0d] transition-transform duration-300 lg:hidden ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="border-b border-[#2a2a2a] p-5">
           <div className="flex items-center justify-between">
-            <div>
-              <img src="/jexpaylogo.png" alt="Jex Pay" className="h-10 sm:h-12 object-contain" />
-              <p className="text-xs uppercase tracking-[0.25em] bg-gradient-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent font-semibold">𝙅𝙀𝙓 𝙋𝘼𝙔</p>
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#D4AF37] to-[#FFD700] text-black font-bold text-lg">
+                {(user?.name || user?.email || 'U')[0].toUpperCase()}
+              </div>
+              <div>
+                <p className="text-white font-semibold">{user?.name || user?.email?.split('@')[0] || 'User'}</p>
+                <p className="text-xs text-gray-500 capitalize">{user?.role || 'Member'}</p>
+              </div>
             </div>
             <button onClick={() => setSidebarOpen(false)} className="rounded-xl bg-[#1a1a1a] p-2 text-white">
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -434,10 +439,15 @@ const Home = () => {
               <h1 className="text-sm font-bold text-white">Member Home</h1>
             </div>
           </div>
-          <button className="relative rounded-2xl bg-[#1a1a1a] p-3 text-white">
-            <FaBell className="h-4 w-4 text-gray-300" />
-            <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#D4AF37]"></span>
-          </button>
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#D4AF37] to-[#FFD700] text-black font-bold text-sm">
+              {(user?.name || user?.email || 'U')[0].toUpperCase()}
+            </div>
+            <button className="relative rounded-2xl bg-[#1a1a1a] p-3 text-white">
+              <FaBell className="h-4 w-4 text-gray-300" />
+              <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#D4AF37]"></span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -557,31 +567,35 @@ const Home = () => {
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#D4AF37]">Live Activity</p>
             <h3 className="mt-2 text-2xl font-bold text-white">What's Happening Now</h3>
             
-            <div className="mt-5 overflow-hidden rounded-2xl border border-[#2a2a2a] bg-[#0b0b0b] p-4">
-              <div className="relative h-[300px] overflow-hidden">
-                <div className="absolute inset-0 flex flex-col gap-3">
+            <div className="mt-5 overflow-hidden rounded-2xl">
+              <div className="relative h-[320px] overflow-hidden rounded-2xl bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] border border-[#2a2a2a] shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(212,175,55,0.08),_transparent_50%)]"></div>
+                <div className="absolute inset-0 flex flex-col gap-2 p-2">
                   {liveActivity.map((item, index) => (
                     <div 
                       key={item.id + index}
-                      className="flex items-center justify-between rounded-xl border border-[#1a1a1a] bg-[#151515] p-3 animate-slide-in"
+                      className="group relative flex items-center justify-between rounded-xl p-3 animate-slide-in backdrop-blur-sm"
                       style={{
                         animationDelay: `${index * 0.3}s`,
-                        animationFillMode: 'both'
+                        animationFillMode: 'both',
+                        background: `linear-gradient(135deg, rgba(30,30,30,0.9) 0%, rgba(20,20,20,0.95) 100%)`,
+                        boxShadow: `0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 20px ${item.color}10`
                       }}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1a1a1a]" style={{ color: item.color }}>
-                          {item.icon}
+                      <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: `linear-gradient(135deg, ${item.color}15 0%, transparent 100%)` }}></div>
+                      <div className="relative flex items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.4)]" style={{ background: `linear-gradient(135deg, ${item.color}30 0%, ${item.color}15 100%)`, border: `1px solid ${item.color}40` }}>
+                          <span style={{ color: item.color }}>{item.icon}</span>
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-white">
-                            {item.name} <span className="text-gray-400">{item.action}</span>
+                          <p className="text-sm font-bold text-white">
+                            {item.name} <span className="text-gray-400 font-normal">{item.action}</span>
                           </p>
-                          <p className="text-xs text-gray-500">{item.type}</p>
+                          <p className="text-xs font-medium" style={{ color: item.color }}>{item.type}</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold" style={{ color: item.color }}>{item.amount}</p>
+                      <div className="relative text-right">
+                        <p className="text-sm font-bold" style={{ color: item.color, textShadow: `0 0 10px ${item.color}50` }}>{item.amount}</p>
                         <p className="text-xs text-gray-500">{item.time}s ago</p>
                       </div>
                     </div>
@@ -594,15 +608,15 @@ const Home = () => {
               @keyframes slideIn {
                 from {
                   opacity: 0;
-                  transform: translateX(-30px);
+                  transform: translateX(-20px) scale(0.95);
                 }
                 to {
                   opacity: 1;
-                  transform: translateX(0);
+                  transform: translateX(0) scale(1);
                 }
               }
               .animate-slide-in {
-                animation: slideIn 0.6s ease-out forwards;
+                animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
                 opacity: 0;
               }
             `}</style>
