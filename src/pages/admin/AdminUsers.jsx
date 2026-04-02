@@ -288,18 +288,18 @@ const AdminUsers = () => {
                         <div key={i} className="bg-[#0a0a0a] rounded-xl p-3">
                           <div className="flex justify-between items-start mb-2">
                             <div>
-                              <p className="text-white font-medium">{bank.holdername}</p>
-                              <p className="text-gray-400 text-sm">{bank.bankname}</p>
+                              <p className="text-white font-medium">{bank.holdername || 'N/A'}</p>
+                              <p className="text-gray-400 text-sm">{bank.bankname || 'Bank Account'}</p>
                             </div>
                             <span className={`px-2 py-1 rounded-lg text-xs ${bank.isprimary ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
                               {bank.isprimary ? 'Primary' : 'Secondary'}
                             </span>
                           </div>
-                          <p className="text-gray-500 text-xs">A/C: {bank.accountnumber}</p>
-                          <p className="text-gray-500 text-xs">IFSC: {bank.ifsccode}</p>
+                          <p className="text-gray-500 text-xs">A/C: {bank.accountnumber || 'N/A'}</p>
+                          <p className="text-gray-500 text-xs">IFSC: {bank.ifsc || bank.ifsccode || 'N/A'}</p>
                           <div className="flex gap-2 mt-2">
-                            <span className={`px-2 py-1 rounded-lg text-xs ${bank.isactive || bank.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
-                              {bank.isactive || bank.status === 'active' ? 'Active' : 'Pending'}
+                            <span className={`px-2 py-1 rounded-lg text-xs ${(bank.isactive !== false && (bank.status === 'active' || !bank.status)) ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                              {(bank.isactive !== false && (bank.status === 'active' || !bank.status)) ? 'Active' : 'Inactive'}
                             </span>
                           </div>
                         </div>
