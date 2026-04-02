@@ -70,10 +70,9 @@ const Home = () => {
     const actions = ['Bought', 'Deposited', 'Sold', 'Transferred'];
     
     const UsdtIcon = () => (
-      <svg viewBox="0 0 32 32" className="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="16" cy="16" r="15" fill="#10B981" fillOpacity="0.15"/>
-        <circle cx="16" cy="16" r="12" stroke="#10B981" strokeWidth="2" fill="none"/>
-        <path d="M16 8V24M12 12H20M12 20H20" stroke="#10B981" strokeWidth="2" strokeLinecap="round"/>
+      <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" fill="#10B981"/>
+        <path d="M12 6v12M9 9h2a3 3 0 110 6M9 15h2a3 3 0 110-6" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
       </svg>
     );
     
