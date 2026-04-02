@@ -68,13 +68,15 @@ const Home = () => {
       '+91876***7788', '+91654***9900', '+91956***1122', '+91789***3344'
     ];
     const actions = ['Bought', 'Deposited', 'Sold', 'Transferred'];
+    
     const UsdtIcon = () => (
-      <svg viewBox="0 0 32 32" className="w-5 h-5" fill="none">
-        <circle cx="16" cy="16" r="14" fill="#10B981" fillOpacity="0.2"/>
-        <path d="M22.5 16.5L20 18L14.5 13.5L11.5 16.5L14.5 19.5L20 15L22.5 16.5Z" fill="#10B981"/>
-        <path d="M14.5 16.5L20 21L22.5 15.5L20 14L14.5 19L11.5 16L14.5 16.5Z" fill="#10B981" fillOpacity="0.6"/>
+      <svg viewBox="0 0 32 32" className="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="15" fill="#10B981" fillOpacity="0.15"/>
+        <circle cx="16" cy="16" r="12" stroke="#10B981" strokeWidth="2" fill="none"/>
+        <path d="M16 8V24M12 12H20M12 20H20" stroke="#10B981" strokeWidth="2" strokeLinecap="round"/>
       </svg>
     );
+    
     const types = [
       { name: 'JToken', color: '#D4AF37', icon: <FaCoins /> },
       { name: 'USDT', color: '#10B981', icon: <UsdtIcon /> },
