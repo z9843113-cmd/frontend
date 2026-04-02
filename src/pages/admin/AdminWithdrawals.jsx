@@ -198,11 +198,21 @@ const AdminWithdrawals = () => {
               <div className="bg-[#0a0a0a] rounded-2xl p-4 border border-[#1a1a1a]">
                 <h4 className="text-[#D4AF37] font-semibold mb-3">Bank Accounts ({userDetails.bankAccounts?.length || 0})</h4>
                 {userDetails.bankAccounts?.length > 0 ? (
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-2">
                     {userDetails.bankAccounts.map((b, i) => (
-                      <div key={i} className="bg-[#0d0d0d] rounded-lg p-2">
-                        <div className="text-white text-xs">{b.bankname}</div>
-                        <div className="text-gray-400 text-xs">A/C: {b.accountnumber?.slice(-4).padStart(b.accountnumber?.length, '****')}</div>
+                      <div key={i} className="bg-[#0d0d0d] rounded-lg p-3">
+                        <div className="flex justify-between items-start mb-1">
+                          <div className="text-white font-medium text-sm">{b.holdername}</div>
+                          <span className={`px-2 py-0.5 rounded text-xs ${b.isprimary ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                            {b.isprimary ? 'Primary' : 'Secondary'}
+                          </span>
+                        </div>
+                        <div className="text-gray-400 text-xs">{b.bankname}</div>
+                        <div className="text-gray-400 text-xs">A/C: {b.accountnumber}</div>
+                        <div className="text-gray-400 text-xs">IFSC: {b.ifsccode}</div>
+                        <div className={`mt-1 text-xs ${b.isactive || b.status === 'active' ? 'text-green-400' : 'text-yellow-400'}`}>
+                          {b.isactive || b.status === 'active' ? 'Active' : 'Inactive'}
+                        </div>
                       </div>
                     ))}
                   </div>

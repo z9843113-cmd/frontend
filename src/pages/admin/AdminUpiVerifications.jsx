@@ -320,20 +320,20 @@ const AdminUpiVerifications = () => {
                 <div className="space-y-2">
                   {userDetails.bankAccounts?.map((bank, i) => (
                     <div key={i} className="rounded-lg bg-[#0a0a0a] p-3">
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between mb-1">
                         <div>
                           <p className="text-white font-medium">{bank.holdername}</p>
-                          <p className="text-xs text-gray-400">{bank.bankname} - ****{bank.accountnumber?.slice(-4)}</p>
+                          <p className="text-xs text-gray-400">{bank.bankname}</p>
                         </div>
-                        <div className="flex gap-2">
-                          <span className={`rounded-lg px-2 py-1 text-xs ${bank.isprimary ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
-                            {bank.isprimary ? 'Primary' : 'Secondary'}
-                          </span>
-                          <span className={`rounded-lg px-2 py-1 text-xs ${bank.isactive || bank.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
-                            {bank.isactive || bank.status === 'active' ? 'Active' : 'Pending'}
-                          </span>
-                        </div>
+                        <span className={`rounded-lg px-2 py-1 text-xs ${bank.isprimary ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                          {bank.isprimary ? 'Primary' : 'Secondary'}
+                        </span>
                       </div>
+                      <p className="text-xs text-gray-400">A/C: {bank.accountnumber}</p>
+                      <p className="text-xs text-gray-400">IFSC: {bank.ifsccode}</p>
+                      <p className={`text-xs mt-1 ${bank.isactive || bank.status === 'active' ? 'text-green-400' : 'text-yellow-400'}`}>
+                        {bank.isactive || bank.status === 'active' ? 'Active' : 'Inactive'}
+                      </p>
                     </div>
                   ))}
                 </div>
