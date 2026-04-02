@@ -9,8 +9,23 @@ const AdminSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({ usdtRate: 83, tokenRate: 0.01, minJTokenBuy: 10, referralPercent: 5, jTokenCommissionPercent: 4, usdtCommissionPercent: 0, upiRewardAmount: 50, bankRewardAmount: 100, telegramRewardAmount: 25, gamingRate: 103, gamingRateMin: 80, mixRate: 108, mixRateMin: 80, exchangeMinAmount: 100, exchangeMaxAmount: 50000 });
-  const [bannerData, setBannerData] = useState({ bannerEnabled: true, bannerTitle: 'Welcome Bonus', bannerSubtitle: 'Get 50% extra on first deposit', bannerButtonText: 'Claim Now', bannerLink: '/deposit', bannerBgImage: '', bannerTemplate: 'premium' });
-  const [discountData, setDiscountData] = useState({ discountEnabled: true, discountPercent: 20, discountMax: 500 });
+  const [bannerData, setBannerData] = useState({
+    bannerEnabled: true,
+    bannerTitle: 'Welcome Bonus',
+    bannerSubtitle: 'Get 50% extra on first deposit',
+    bannerButtonText: 'Claim Now',
+    bannerLink: '/deposit',
+    bannerBgImage: '',
+    bannerTemplate: 'premium',
+    depositDiscountEnabled: false,
+    depositDiscountPercent: 20,
+    depositDiscountMax: 500,
+    depositDiscountMaxUses: 1,
+    jtokenDiscountEnabled: false,
+    jtokenDiscountPercent: 10,
+    jtokenDiscountMax: 300,
+    jtokenDiscountMaxUses: 1
+  });
   const [supportLinks, setSupportLinks] = useState({ whatsappSupport: '', telegramSupport: '', telegramGroup: '' });
   const [savingSupport, setSavingSupport] = useState(false);
   const [savingBanner, setSavingBanner] = useState(false);
@@ -27,7 +42,23 @@ const AdminSettings = () => {
   const navigate = useNavigate();
 
   useEffect(() => { fetchSettings(); fetchSupportLinks(); }, []);
-  const fetchSettings = async () => { try { const res = await adminAPI.getSettings(); const data = res?.data || res || {}; setSettings(data); setFormData({ usdtRate: parseFloat(data.usdtrate) || 83, tokenRate: parseFloat(data.tokenrate) || 0.01, minJTokenBuy: parseFloat(data.minjtokenbuy) || 10, referralPercent: parseFloat(data.referralpercent) || 5, jTokenCommissionPercent: parseFloat(data.jtokencommissionpercent) || 4, usdtCommissionPercent: parseFloat(data.usdtcommissionpercent) || 0, upiRewardAmount: parseFloat(data.upirewardamount) || 50, bankRewardAmount: parseFloat(data.bankrewardamount) || 100, telegramRewardAmount: parseFloat(data.telegramrewardamount) || 25, gamingRate: parseFloat(data.gamingrate) || 103, gamingRateMin: parseFloat(data.gamingratemin) || 80, mixRate: parseFloat(data.mixrate) || 108, mixRateMin: parseFloat(data.mixratemin) || 80, exchangeMinAmount: parseFloat(data.exchangeminamount) || 100, exchangeMaxAmount: parseFloat(data.exchangemaxamount) || 50000 }); setBannerData({ bannerEnabled: data.bannerenabled !== false, bannerTitle: data.bannertitle || 'Welcome Bonus', bannerSubtitle: data.bannersubtitle || 'Get 50% extra on first deposit', bannerButtonText: data.bannerbuttontext || 'Claim Now', bannerLink: data.bannerlink || '/deposit' }); } catch { console.error('Failed to fetch settings'); } finally { setLoading(false); } };
+  const fetchSettings = async () => { try { const res = await adminAPI.getSettings(); const data = res?.data || res || {}; setSettings(data); setFormData({ usdtRate: parseFloat(data.usdtrate) || 83, tokenRate: parseFloat(data.tokenrate) || 0.01, minJTokenBuy: parseFloat(data.minjtokenbuy) || 10, referralPercent: parseFloat(data.referralpercent) || 5, jTokenCommissionPercent: parseFloat(data.jtokencommissionpercent) || 4, usdtCommissionPercent: parseFloat(data.usdtcommissionpercent) || 0, upiRewardAmount: parseFloat(data.upirewardamount) || 50, bankRewardAmount: parseFloat(data.bankrewardamount) || 100, telegramRewardAmount: parseFloat(data.telegramrewardamount) || 25, gamingRate: parseFloat(data.gamingrate) || 103, gamingRateMin: parseFloat(data.gamingratemin) || 80, mixRate: parseFloat(data.mixrate) || 108, mixRateMin: parseFloat(data.mixratemin) || 80, exchangeMinAmount: parseFloat(data.exchangeminamount) || 100, exchangeMaxAmount: parseFloat(data.exchangemaxamount) || 50000 }); setBannerData({ 
+        bannerEnabled: data.bannerenabled !== false, 
+        bannerTitle: data.bannertitle || 'Welcome Bonus', 
+        bannerSubtitle: data.bannersubtitle || 'Get 50% extra on first deposit', 
+        bannerButtonText: data.bannerbuttontext || 'Claim Now', 
+        bannerLink: data.bannerlink || '/deposit',
+        bannerBgImage: data.bannerbgimage || '',
+        bannerTemplate: data.bannertemplate || 'premium',
+        depositDiscountEnabled: data.depositdiscountenabled || false,
+        depositDiscountPercent: data.depositdiscountpercent || 20,
+        depositDiscountMax: data.depositdiscountmax || 500,
+        depositDiscountMaxUses: data.depositdiscountmaxuses || 1,
+        jtokenDiscountEnabled: data.jtokendiscountenabled || false,
+        jtokenDiscountPercent: data.jtokendiscountpercent || 10,
+        jtokenDiscountMax: data.jtokendiscountmax || 300,
+        jtokenDiscountMaxUses: data.jtokendiscountmaxuses || 1
+      }); } catch { console.error('Failed to fetch settings'); } finally { setLoading(false); } };
   const fetchSupportLinks = async () => { try { const res = await adminAPI.getSupportLinks(); const data = res?.data || res || {}; setSupportLinks({ whatsappSupport: data.whatsappSupport || '', telegramSupport: data.telegramSupport || '', telegramGroup: data.telegramGroup || '' }); } catch { console.error('Failed to fetch support links'); } };
 
   const handleSubmit = async (e) => {
@@ -212,116 +243,183 @@ const AdminSettings = () => {
 
         <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-white">Home Page Banner</h3>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <span className="text-gray-400 text-sm">Enable</span>
-              <div className="relative">
-                <input 
-                  type="checkbox" 
-                  checked={bannerData.bannerEnabled}
-                  onChange={(e) => setBannerData({ ...bannerData, bannerEnabled: e.target.checked })}
-                  className="sr-only"
-                />
-                <div className={`w-12 h-7 rounded-full transition-colors ${bannerData.bannerEnabled ? 'bg-green-500' : 'bg-gray-600'}`}>
-                  <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform mt-1 ${bannerData.bannerEnabled ? 'translate-x-6 ml-0.5' : 'translate-x-1'}`} />
-                </div>
-              </div>
-            </label>
+            <h3 className="text-lg font-semibold text-white">Home Page Banner & Discounts</h3>
           </div>
-          <p className="text-gray-400 text-sm mb-4">Control the promotional banner shown on the home page.</p>
+          <p className="text-gray-400 text-sm mb-4">Control the promotional banner and discount offers shown to users.</p>
           
           {bannerMessage && <div className={`mb-4 px-4 py-2 rounded-xl ${bannerMessage.includes('success') ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>{bannerMessage}</div>}
           
-          <form onSubmit={handleBannerSubmit} className="space-y-4">
+          <form onSubmit={handleBannerSubmit} className="space-y-6">
             <div>
-              <label className="block text-gray-400 text-sm mb-2">Banner Title</label>
-              <input 
-                type="text" 
-                value={bannerData.bannerTitle} 
-                onChange={(e) => setBannerData({ ...bannerData, bannerTitle: e.target.value })} 
-                placeholder="Welcome Bonus"
-                className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" 
-              />
-            </div>
-            <div>
-              <label className="block text-gray-400 text-sm mb-2">Banner Subtitle</label>
-              <input 
-                type="text" 
-                value={bannerData.bannerSubtitle} 
-                onChange={(e) => setBannerData({ ...bannerData, bannerSubtitle: e.target.value })} 
-                placeholder="Get 50% extra on first deposit"
-                className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" 
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-400 text-sm mb-2">Button Text</label>
-                <input 
-                  type="text" 
-                  value={bannerData.bannerButtonText} 
-                  onChange={(e) => setBannerData({ ...bannerData, bannerButtonText: e.target.value })} 
-                  placeholder="Claim Now"
-                  className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" 
-                />
-              </div>
-              <div>
-                <label className="block text-gray-400 text-sm mb-2">Button Link</label>
-                <select 
-                  value={bannerData.bannerLink} 
-                  onChange={(e) => setBannerData({ ...bannerData, bannerLink: e.target.value })} 
-                  className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
-                >
-                  <option value="/deposit">Deposit Page</option>
-                  <option value="/exchange">Exchange Page</option>
-                  <option value="/team">Team Page</option>
-                </select>
-              </div>
-            </div>
-            <button type="submit" disabled={savingBanner} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">{savingBanner ? 'Saving...' : 'Save Banner'}</button>
-          </form>
-        </div>
-
-        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-white">First Deposit Discount</h3>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <span className="text-gray-400 text-sm">Enable</span>
-              <div className="relative">
-                <input 
-                  type="checkbox" 
-                  checked={discountData.discountEnabled}
-                  onChange={(e) => setDiscountData({ ...discountData, discountEnabled: e.target.checked })}
-                  className="sr-only"
-                />
-                <div className={`w-12 h-7 rounded-full transition-colors ${discountData.discountEnabled ? 'bg-green-500' : 'bg-gray-600'}`}>
-                  <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform mt-1 ${discountData.discountEnabled ? 'translate-x-6 ml-0.5' : 'translate-x-1'}`} />
+              <h4 className="text-white font-semibold mb-4 pb-2 border-b border-[#2a2a2a]">Banner Settings</h4>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">Enable Banner</span>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="relative">
+                      <input 
+                        type="checkbox" 
+                        checked={bannerData.bannerEnabled}
+                        onChange={(e) => setBannerData({ ...bannerData, bannerEnabled: e.target.checked })}
+                        className="sr-only"
+                      />
+                      <div className={`w-12 h-7 rounded-full transition-colors ${bannerData.bannerEnabled ? 'bg-green-500' : 'bg-gray-600'}`}>
+                        <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform mt-1 ${bannerData.bannerEnabled ? 'translate-x-6 ml-0.5' : 'translate-x-1'}`} />
+                      </div>
+                    </div>
+                  </label>
+                </div>
+                <div>
+                  <label className="block text-gray-400 text-sm mb-2">Banner Title</label>
+                  <input 
+                    type="text" 
+                    value={bannerData.bannerTitle} 
+                    onChange={(e) => setBannerData({ ...bannerData, bannerTitle: e.target.value })} 
+                    placeholder="Welcome Bonus"
+                    className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-400 text-sm mb-2">Banner Subtitle</label>
+                  <input 
+                    type="text" 
+                    value={bannerData.bannerSubtitle} 
+                    onChange={(e) => setBannerData({ ...bannerData, bannerSubtitle: e.target.value })} 
+                    placeholder="Get 50% extra on first deposit"
+                    className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-gray-400 text-sm mb-2">Button Text</label>
+                    <input 
+                      type="text" 
+                      value={bannerData.bannerButtonText} 
+                      onChange={(e) => setBannerData({ ...bannerData, bannerButtonText: e.target.value })} 
+                      placeholder="Claim Now"
+                      className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 text-sm mb-2">Button Link</label>
+                    <select 
+                      value={bannerData.bannerLink} 
+                      onChange={(e) => setBannerData({ ...bannerData, bannerLink: e.target.value })} 
+                      className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+                    >
+                      <option value="/deposit">Deposit Page</option>
+                      <option value="/exchange">Exchange Page</option>
+                      <option value="/team">Team Page</option>
+                    </select>
+                  </div>
                 </div>
               </div>
-            </label>
-          </div>
-          <p className="text-gray-400 text-sm mb-4">Give discount on user's first deposit. User can use it only once.</p>
-          
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-gray-400 text-sm mb-2">Discount %</label>
-              <input 
-                type="number" 
-                value={discountData.discountPercent} 
-                onChange={(e) => setDiscountData({ ...discountData, discountPercent: parseFloat(e.target.value) })} 
-                className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
-              />
             </div>
+
             <div>
-              <label className="block text-gray-400 text-sm mb-2">Max Bonus (₹)</label>
-              <input 
-                type="number" 
-                value={discountData.discountMax} 
-                onChange={(e) => setDiscountData({ ...discountData, discountMax: parseFloat(e.target.value) })} 
-                className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
-              />
+              <h4 className="text-white font-semibold mb-4 pb-2 border-b border-[#2a2a2a]">Deposit Discount</h4>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">Enable Deposit Discount</span>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="relative">
+                      <input 
+                        type="checkbox" 
+                        checked={bannerData.depositDiscountEnabled}
+                        onChange={(e) => setBannerData({ ...bannerData, depositDiscountEnabled: e.target.checked })}
+                        className="sr-only"
+                      />
+                      <div className={`w-12 h-7 rounded-full transition-colors ${bannerData.depositDiscountEnabled ? 'bg-green-500' : 'bg-gray-600'}`}>
+                        <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform mt-1 ${bannerData.depositDiscountEnabled ? 'translate-x-6 ml-0.5' : 'translate-x-1'}`} />
+                      </div>
+                    </div>
+                  </label>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-gray-400 text-sm mb-2">Discount %</label>
+                    <input 
+                      type="number" 
+                      value={bannerData.depositDiscountPercent} 
+                      onChange={(e) => setBannerData({ ...bannerData, depositDiscountPercent: parseFloat(e.target.value) })} 
+                      className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 text-sm mb-2">Max Bonus (₹)</label>
+                    <input 
+                      type="number" 
+                      value={bannerData.depositDiscountMax} 
+                      onChange={(e) => setBannerData({ ...bannerData, depositDiscountMax: parseFloat(e.target.value) })} 
+                      className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 text-sm mb-2">Max Uses</label>
+                    <input 
+                      type="number" 
+                      value={bannerData.depositDiscountMaxUses} 
+                      onChange={(e) => setBannerData({ ...bannerData, depositDiscountMaxUses: parseInt(e.target.value) })} 
+                      className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          <button onClick={async () => { try { await adminAPI.updateSettings(discountData); alert('Discount settings saved!'); } catch { alert('Failed to save'); }}} className="w-full py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-2xl">Save Discount</button>
+
+            <div>
+              <h4 className="text-white font-semibold mb-4 pb-2 border-b border-[#2a2a2a]">JToken Purchase Discount</h4>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-400 text-sm">Enable JToken Discount</span>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="relative">
+                      <input 
+                        type="checkbox" 
+                        checked={bannerData.jtokenDiscountEnabled}
+                        onChange={(e) => setBannerData({ ...bannerData, jtokenDiscountEnabled: e.target.checked })}
+                        className="sr-only"
+                      />
+                      <div className={`w-12 h-7 rounded-full transition-colors ${bannerData.jtokenDiscountEnabled ? 'bg-green-500' : 'bg-gray-600'}`}>
+                        <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform mt-1 ${bannerData.jtokenDiscountEnabled ? 'translate-x-6 ml-0.5' : 'translate-x-1'}`} />
+                      </div>
+                    </div>
+                  </label>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-gray-400 text-sm mb-2">Discount %</label>
+                    <input 
+                      type="number" 
+                      value={bannerData.jtokenDiscountPercent} 
+                      onChange={(e) => setBannerData({ ...bannerData, jtokenDiscountPercent: parseFloat(e.target.value) })} 
+                      className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 text-sm mb-2">Max Bonus (₹)</label>
+                    <input 
+                      type="number" 
+                      value={bannerData.jtokenDiscountMax} 
+                      onChange={(e) => setBannerData({ ...bannerData, jtokenDiscountMax: parseFloat(e.target.value) })} 
+                      className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 text-sm mb-2">Max Uses</label>
+                    <input 
+                      type="number" 
+                      value={bannerData.jtokenDiscountMaxUses} 
+                      onChange={(e) => setBannerData({ ...bannerData, jtokenDiscountMaxUses: parseInt(e.target.value) })} 
+                      className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" disabled={savingBanner} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">{savingBanner ? 'Saving...' : 'Save All'}</button>
+          </form>
         </div>
 
         <div className="bg-gradient-to-br from-red-900/30 to-[#0d0d0d] rounded-3xl p-6 border border-red-500/30">
