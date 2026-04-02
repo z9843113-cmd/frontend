@@ -31,6 +31,7 @@ const Home = () => {
   const [recentDeposits, setRecentDeposits] = useState([]);
   const [recentWithdrawals, setRecentWithdrawals] = useState([]);
   const [recentExchanges, setRecentExchanges] = useState([]);
+  const [recentTransactions, setRecentTransactions] = useState([]);
   const [userStats, setUserStats] = useState({ todayVolume: 0, totalVolume: 0, todayProfit: 0, totalProfit: 0 });
   const [loading, setLoading] = useState(true);
   const [usdtRate, setUsdtRate] = useState(0);
@@ -56,7 +57,7 @@ const Home = () => {
   useEffect(() => {
     const loadHome = async () => {
       try {
-        const [walletRes, depositsRes, withdrawalsRes, profileRes, upiRes, bankRes, ratesRes, settingsRes, statsRes, exchangeRes] = await Promise.all([
+        const [walletRes, depositsRes, withdrawalsRes, profileRes, upiRes, bankRes, ratesRes, settingsRes, statsRes, exchangeRes, transactionsRes] = await Promise.all([
           walletAPI.getWallet(),
           depositAPI.getHistory(),
           withdrawalAPI.getHistory(),
@@ -66,13 +67,15 @@ const Home = () => {
           publicAPI.getCryptoRates(),
           adminAPI.getSettings(),
           userAPI.getUserStats().catch(() => ({ data: {} })),
-          userAPI.getMyExchangeRequests().catch(() => ({ data: [] }))
+          userAPI.getMyExchangeRequests().catch(() => ({ data: [] })),
+          userAPI.getTransactions().catch(() => [])
         ]);
 
         const walletData = walletRes?.data || walletRes || null;
         const depositsData = depositsRes?.data || depositsRes || [];
         const withdrawalsData = withdrawalsRes?.data || withdrawalsRes || [];
         const exchangeData = exchangeRes?.data || exchangeRes || [];
+        const transactionsData = transactionsRes?.data || transactionsRes || [];
         const profileData = profileRes?.data || profileRes || {};
         const upiData = upiRes?.data || upiRes || [];
         const bankData = bankRes?.data || bankRes || [];
@@ -85,6 +88,7 @@ const Home = () => {
         setRecentDeposits(Array.isArray(depositsData) ? depositsData : []);
         setRecentWithdrawals(Array.isArray(withdrawalsData) ? withdrawalsData : []);
         setRecentExchanges(Array.isArray(exchangeData) ? exchangeData : []);
+        setRecentTransactions(Array.isArray(transactionsData) ? transactionsData : []);
         setUserStats({
           todayVolume: parseFloat(statsData.todayVolume || 0),
           totalVolume: parseFloat(statsData.totalVolume || 0),
@@ -222,7 +226,12 @@ const Home = () => {
       entryType: 'exchange',
       method: item.ratetype === 'BUY' ? 'Buy USDT' : 'Sell USDT'
     }));
-    return [...depositItems, ...withdrawalItems, ...exchangeItems]
+    const transactionItems = recentTransactions.map((item) => ({ 
+      ...item, 
+      entryType: 'transaction',
+      method: item.type || 'Transaction'
+    }));
+    return [...depositItems, ...withdrawalItems, ...exchangeItems, ...transactionItems]
       .sort((a, b) => new Date(b.createdat || 0) - new Date(a.createdat || 0))
       .slice(0, 6);
   };
@@ -230,6 +239,7 @@ const Home = () => {
   console.log('Recent Deposits:', recentDeposits);
   console.log('Recent Withdrawals:', recentWithdrawals);
   console.log('Recent Exchanges:', recentExchanges);
+  console.log('Recent Transactions:', recentTransactions);
 
   if (loading) {
     return (
@@ -487,7 +497,7 @@ const Home = () => {
           <div className="mb-4 flex items-center justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#D4AF37]">Recent Activity</p>
-              <h3 className="mt-2 text-2xl font-bold text-white">Latest wallet movement</h3>
+              <h3 className="mt-2 text-2xl font-bold text-white">USDT Wallet Movement</h3>
             </div>
             <button onClick={() => navigate('/exchange')} className="text-sm font-semibold text-[#D4AF37]">
               View All
@@ -495,14 +505,13 @@ const Home = () => {
           </div>
 
           <div className="space-y-3">
-            {recentActivity.length === 0 && (
+            {recentActivity.filter(item => (item.method || '').toUpperCase().includes('USDT')).length === 0 ? (
               <div className="rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] px-4 py-8 text-center text-sm text-gray-500">
-                No recent activity yet.
+                No USDT activity yet.
               </div>
-            )}
-
-            {recentActivity.map((item, index) => {
-                    const isUSDT = (item.method || '').toUpperCase().includes('USDT') || (item.type || '').toUpperCase().includes('USDT');
+            ) : (
+              recentActivity.filter(item => (item.method || '').toUpperCase().includes('USDT')).slice(0, 4).map((item, index) => {
+                    const isUSDT = true;
                     const isExchange = item.entryType === 'exchange';
                     const isDeposit = item.entryType === 'deposit';
                     return (
@@ -530,7 +539,56 @@ const Home = () => {
                         </div>
                       </div>
                     );
-                  })}
+                  })
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-[28px] border border-[#242424] bg-gradient-to-br from-[#171717] via-[#111111] to-[#0c0c0c] p-5">
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#D4AF37]">INR Activity</p>
+              <h3 className="mt-2 text-2xl font-bold text-white">INR Wallet Movement</h3>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {recentActivity.filter(item => !((item.method || '').toUpperCase().includes('USDT'))).length === 0 ? (
+              <div className="rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] px-4 py-8 text-center text-sm text-gray-500">
+                No INR activity yet.
+              </div>
+            ) : (
+              recentActivity.filter(item => !((item.method || '').toUpperCase().includes('USDT'))).slice(0, 4).map((item, index) => {
+                    const isUSDT = false;
+                    const isExchange = item.entryType === 'exchange';
+                    const isDeposit = item.entryType === 'deposit';
+                    return (
+                      <div key={`${item.id || index}-${item.createdat || index}`} className="flex items-center justify-between rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] p-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${isDeposit ? 'bg-emerald-500/15 text-emerald-400' : isExchange ? 'bg-blue-500/15 text-blue-400' : 'bg-rose-500/15 text-rose-400'}`}>
+                            {isDeposit ? <FaArrowDown className="h-4 w-4" /> : isExchange ? <FaExchangeAlt className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-white">
+                              {isExchange 
+                                ? (item.ratetype === 'BUY' ? 'Buy USDT' : 'Sell USDT') 
+                                : item.method || (isDeposit ? 'Deposit' : 'Withdrawal')}
+                            </p>
+                            <p className="text-xs text-gray-500">{item.createdat ? new Date(item.createdat).toLocaleString() : 'Pending time'}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className={`text-sm font-bold ${isDeposit ? 'text-emerald-400' : isExchange ? 'text-blue-400' : 'text-rose-400'}`}>
+                            {isDeposit ? '+' : isExchange ? (item.ratetype === 'BUY' ? '+' : '-') : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(item.amount || 0)}`}
+                          </p>
+                          <p className={`text-xs font-medium ${item.status === 'APPROVED' ? 'text-emerald-400' : item.status === 'REJECTED' ? 'text-rose-400' : 'text-amber-400'}`}>
+                            {item.status === 'APPROVED' ? 'SUCCESS' : item.status === 'REJECTED' ? 'FAILED' : item.status || 'PENDING'}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+            )}
           </div>
         </div>
       </div>
