@@ -131,7 +131,32 @@ const Home = () => {
           ? settingsData.bannerenabled !== false 
           : true;
         const bannerTitle = settingsData.bannertitle || 'Welcome Bonus';
-        const bannerSubtitle = settingsData.bannersubtitle || 'Get 50% extra on first deposit';
+        
+        // Build subtitle based on discounts
+        const depositDiscountEnabled = settingsData.depositdiscountenabled;
+        const depositDiscountPercent = parseFloat(settingsData.depositdiscountpercent || 0);
+        const depositDiscountMax = parseFloat(settingsData.depositdiscountmax || 0);
+        const depositDiscountMaxUses = parseInt(settingsData.depositdiscountmaxuses || 1);
+        
+        const jtokenDiscountEnabled = settingsData.jtokendiscountenabled;
+        const jtokenDiscountPercent = parseFloat(settingsData.jtokendiscountpercent || 0);
+        const jtokenDiscountMax = parseFloat(settingsData.jtokendiscountmax || 0);
+        const jtokenDiscountMaxUses = parseInt(settingsData.jtokendiscountmaxuses || 1);
+        
+        let bannerSubtitle = settingsData.bannersubtitle || '';
+        if (depositDiscountEnabled && depositDiscountPercent > 0) {
+          const usesText = depositDiscountMaxUses > 1 ? ` (${depositDiscountMaxUses}x)` : '';
+          bannerSubtitle = `Get ${depositDiscountPercent}% Extra on Deposit${usesText}`;
+        }
+        if (jtokenDiscountEnabled && jtokenDiscountPercent > 0) {
+          const prefix = bannerSubtitle ? ', ' : '';
+          const usesText = jtokenDiscountMaxUses > 1 ? ` (${jtokenDiscountMaxUses}x)` : '';
+          bannerSubtitle += `${prefix}${jtokenDiscountPercent}% Extra on JToken${usesText}`;
+        }
+        if (!bannerSubtitle) {
+          bannerSubtitle = 'Get bonus on deposits and JToken';
+        }
+        
         const bannerButtonText = settingsData.bannerbuttontext || 'Claim Now';
         const bannerLink = settingsData.bannerlink || '/deposit';
         
