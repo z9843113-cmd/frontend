@@ -47,6 +47,7 @@ const BuyJToken = () => {
   const [selectedApp, setSelectedApp] = useState('');
   const [selectedUpi, setSelectedUpi] = useState('');
   const [userUpiAccounts, setUserUpiAccounts] = useState([]);
+  const [allUpiApps, setAllUpiApps] = useState([]);
   const [enabledUpiApps, setEnabledUpiApps] = useState([]);
   const [tokenRate, setTokenRate] = useState(1);
   const [jTokenCommission, setJTokenCommission] = useState(0);
@@ -92,12 +93,15 @@ const BuyJToken = () => {
         setTokenRate(parseFloat(settings.tokenrate) || 1);
         setJTokenCommission(parseFloat(settings.jtokencommissionpercent) || 0);
         
-        // Filter UPI apps to only show enabled ones (isForJToken = true by admin)
+        // Get all UPI apps and filter for JToken enabled ones
         const allApps = upiAppsRes?.data || upiAppsRes || [];
         const enabledApps = allApps.filter(app => app.isActive || app.isactive);
-        setEnabledUpiApps(enabledApps);
+        const jtokenEnabledApps = allApps.filter(app => (app.isActive || app.isactive) && (app.isforjtoken || app.isForJToken));
+        setAllUpiApps(allApps);
+        setEnabledUpiApps(jtokenEnabledApps);
         
-        console.log('Enabled UPI Apps for JToken:', enabledApps);
+        console.log('All UPI Apps:', allApps);
+        console.log('JToken Enabled Apps:', jtokenEnabledApps);
       } catch (err) {
         console.error('Load error:', err);
       } finally {
@@ -273,7 +277,12 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               {enabledUpiApps.length === 0 ? (
                 <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
                   <p className="text-red-400 text-sm font-medium mb-2">No payment apps available for JToken purchase.</p>
-                  <p className="text-gray-400 text-xs">Please add a UPI app from Manage Account or try again later.</p>
+                  {allUpiApps.length > 0 && (
+                    <div className="mb-2">
+                      <p className="text-gray-400 text-xs mb-1">Admin has not enabled any apps for JToken purchase yet.</p>
+                      <p className="text-gray-400 text-xs">Available apps: {allUpiApps.map(a => a.name).join(', ')}</p>
+                    </div>
+                  )}
                   <button onClick={() => navigate('/manage-account')} className="mt-2 text-[#D4AF37] text-sm hover:underline">
                     Go to Manage Account →
                   </button>
