@@ -510,7 +510,7 @@ const Home = () => {
                 No USDT activity yet.
               </div>
             ) : (
-              recentActivity.filter(item => (item.method || '').toUpperCase().includes('USDT')).slice(0, 4).map((item, index) => {
+              recentActivity.filter(item => (item.method || '').toUpperCase().includes('USDT')).slice(0, 5).map((item, index) => {
                     const isUSDT = true;
                     const isExchange = item.entryType === 'exchange';
                     const isDeposit = item.entryType === 'deposit';
@@ -558,7 +558,7 @@ const Home = () => {
                 No INR activity yet.
               </div>
             ) : (
-              recentActivity.filter(item => !((item.method || '').toUpperCase().includes('USDT'))).slice(0, 4).map((item, index) => {
+              recentActivity.filter(item => !((item.method || '').toUpperCase().includes('USDT'))).slice(0, 5).map((item, index) => {
                     const isUSDT = false;
                     const isExchange = item.entryType === 'exchange';
                     const isDeposit = item.entryType === 'deposit';
