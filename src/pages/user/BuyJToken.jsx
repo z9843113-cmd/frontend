@@ -44,8 +44,10 @@ const BuyJToken = () => {
 
   const [screenshotPreview, setScreenshotPreview] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [selectedApp, setSelectedApp] = useState('');
   const [selectedUpi, setSelectedUpi] = useState('');
   const [userUpiAccounts, setUserUpiAccounts] = useState([]);
+  const [enabledUpiApps, setEnabledUpiApps] = useState([]);
   const [tokenRate, setTokenRate] = useState(1);
   const [jTokenCommission, setJTokenCommission] = useState(0);
 
@@ -65,11 +67,12 @@ const BuyJToken = () => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const [walletRes, requestsRes, userUpiRes, settingsRes] = await Promise.all([
+        const [walletRes, requestsRes, userUpiRes, settingsRes, upiAppsRes] = await Promise.all([
           walletAPI.getWallet().catch(() => null),
           jTokenPurchaseAPI.getMyRequests().catch(() => ({ data: { purchases: [] } })),
           userAPI.getUpiAccounts().catch(() => []),
-          adminAPI.getSettings().catch((e) => { console.log('Settings error:', e); return {}; })
+          adminAPI.getSettings().catch((e) => { console.log('Settings error:', e); return {}; }),
+          publicAPI.getUpiApps().catch(() => [])
         ]);
         
         console.log('Settings response:', settingsRes);
@@ -88,6 +91,11 @@ const BuyJToken = () => {
         console.log('JToken Commission:', settings.jtokencommissionpercent);
         setTokenRate(parseFloat(settings.tokenrate) || 1);
         setJTokenCommission(parseFloat(settings.jtokencommissionpercent) || 0);
+        
+        // Filter UPI apps to only show enabled ones
+        const allApps = upiAppsRes?.data || upiAppsRes || [];
+        const enabledApps = allApps.filter(app => app.isActive || app.isactive);
+        setEnabledUpiApps(enabledApps);
       } catch (err) {
         console.error('Load error:', err);
       } finally {
@@ -135,21 +143,14 @@ const BuyJToken = () => {
       setMessage('Minimum amount is ₹10');
       return;
     }
-    if (!selectedUpi) {
-      setMessage('Please select your UPI account');
-      return;
-    }
-    
-    const selectedUpiData = userUpiAccounts.find(u => u.id === selectedUpi);
-    const appId = selectedUpiData?.appid || selectedUpiData?.appId || selectedUpiData?.appID;
-    if (!appId) {
-      setMessage('Please select a verified UPI account');
+    if (!selectedApp) {
+      setMessage('Please select a payment app');
       return;
     }
     
     setSubmitting(true);
     try {
-      const res = await jTokenPurchaseAPI.create({ amount: parseFloat(amount), method: appId, upiId: selectedUpi });
+      const res = await jTokenPurchaseAPI.create({ amount: parseFloat(amount), method: selectedApp, upiId: '' });
       const newRequest = res?.data?.request || res?.request || res?.data || res;
       setRequest(newRequest);
       setShowWaitPopup(true);
@@ -168,6 +169,8 @@ const BuyJToken = () => {
       await jTokenPurchaseAPI.cancel(request.id);
       setRequest(null);
       setShowWaitPopup(false);
+      setSelectedApp('');
+      setSelectedUpi('');
       // Refresh data
       const res = await jTokenPurchaseAPI.getMyRequests();
       const allRequests = res?.data?.purchases || res?.data || res || [];
@@ -264,24 +267,24 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
             <h2 className="text-white font-bold text-lg mb-4">Buy J Token</h2>
             
             <div className="mb-4">
-              <p className="text-gray-400 text-sm mb-2">Select Your UPI Account</p>
-              {userUpiAccounts.length === 0 ? (
-                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
-                  <p className="text-red-400 text-sm">Please add and verify a UPI account first.</p>
+              <p className="text-gray-400 text-sm mb-2">Select Payment App</p>
+              {enabledUpiApps.length === 0 ? (
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3">
+                  <p className="text-yellow-400 text-sm">No payment apps available. Please try again later.</p>
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">
-                  {userUpiAccounts.map((upi) => (
+                  {enabledUpiApps.map((app) => (
                     <button
-                      key={upi.id}
-                      onClick={() => setSelectedUpi(upi.id)}
+                      key={app.id}
+                      onClick={() => { setSelectedApp(app.id); setSelectedUpi(''); }}
                       className={`px-4 py-2 rounded-xl font-semibold text-sm ${
-                        selectedUpi === upi.id
+                        selectedApp === app.id
                           ? 'bg-[#D4AF37] text-black'
                           : 'bg-[#0a0a0a] border border-[#2a2a2a] text-gray-400'
                       }`}
                     >
-                      {upi.upiid || upi.upiId} {upi.appName && <span className="text-[#D4AF37] text-xs">({upi.appName})</span>}
+                      {app.name}
                     </button>
                   ))}
                 </div>
@@ -319,7 +322,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               })()}
             </div>
 
-            <button onClick={handleCreate} disabled={submitting || !selectedUpi || !amount} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">
+            <button onClick={handleCreate} disabled={submitting || !selectedApp || !amount} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">
               {submitting ? 'Creating...' : 'Create Request'}
             </button>
           </div>
