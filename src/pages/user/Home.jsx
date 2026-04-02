@@ -81,8 +81,20 @@ const Home = () => {
         const bankData = bankRes?.data || bankRes || [];
         const ratesData = ratesRes?.data || ratesRes || [];
         const settingsData = settingsRes?.data || settingsRes || {};
+        console.log('Settings Response:', settingsRes);
+        console.log('Settings Data for banner:', settingsData);
+        console.log('Banner enabled value:', settingsData.bannerenabled);
+        console.log('Banner title value:', settingsData.bannertitle);
         const statsData = statsRes?.data || statsRes || {};
         const tether = Array.isArray(ratesData) ? ratesData.find((rate) => rate.id === 'tether') : null;
+
+        console.log('Banner data from settings:', {
+          bannerEnabled: settingsData.bannerenabled,
+          bannerTitle: settingsData.bannertitle,
+          bannerSubtitle: settingsData.bannersubtitle,
+          bannerButtonText: settingsData.bannerbuttontext,
+          bannerLink: settingsData.bannerlink
+        });
 
         setWallet(walletData);
         setRecentDeposits(Array.isArray(depositsData) ? depositsData : []);
@@ -114,15 +126,22 @@ const Home = () => {
           setUsdtRate(parseFloat(walletData.usdtRate));
         }
 
-        if (settingsData.bannerEnabled !== undefined || settingsData.bannerTitle) {
-          setBanner({
-            enabled: settingsData.bannerEnabled !== false,
-            title: settingsData.bannerTitle || 'Welcome Bonus',
-            subtitle: settingsData.bannerSubtitle || 'Get 50% extra on first deposit',
-            buttonText: settingsData.bannerButtonText || 'Claim Now',
-            link: settingsData.bannerLink || '/deposit'
-          });
-        }
+        // Banner settings from admin
+        const bannerEnabled = settingsData.bannerenabled !== undefined 
+          ? settingsData.bannerenabled !== false 
+          : true;
+        const bannerTitle = settingsData.bannertitle || 'Welcome Bonus';
+        const bannerSubtitle = settingsData.bannersubtitle || 'Get 50% extra on first deposit';
+        const bannerButtonText = settingsData.bannerbuttontext || 'Claim Now';
+        const bannerLink = settingsData.bannerlink || '/deposit';
+        
+        setBanner({
+          enabled: bannerEnabled,
+          title: bannerTitle,
+          subtitle: bannerSubtitle,
+          buttonText: bannerButtonText,
+          link: bannerLink
+        });
 
         const accountState = {
           hasUPI: upiData.length > 0,
