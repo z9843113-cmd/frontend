@@ -88,12 +88,13 @@ const AdminJToken = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (saving) return; // Prevent double submission
     if (!selectedUser) {
       setMessage('Please select a user first');
       return;
     }
     if (!amount || parseFloat(amount) <= 0) {
-      setMessage('Enter a valid J Token amount');
+      setMessage('Enter a valid INR amount');
       return;
     }
     if (!statusType) {
@@ -104,14 +105,17 @@ const AdminJToken = () => {
     setSaving(true);
     setMessage('');
     try {
+      const amountValue = parseFloat(amount);
+      console.log('Sending credit request:', { userId: selectedUser.id, action, amount: amountValue, statusType });
+      
       const res = await adminAPI.updateUserJToken(selectedUser.id, {
         action,
-        amount: parseFloat(amount),
+        amount: amountValue,
         statusType,
         note: note.trim()
       });
       const data = res?.data || res;
-      setMessage(data?.message || 'J Token updated successfully');
+      setMessage(data?.message || 'INR updated successfully');
       setAmount('');
       setNote('');
       setStatusType('REWARD');
