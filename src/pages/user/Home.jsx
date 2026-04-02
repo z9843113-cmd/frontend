@@ -21,7 +21,11 @@ import {
   FaUsers,
   FaWallet,
   FaToggleOn,
-  FaToggleOff
+  FaToggleOff,
+  FaGamepad,
+  FaUniversity,
+  FaMoneyBillWave,
+  FaBitcoin
 } from 'react-icons/fa';
 
 const Home = () => {
@@ -502,42 +506,67 @@ const Home = () => {
 
         <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="rounded-[28px] border border-[#242424] bg-gradient-to-br from-[#171717] via-[#121212] to-[#0c0c0c] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.32)]">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#D4AF37]">J Token</p>
-                <h3 className="mt-2 text-2xl font-bold text-white">Buy & Redeem J Token</h3>
-              </div>
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#D4AF37]/10 text-[#D4AF37]">
-                <FaCoins className="h-7 w-7" />
-              </div>
-            </div>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-2xl border border-[#2a2a2a] bg-black/20 p-4">
-                <p className="text-xs text-gray-500">J Token Balance</p>
-                <p className="mt-2 text-xl font-bold text-white">{formatToken(wallet?.tokenbalance || 0)}</p>
-              </div>
-              <div className="rounded-2xl border border-[#2a2a2a] bg-black/20 p-4">
-                <p className="text-xs text-gray-500">Rate</p>
-                <p className="mt-2 text-xl font-bold text-white">₹{formatINR(wallet?.tokenRate || wallet?.tokenrate || 0.01)}</p>
-              </div>
-              <div className="rounded-2xl border border-[#2a2a2a] bg-black/20 p-4">
-                <p className="text-xs text-gray-500">Redeem Value</p>
-                <p className="mt-2 text-xl font-bold text-emerald-400">₹{formatINR(getRewardValue())}</p>
-              </div>
-            </div>
-
-            <div className="mt-5 rounded-2xl border border-[#2a2a2a] bg-[#0b0b0b] p-4">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-semibold text-white">How it works</p>
-                  <p className="mt-1 text-xs text-gray-500">Buy J Token with INR and redeem anytime at current rate.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#D4AF37]">Live Activity</p>
+            <h3 className="mt-2 text-2xl font-bold text-white">What's Happening Now</h3>
+            
+            <div className="mt-5 overflow-hidden rounded-2xl border border-[#2a2a2a] bg-[#0b0b0b] p-4">
+              <div className="relative h-[300px] overflow-hidden">
+                <div className="absolute inset-0 flex flex-col gap-3">
+                  {[
+                    { name: 'Rahul S.', action: 'Bought', amount: '₹5,000', type: 'JToken', color: '#D4AF37', icon: <FaCoins /> },
+                    { name: 'Priya M.', action: 'Deposited', amount: '$200', type: 'USDT', color: '#10B981', icon: <FaBitcoin /> },
+                    { name: 'Amit K.', action: 'Sold', amount: '₹8,500', type: 'Gaming', color: '#EF4444', icon: <FaGamepad /> },
+                    { name: 'Sneha R.', action: 'Sold', amount: '₹12,000', type: 'MIX', color: '#8B5CF6', icon: <FaExchangeAlt /> },
+                    { name: 'Vikram J.', action: 'Bought', amount: '₹15,000', type: 'JToken', color: '#D4AF37', icon: <FaCoins /> },
+                    { name: 'Kiran P.', action: 'Deposited', amount: '$500', type: 'USDT', color: '#10B981', icon: <FaBitcoin /> },
+                    { name: 'Meera L.', action: 'Sold', amount: '₹3,200', type: 'Gaming', color: '#EF4444', icon: <FaGamepad /> },
+                    { name: 'Raj K.', action: 'Bought', amount: '₹25,000', type: 'JToken', color: '#D4AF37', icon: <FaCoins /> },
+                  ].map((item, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-center justify-between rounded-xl border border-[#1a1a1a] bg-[#151515] p-3 animate-slide-in"
+                      style={{
+                        animationDelay: `${index * 0.5}s`,
+                        animationFillMode: 'both'
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1a1a1a]" style={{ color: item.color }}>
+                          {item.icon}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-white">
+                            {item.name} <span className="text-gray-400">{item.action}</span>
+                          </p>
+                          <p className="text-xs text-gray-500">{item.type}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold" style={{ color: item.color }}>{item.amount}</p>
+                        <p className="text-xs text-gray-500">{Math.floor(Math.random() * 59) + 1}s ago</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <button onClick={() => navigate('/buy-jtoken')} className="rounded-2xl bg-[#D4AF37] px-4 py-2 text-sm font-bold text-black">
-                  Buy Now
-                </button>
               </div>
             </div>
+
+            <style>{`
+              @keyframes slideIn {
+                from {
+                  opacity: 0;
+                  transform: translateX(-30px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateX(0);
+                }
+              }
+              .animate-slide-in {
+                animation: slideIn 0.6s ease-out forwards;
+                opacity: 0;
+              }
+            `}</style>
           </div>
 
           <div className="space-y-4">
