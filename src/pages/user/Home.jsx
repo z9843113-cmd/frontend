@@ -231,6 +231,9 @@ const Home = () => {
       entryType: 'transaction',
       method: item.type || 'Transaction'
     }));
+    
+    console.log('All items for INR:', transactionItems);
+    
     return [...depositItems, ...withdrawalItems, ...exchangeItems, ...transactionItems]
       .sort((a, b) => new Date(b.createdat || 0) - new Date(a.createdat || 0))
       .slice(0, 6);
