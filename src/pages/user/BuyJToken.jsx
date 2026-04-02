@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/BottomNav';
-import { jTokenPurchaseAPI, walletAPI, uploadToCloudinary, userAPI, adminAPI } from '../../services/api';
+import { jTokenPurchaseAPI, walletAPI, uploadToCloudinary, userAPI, adminAPI, publicAPI } from '../../services/api';
 import { FaArrowLeft, FaCopy, FaTimes } from 'react-icons/fa';
 
 const BuyJToken = () => {
@@ -92,10 +92,12 @@ const BuyJToken = () => {
         setTokenRate(parseFloat(settings.tokenrate) || 1);
         setJTokenCommission(parseFloat(settings.jtokencommissionpercent) || 0);
         
-        // Filter UPI apps to only show enabled ones
+        // Filter UPI apps to only show enabled ones (isForJToken = true by admin)
         const allApps = upiAppsRes?.data || upiAppsRes || [];
         const enabledApps = allApps.filter(app => app.isActive || app.isactive);
         setEnabledUpiApps(enabledApps);
+        
+        console.log('Enabled UPI Apps for JToken:', enabledApps);
       } catch (err) {
         console.error('Load error:', err);
       } finally {
@@ -269,8 +271,12 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
             <div className="mb-4">
               <p className="text-gray-400 text-sm mb-2">Select Payment App</p>
               {enabledUpiApps.length === 0 ? (
-                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3">
-                  <p className="text-yellow-400 text-sm">No payment apps available. Please try again later.</p>
+                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
+                  <p className="text-red-400 text-sm font-medium mb-2">No payment apps available for JToken purchase.</p>
+                  <p className="text-gray-400 text-xs">Please add a UPI app from Manage Account or try again later.</p>
+                  <button onClick={() => navigate('/manage-account')} className="mt-2 text-[#D4AF37] text-sm hover:underline">
+                    Go to Manage Account →
+                  </button>
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">
