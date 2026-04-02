@@ -62,13 +62,15 @@ const AdminNotificationBell = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const [notifRes, exchangeRes] = await Promise.all([
+        const [notifRes, exchangeRes, upiRes] = await Promise.all([
           adminAPI.getNotifications(),
-          adminAPI.getExchangeRequests({ page: 1, limit: 10, status: 'PENDING' }).catch(() => ({ data: { requests: [] } }))
+          adminAPI.getExchangeRequests({ page: 1, limit: 10, status: 'PENDING' }).catch(() => ({ data: { requests: [] } })),
+          adminAPI.getUpiVerifications({ page: 1, limit: 5, status: 'PENDING' }).catch(() => ({ verifications: [] }))
         ]);
         
         const data = notifRes?.data || notifRes || { totalUnread: 0, items: [] };
         const exchangeData = exchangeRes?.data || exchangeRes || { requests: [] };
+        const upiData = upiRes?.verifications || [];
         
         const exchangeNotifications = (exchangeData.requests || []).map(req => ({
           id: 'exchange-' + req.id,
@@ -79,7 +81,16 @@ const AdminNotificationBell = () => {
           createdat: req.createdat
         }));
         
-        const allItems = [...(data.items || []), ...exchangeNotifications].sort((a, b) => new Date(b.createdat) - new Date(a.createdat));
+        const upiNotifications = upiData.map(v => ({
+          id: 'upi-' + v.id,
+          title: 'UPI Verification',
+          description: `${v.phone} - ${v.upiid}`,
+          type: 'UPI_VERIFICATION',
+          requestId: v.id,
+          createdat: v.createdat
+        }));
+        
+        const allItems = [...(data.items || []), ...exchangeNotifications, ...upiNotifications].sort((a, b) => new Date(b.createdat) - new Date(a.createdat));
         
         const currentIds = allItems.map((item) => item.id);
         const previousIds = JSON.parse(localStorage.getItem(LAST_IDS_KEY) || '[]');

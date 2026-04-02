@@ -65,7 +65,7 @@ const AdminUpiVerifications = () => {
     setProcessingId(id);
     try {
       await adminAPI.approveUpiVerification(id);
-      setVerifications(prev => prev.map(v => v.id === id ? { ...v, status: 'APPROVED' } : v));
+      setVerifications(prev => prev.filter(v => v.id !== id));
       setShowUserPopup(false);
       setUserDetails(null);
     } catch (err) {
@@ -81,7 +81,7 @@ const AdminUpiVerifications = () => {
     setProcessingId(id);
     try {
       await adminAPI.rejectUpiVerification(id, reason);
-      setVerifications(prev => prev.map(v => v.id === id ? { ...v, status: 'REJECTED' } : v));
+      setVerifications(prev => prev.filter(v => v.id !== id));
       setShowUserPopup(false);
       setUserDetails(null);
     } catch (err) {
