@@ -254,7 +254,10 @@ const AdminJToken = () => {
                 <button key={user.id} onClick={() => handleSelectUser(user)} className="w-full rounded-2xl border border-[#242424] bg-[#101010] p-4 text-left transition hover:border-[#D4AF37]/40">
                   <p className="font-semibold text-white">{user.email || 'No email'}</p>
                   <p className="mt-1 text-xs text-gray-500">Referral: {user.referralcode || 'N/A'}</p>
-                  <p className="mt-2 text-sm text-[#D4AF37]">Current J Token: {parseFloat(user.tokenbalance || 0).toFixed(2)}</p>
+                  <div className="mt-2 flex gap-4 text-sm">
+                    <p className="text-[#D4AF37]">JToken: {parseFloat(user.tokenbalance || 0).toFixed(2)}</p>
+                    <p className="text-emerald-400">INR: ₹{parseFloat(user.inrbalance || 0).toFixed(2)}</p>
+                  </div>
                 </button>
               ))}
             </div>
