@@ -162,12 +162,18 @@ const BuyJToken = () => {
   };
 
   const handleCancel = async () => {
-    if (!confirm('Cancel this request?')) return;
+    if (!window.confirm('Cancel this request?')) return;
     setSubmitting(true);
     try {
       await jTokenPurchaseAPI.cancel(request.id);
       setRequest(null);
       setShowWaitPopup(false);
+      // Refresh data
+      const res = await jTokenPurchaseAPI.getMyRequests();
+      const allRequests = res?.data?.purchases || res?.data || res || [];
+      setHistory(allRequests);
+      const req = allRequests.find(r => !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(r.status));
+      setRequest(req);
     } catch (err) {
       setMessage(err?.message || 'Failed to cancel');
     } finally {
@@ -348,7 +354,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               </div>
             )}
 
-            {(request.status === 'READY_TO_PAY' || request.status === 'PAYMENT_STARTED') && (
+            {(request.status === 'READY_TO_PAY' || request.status === 'PAYMENT_STARTED' || request.status === 'PENDING' || request.status === 'WAITING_ORDER') && (
               <button onClick={handleCancel} disabled={submitting} className="w-full py-3 bg-red-500/20 text-red-400 rounded-2xl font-semibold mt-3 disabled:opacity-50">
                 Cancel Request
               </button>
