@@ -47,8 +47,8 @@ const BuyJToken = () => {
   const [selectedApp, setSelectedApp] = useState('');
   const [selectedUpi, setSelectedUpi] = useState('');
   const [userUpiAccounts, setUserUpiAccounts] = useState([]);
-  const [allUpiApps, setAllUpiApps] = useState([]);
   const [enabledUpiApps, setEnabledUpiApps] = useState([]);
+  const [availableApps, setAvailableApps] = useState([]);
   const [tokenRate, setTokenRate] = useState(1);
   const [jTokenCommission, setJTokenCommission] = useState(0);
 
@@ -68,12 +68,13 @@ const BuyJToken = () => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const [walletRes, requestsRes, userUpiRes, settingsRes, upiAppsRes] = await Promise.all([
+        const [walletRes, requestsRes, userUpiRes, settingsRes, jtokenAppsRes, paymentAppsRes] = await Promise.all([
           walletAPI.getWallet().catch(() => null),
           jTokenPurchaseAPI.getMyRequests().catch(() => ({ data: { purchases: [] } })),
           userAPI.getUpiAccounts().catch(() => []),
           adminAPI.getSettings().catch((e) => { console.log('Settings error:', e); return {}; }),
-          publicAPI.getUpiApps().catch(() => [])
+          userAPI.getJTokenApps().catch(() => ({ enabledApps: [] })),
+          userAPI.getPaymentApps().catch(() => ({ userApps: [] }))
         ]);
         
         console.log('Settings response:', settingsRes);
@@ -93,15 +94,22 @@ const BuyJToken = () => {
         setTokenRate(parseFloat(settings.tokenrate) || 1);
         setJTokenCommission(parseFloat(settings.jtokencommissionpercent) || 0);
         
-        // Get all UPI apps and filter for JToken enabled ones
-        const allApps = upiAppsRes?.data || upiAppsRes || [];
-        const enabledApps = allApps.filter(app => app.isActive || app.isactive);
-        const jtokenEnabledApps = allApps.filter(app => (app.isActive || app.isactive) && (app.isforjtoken || app.isForJToken));
-        setAllUpiApps(allApps);
-        setEnabledUpiApps(jtokenEnabledApps);
+        // Get admin-enabled JToken apps
+        const jtokenApps = jtokenAppsRes?.enabledApps || [];
+        const userApps = paymentAppsRes?.userApps || [];
         
-        console.log('All UPI Apps:', allApps);
-        console.log('JToken Enabled Apps:', jtokenEnabledApps);
+        console.log('JToken Enabled Apps (from API):', jtokenApps);
+        console.log('User Payment Apps (from API):', userApps);
+        
+        // Match: only show apps that are both enabled by admin AND added by user
+        const matchedApps = jtokenApps.filter(app =>
+          userApps.some(u => u.appid?.toLowerCase() === app.id?.toLowerCase())
+        );
+        
+        setEnabledUpiApps(jtokenApps);
+        setAvailableApps(matchedApps);
+        
+        console.log('Available Apps (matched):', matchedApps);
       } catch (err) {
         console.error('Load error:', err);
       } finally {
@@ -274,22 +282,17 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
             
             <div className="mb-4">
               <p className="text-gray-400 text-sm mb-2">Select Payment App</p>
-              {enabledUpiApps.length === 0 ? (
-                <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
-                  <p className="text-red-400 text-sm font-medium mb-2">No payment apps available for JToken purchase.</p>
-                  {allUpiApps.length > 0 && (
-                    <div className="mb-2">
-                      <p className="text-gray-400 text-xs mb-1">Admin has not enabled any apps for JToken purchase yet.</p>
-                      <p className="text-gray-400 text-xs">Available apps: {allUpiApps.map(a => a.name).join(', ')}</p>
-                    </div>
-                  )}
-                  <button onClick={() => navigate('/manage-account')} className="mt-2 text-[#D4AF37] text-sm hover:underline">
+              {availableApps.length === 0 ? (
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3">
+                  <p className="text-yellow-400 text-sm font-medium mb-2">⚠️ JexPay only accepts: {enabledUpiApps.map(a => a.name).join(', ')}</p>
+                  <p className="text-gray-300 text-sm">You have not added any of these apps. Please add one to continue.</p>
+                  <button onClick={() => navigate('/manage-account')} className="mt-3 px-4 py-2 bg-[#D4AF37] text-black font-semibold rounded-xl text-sm">
                     Go to Manage Account →
                   </button>
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-2">
-                  {enabledUpiApps.map((app) => (
+                  {availableApps.map((app) => (
                     <button
                       key={app.id}
                       onClick={() => { setSelectedApp(app.id); setSelectedUpi(''); }}
@@ -337,7 +340,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               })()}
             </div>
 
-            <button onClick={handleCreate} disabled={submitting || !selectedApp || !amount} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">
+            <button onClick={handleCreate} disabled={submitting || !selectedApp || !amount || availableApps.length === 0} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">
               {submitting ? 'Creating...' : 'Create Request'}
             </button>
           </div>
