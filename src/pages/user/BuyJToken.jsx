@@ -101,8 +101,24 @@ const BuyJToken = () => {
         console.log('JToken Enabled Apps (from API):', jtokenApps);
         console.log('User Payment Apps (from API):', userApps);
         
-        // Show all enabled apps - backend will validate user has that app
+        // Check if user has added any of the enabled apps
+        const userUpiList = userUpiRes?.data || userUpiRes || [];
+        console.log('User UPI Accounts:', userUpiList);
+        
+        // Match: check if any user's UPI appid matches any enabled app id or name
+        const hasAnyApp = userUpiList.some(u => 
+          jtokenApps.some(app => 
+            u.appid?.toLowerCase() === app.id?.toLowerCase() ||
+            u.appid?.toLowerCase() === app.name?.toLowerCase().replace(/\s+/g, '-') ||
+            app.name?.toLowerCase().includes(u.appid?.toLowerCase() || '') ||
+            u.appid?.toLowerCase().includes(app.name?.toLowerCase().replace(/\s+/g, '-').slice(0,4) || '')
+          )
+        );
+        
         setEnabledUpiApps(jtokenApps);
+        setAvailableApps(hasAnyApp ? jtokenApps : []);
+        
+        console.log('Has any enabled app:', hasAnyApp);
       } catch (err) {
         console.error('Load error:', err);
       } finally {
