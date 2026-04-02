@@ -9,7 +9,8 @@ const AdminSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({ usdtRate: 83, tokenRate: 0.01, minJTokenBuy: 10, referralPercent: 5, jTokenCommissionPercent: 4, usdtCommissionPercent: 0, upiRewardAmount: 50, bankRewardAmount: 100, telegramRewardAmount: 25, gamingRate: 103, gamingRateMin: 80, mixRate: 108, mixRateMin: 80, exchangeMinAmount: 100, exchangeMaxAmount: 50000 });
-  const [bannerData, setBannerData] = useState({ bannerEnabled: true, bannerTitle: 'Welcome Bonus', bannerSubtitle: 'Get 50% extra on first deposit', bannerButtonText: 'Claim Now', bannerLink: '/deposit' });
+  const [bannerData, setBannerData] = useState({ bannerEnabled: true, bannerTitle: 'Welcome Bonus', bannerSubtitle: 'Get 50% extra on first deposit', bannerButtonText: 'Claim Now', bannerLink: '/deposit', bannerBgImage: '', bannerTemplate: 'premium' });
+  const [discountData, setDiscountData] = useState({ discountEnabled: true, discountPercent: 20, discountMax: 500 });
   const [supportLinks, setSupportLinks] = useState({ whatsappSupport: '', telegramSupport: '', telegramGroup: '' });
   const [savingSupport, setSavingSupport] = useState(false);
   const [savingBanner, setSavingBanner] = useState(false);
@@ -278,6 +279,49 @@ const AdminSettings = () => {
             </div>
             <button type="submit" disabled={savingBanner} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">{savingBanner ? 'Saving...' : 'Save Banner'}</button>
           </form>
+        </div>
+
+        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-white">First Deposit Discount</h3>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <span className="text-gray-400 text-sm">Enable</span>
+              <div className="relative">
+                <input 
+                  type="checkbox" 
+                  checked={discountData.discountEnabled}
+                  onChange={(e) => setDiscountData({ ...discountData, discountEnabled: e.target.checked })}
+                  className="sr-only"
+                />
+                <div className={`w-12 h-7 rounded-full transition-colors ${discountData.discountEnabled ? 'bg-green-500' : 'bg-gray-600'}`}>
+                  <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform mt-1 ${discountData.discountEnabled ? 'translate-x-6 ml-0.5' : 'translate-x-1'}`} />
+                </div>
+              </div>
+            </label>
+          </div>
+          <p className="text-gray-400 text-sm mb-4">Give discount on user's first deposit. User can use it only once.</p>
+          
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-gray-400 text-sm mb-2">Discount %</label>
+              <input 
+                type="number" 
+                value={discountData.discountPercent} 
+                onChange={(e) => setDiscountData({ ...discountData, discountPercent: parseFloat(e.target.value) })} 
+                className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 text-sm mb-2">Max Bonus (₹)</label>
+              <input 
+                type="number" 
+                value={discountData.discountMax} 
+                onChange={(e) => setDiscountData({ ...discountData, discountMax: parseFloat(e.target.value) })} 
+                className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+              />
+            </div>
+          </div>
+          <button onClick={async () => { try { await adminAPI.updateSettings(discountData); alert('Discount settings saved!'); } catch { alert('Failed to save'); }}} className="w-full py-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-2xl">Save Discount</button>
         </div>
 
         <div className="bg-gradient-to-br from-red-900/30 to-[#0d0d0d] rounded-3xl p-6 border border-red-500/30">

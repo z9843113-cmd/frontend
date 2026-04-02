@@ -135,7 +135,8 @@ const userAPI = {
   getTransactions: () => authFetch(`${API_BASE}/user/transactions`),
   getUserStats: () => authFetch(`${API_BASE}/user/stats`),
   getJTokenApps: () => authFetch(`${API_BASE}/user/jtoken-apps`),
-  getPaymentApps: () => authFetch(`${API_BASE}/user/payment-apps`)
+  getPaymentApps: () => authFetch(`${API_BASE}/user/payment-apps`),
+  getDiscountStatus: () => authFetch(`${API_BASE}/user/discount-status`)
 };
 
 const walletAPI = { 

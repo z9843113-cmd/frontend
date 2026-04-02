@@ -325,7 +325,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
             </div>
 
             <div className="mb-4">
-              <p className="text-gray-400 text-sm mb-2">Enter amount (min ₹10)</p>
+              <p className="text-gray-400 text-sm mb-2">Enter amount</p>
               <input
                 type="number"
                 value={amount}
