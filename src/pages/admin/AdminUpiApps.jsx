@@ -29,6 +29,7 @@ const AdminUpiApps = () => {
 
   const handleEdit = (app) => { setName(app.name); setIconUrl(app.iconUrl || ''); setEditId(app.id); setShowForm(true); };
   const handleToggle = async (app) => { try { await adminAPI.updateUpiApp(app.id, { isActive: !(app.isActive || app.isactive) }); fetchApps(); } catch { console.error('Failed to toggle UPI app'); } };
+  const handleToggleJToken = async (app) => { try { await adminAPI.updateUpiApp(app.id, { isForJToken: !(app.isforjtoken || app.isForJToken) }); fetchApps(); } catch { console.error('Failed to toggle JToken'); } };
   const handleDelete = async (id) => { if (!confirm('Are you sure?')) return; try { await adminAPI.deleteUpiApp(id); fetchApps(); } catch { console.error('Failed to delete UPI app'); } };
 
   const menuItems = [
@@ -91,14 +92,19 @@ const AdminUpiApps = () => {
           {loading ? <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-20 bg-[#0a0a0a] rounded-2xl"></div>)}</div> : apps.length === 0 ? <p className="text-gray-500 text-center py-8">No UPI apps found</p> : (
             <div className="space-y-3">
               {apps.map((app) => {
+                const isForJToken = app.isforjtoken || app.isForJToken;
                 return (
                 <div key={app.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 sm:p-4 bg-[#0a0a0a] rounded-2xl border border-[#1a1a1a]">
                   <div className="w-full sm:w-auto">
                     <p className="text-white font-medium text-sm sm:text-base">{app.name}</p>
-                    <p className="text-gray-500 text-xs sm:text-sm">{(app.isActive || app.isactive) ? 'Active' : 'Inactive'}</p>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${(app.isActive || app.isactive) ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>{(app.isActive || app.isactive) ? 'Active' : 'Inactive'}</span>
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${isForJToken ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'}`}>JToken: {isForJToken ? 'Enabled' : 'Disabled'}</span>
+                    </div>
                   </div>
                   <div className="flex flex-wrap gap-2 w-full sm:w-auto items-center">
                     <button onClick={() => handleToggle(app)} className="flex-1 sm:flex-none px-3 py-2 bg-[#1a1a1a] text-gray-400 rounded-xl text-xs sm:text-sm hover:bg-[#252525]">{(app.isActive || app.isactive) ? 'Disable' : 'Enable'}</button>
+                    <button onClick={() => handleToggleJToken(app)} className={`flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs sm:text-sm ${isForJToken ? 'bg-blue-500/20 text-blue-400' : 'bg-gray-500/20 text-gray-400'} hover:bg-[#252525]`}>{isForJToken ? 'JToken: On' : 'JToken: Off'}</button>
                     <button onClick={() => handleEdit(app)} className="flex-1 sm:flex-none px-3 py-2 bg-[#1a1a1a] text-gray-400 rounded-xl text-xs sm:text-sm hover:bg-[#252525]">Edit</button>
                     <button onClick={() => handleDelete(app.id)} className="flex-1 sm:flex-none px-3 py-2 bg-red-500/20 text-red-400 rounded-xl text-xs sm:text-sm hover:bg-red-500/30">Delete</button>
                   </div>

@@ -103,13 +103,17 @@ const BuyJToken = () => {
         
         // Match: only show apps that are both enabled by admin AND added by user
         const matchedApps = jtokenApps.filter(app =>
-          userApps.some(u => u.appid?.toLowerCase() === app.id?.toLowerCase())
+          userApps.some(u => 
+            u.appid?.toLowerCase() === app.id?.toLowerCase() ||
+            u.appid?.toLowerCase() === app.name?.toLowerCase().replace(/\s+/g, '-')
+          )
         );
         
         setEnabledUpiApps(jtokenApps);
         setAvailableApps(matchedApps);
         
         console.log('Available Apps (matched):', matchedApps);
+        console.log('Enabled UPI Apps:', jtokenApps);
       } catch (err) {
         console.error('Load error:', err);
       } finally {
@@ -282,7 +286,12 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
             
             <div className="mb-4">
               <p className="text-gray-400 text-sm mb-2">Select Payment App</p>
-              {availableApps.length === 0 ? (
+              {enabledUpiApps.length === 0 ? (
+                <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3">
+                  <p className="text-yellow-400 text-sm font-medium mb-2">⚠️ No payment apps available for JToken purchase.</p>
+                  <p className="text-gray-300 text-sm">Admin has not enabled any apps yet. Please try again later.</p>
+                </div>
+              ) : availableApps.length === 0 ? (
                 <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3">
                   <p className="text-yellow-400 text-sm font-medium mb-2">⚠️ JexPay only accepts: {enabledUpiApps.map(a => a.name).join(', ')}</p>
                   <p className="text-gray-300 text-sm">You have not added any of these apps. Please add one to continue.</p>
