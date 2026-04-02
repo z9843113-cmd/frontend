@@ -232,7 +232,21 @@ const Home = () => {
       method: item.type || 'Transaction'
     }));
     
-    return [...depositItems, ...withdrawalItems, ...exchangeItems, ...transactionItems]
+    // Combine and remove duplicates (keep deposit items, remove transaction duplicates)
+    const combined = [...depositItems, ...withdrawalItems, ...exchangeItems];
+    
+    // Add transaction items that aren't duplicates (type not USDT_DEPOSIT)
+    transactionItems.forEach(item => {
+      const isDuplicate = combined.some(existing => 
+        existing.id === item.id || 
+        (existing.method === 'USDT_DEPOSIT' && item.method === 'USDT_DEPOSIT')
+      );
+      if (!isDuplicate) {
+        combined.push(item);
+      }
+    });
+    
+    return combined
       .sort((a, b) => new Date(b.createdat || 0) - new Date(a.createdat || 0))
       .slice(0, 6);
   };
