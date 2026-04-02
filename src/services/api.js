@@ -133,7 +133,7 @@ const userAPI = {
   createExchangeRequest: (data) => authFetch(`${API_BASE}/user/exchange-request`, { method: 'POST', body: JSON.stringify(data) }),
   getMyExchangeRequests: () => authFetch(`${API_BASE}/user/exchange-requests`),
   getTransactions: () => authFetch(`${API_BASE}/user/transactions`),
-  getUserStats: () => authFetch(`${API_BASE}/user/stats'),
+  getUserStats: () => authFetch(`${API_BASE}/user/stats`),
   getJTokenApps: () => authFetch(`${API_BASE}/user/jtoken-apps`),
   getPaymentApps: () => authFetch(`${API_BASE}/user/payment-apps`)
 };
