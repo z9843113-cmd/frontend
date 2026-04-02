@@ -119,9 +119,10 @@ const AdminJToken = () => {
       setAmount('');
       setNote('');
       setStatusType('REWARD');
+      // Refresh user details to show updated balance
       const refresh = await adminAPI.getUserDetails(selectedUser.id);
       const refreshed = refresh?.data || refresh;
-      setSelectedUser({ ...selectedUser, wallet: refreshed.wallet });
+      setSelectedUser({ ...selectedUser, email: refreshed.user?.email, wallet: refreshed.wallet });
     } catch (error) {
       setMessage(error?.response?.data?.error || 'Failed to update balance');
     } finally {
@@ -270,7 +271,10 @@ const AdminJToken = () => {
                 <div className="mt-4 rounded-2xl border border-[#2a2a2a] bg-[#0b0b0b] p-4">
                   <p className="text-sm text-gray-500">Selected user</p>
                   <p className="mt-1 font-semibold text-white">{selectedUser.email}</p>
-                  <p className="mt-2 text-sm text-[#D4AF37]">Live J Token balance: {parseFloat(selectedUser.wallet?.tokenbalance || selectedUser.tokenbalance || 0).toFixed(2)}</p>
+                  <div className="mt-2 flex gap-4 text-sm">
+                    <p className="text-[#D4AF37]">JToken: {parseFloat(selectedUser.wallet?.tokenbalance || selectedUser.tokenbalance || 0).toFixed(2)}</p>
+                    <p className="text-emerald-400">INR: ₹{parseFloat(selectedUser.wallet?.inrbalance || selectedUser.inrbalance || 0).toFixed(2)}</p>
+                  </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="mt-4 space-y-4">
