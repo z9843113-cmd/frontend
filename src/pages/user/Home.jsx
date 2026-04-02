@@ -57,6 +57,54 @@ const Home = () => {
     buttonText: 'Claim Now',
     link: '/deposit'
   });
+  const [liveActivity, setLiveActivity] = useState([]);
+
+  const generateLiveActivity = () => {
+    const names = [
+      '+91823***1631', '+91987***4522', '+91700***8891', '+91876***2234',
+      '+91956***7789', '+91889***1122', '+91788***4455', '+91987***9900',
+      '+91823***5567', '+91654***3344', '+91789***6677', '+91909***1122',
+      '+91823***8899', '+91654***4477', '+91700***2233', '+91987***5566',
+      '+91876***7788', '+91654***9900', '+91956***1122', '+91789***3344'
+    ];
+    const actions = ['Bought', 'Deposited', 'Sold', 'Transferred'];
+    const types = [
+      { name: 'JToken', color: '#D4AF37', icon: <FaCoins /> },
+      { name: 'USDT', color: '#10B981', icon: <FaBitcoin /> },
+      { name: 'Gaming', color: '#EF4444', icon: <FaGamepad /> },
+      { name: 'MIX', color: '#8B5CF6', icon: <FaExchangeAlt /> }
+    ];
+    
+    return Array.from({ length: 8 }, (_, i) => {
+      const type = types[Math.floor(Math.random() * types.length)];
+      const isINR = type.name !== 'USDT';
+      const amount = isINR 
+        ? `₹${Math.floor(Math.random() * 25000) + 1000}`
+        : `$${Math.floor(Math.random() * 500) + 50}`;
+      
+      return {
+        id: Date.now() + i,
+        name: names[Math.floor(Math.random() * names.length)],
+        action: actions[Math.floor(Math.random() * actions.length)],
+        amount,
+        type: type.name,
+        color: type.color,
+        icon: type.icon,
+        time: Math.floor(Math.random() * 59) + 1
+      };
+    });
+  };
+
+  useEffect(() => {
+    setLiveActivity(generateLiveActivity());
+    const interval = setInterval(() => {
+      setLiveActivity(prev => {
+        const newItem = generateLiveActivity()[Math.floor(Math.random() * 8)];
+        return [newItem, ...prev.slice(0, 7)];
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const loadHome = async () => {
@@ -512,21 +560,12 @@ const Home = () => {
             <div className="mt-5 overflow-hidden rounded-2xl border border-[#2a2a2a] bg-[#0b0b0b] p-4">
               <div className="relative h-[300px] overflow-hidden">
                 <div className="absolute inset-0 flex flex-col gap-3">
-                  {[
-                    { name: 'Rahul S.', action: 'Bought', amount: '₹5,000', type: 'JToken', color: '#D4AF37', icon: <FaCoins /> },
-                    { name: 'Priya M.', action: 'Deposited', amount: '$200', type: 'USDT', color: '#10B981', icon: <FaBitcoin /> },
-                    { name: 'Amit K.', action: 'Sold', amount: '₹8,500', type: 'Gaming', color: '#EF4444', icon: <FaGamepad /> },
-                    { name: 'Sneha R.', action: 'Sold', amount: '₹12,000', type: 'MIX', color: '#8B5CF6', icon: <FaExchangeAlt /> },
-                    { name: 'Vikram J.', action: 'Bought', amount: '₹15,000', type: 'JToken', color: '#D4AF37', icon: <FaCoins /> },
-                    { name: 'Kiran P.', action: 'Deposited', amount: '$500', type: 'USDT', color: '#10B981', icon: <FaBitcoin /> },
-                    { name: 'Meera L.', action: 'Sold', amount: '₹3,200', type: 'Gaming', color: '#EF4444', icon: <FaGamepad /> },
-                    { name: 'Raj K.', action: 'Bought', amount: '₹25,000', type: 'JToken', color: '#D4AF37', icon: <FaCoins /> },
-                  ].map((item, index) => (
+                  {liveActivity.map((item, index) => (
                     <div 
-                      key={index}
+                      key={item.id + index}
                       className="flex items-center justify-between rounded-xl border border-[#1a1a1a] bg-[#151515] p-3 animate-slide-in"
                       style={{
-                        animationDelay: `${index * 0.5}s`,
+                        animationDelay: `${index * 0.3}s`,
                         animationFillMode: 'both'
                       }}
                     >
@@ -543,7 +582,7 @@ const Home = () => {
                       </div>
                       <div className="text-right">
                         <p className="font-bold" style={{ color: item.color }}>{item.amount}</p>
-                        <p className="text-xs text-gray-500">{Math.floor(Math.random() * 59) + 1}s ago</p>
+                        <p className="text-xs text-gray-500">{item.time}s ago</p>
                       </div>
                     </div>
                   ))}
