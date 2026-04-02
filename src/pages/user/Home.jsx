@@ -14,6 +14,7 @@ import {
   FaBolt,
   FaChartArea,
   FaCoins,
+  FaExchangeAlt,
   FaGift,
   FaShieldAlt,
   FaStar,
@@ -29,6 +30,7 @@ const Home = () => {
   const [wallet, setWallet] = useState(null);
   const [recentDeposits, setRecentDeposits] = useState([]);
   const [recentWithdrawals, setRecentWithdrawals] = useState([]);
+  const [recentExchanges, setRecentExchanges] = useState([]);
   const [userStats, setUserStats] = useState({ todayVolume: 0, totalVolume: 0, todayProfit: 0, totalProfit: 0 });
   const [loading, setLoading] = useState(true);
   const [usdtRate, setUsdtRate] = useState(0);
@@ -54,7 +56,7 @@ const Home = () => {
   useEffect(() => {
     const loadHome = async () => {
       try {
-        const [walletRes, depositsRes, withdrawalsRes, profileRes, upiRes, bankRes, ratesRes, settingsRes, statsRes] = await Promise.all([
+        const [walletRes, depositsRes, withdrawalsRes, profileRes, upiRes, bankRes, ratesRes, settingsRes, statsRes, exchangeRes] = await Promise.all([
           walletAPI.getWallet(),
           depositAPI.getHistory(),
           withdrawalAPI.getHistory(),
@@ -63,12 +65,14 @@ const Home = () => {
           userAPI.getBankAccounts ? userAPI.getBankAccounts() : Promise.resolve({ data: [] }),
           publicAPI.getCryptoRates(),
           adminAPI.getSettings(),
-          userAPI.getUserStats().catch(() => ({ data: {} }))
+          userAPI.getUserStats().catch(() => ({ data: {} })),
+          userAPI.getMyExchangeRequests().catch(() => ({ data: [] }))
         ]);
 
         const walletData = walletRes?.data || walletRes || null;
         const depositsData = depositsRes?.data || depositsRes || [];
         const withdrawalsData = withdrawalsRes?.data || withdrawalsRes || [];
+        const exchangeData = exchangeRes?.data || exchangeRes || [];
         const profileData = profileRes?.data || profileRes || {};
         const upiData = upiRes?.data || upiRes || [];
         const bankData = bankRes?.data || bankRes || [];
@@ -80,6 +84,7 @@ const Home = () => {
         setWallet(walletData);
         setRecentDeposits(Array.isArray(depositsData) ? depositsData : []);
         setRecentWithdrawals(Array.isArray(withdrawalsData) ? withdrawalsData : []);
+        setRecentExchanges(Array.isArray(exchangeData) ? exchangeData : []);
         setUserStats({
           todayVolume: parseFloat(statsData.todayVolume || 0),
           totalVolume: parseFloat(statsData.totalVolume || 0),
@@ -212,7 +217,8 @@ const Home = () => {
   const getRecentActivity = () => {
     const depositItems = recentDeposits.map((item) => ({ ...item, entryType: 'deposit' }));
     const withdrawalItems = recentWithdrawals.map((item) => ({ ...item, entryType: 'withdrawal' }));
-    return [...depositItems, ...withdrawalItems]
+    const exchangeItems = recentExchanges.map((item) => ({ ...item, entryType: 'exchange' }));
+    return [...depositItems, ...withdrawalItems, ...exchangeItems]
       .sort((a, b) => new Date(b.createdat || 0) - new Date(a.createdat || 0))
       .slice(0, 6);
   };
@@ -489,20 +495,26 @@ const Home = () => {
 
             {recentActivity.map((item, index) => {
                     const isUSDT = (item.method || '').toUpperCase().includes('USDT') || (item.type || '').toUpperCase().includes('USDT');
+                    const isExchange = item.entryType === 'exchange';
+                    const isDeposit = item.entryType === 'deposit';
                     return (
                       <div key={`${item.id || index}-${item.createdat || index}`} className="flex items-center justify-between rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] p-4">
                         <div className="flex items-center gap-3">
-                          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${item.entryType === 'deposit' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}>
-                            {item.entryType === 'deposit' ? <FaArrowDown className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
+                          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${isDeposit ? 'bg-emerald-500/15 text-emerald-400' : isExchange ? 'bg-blue-500/15 text-blue-400' : 'bg-rose-500/15 text-rose-400'}`}>
+                            {isDeposit ? <FaArrowDown className="h-4 w-4" /> : isExchange ? <FaExchangeAlt className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-white">{item.method || (item.entryType === 'deposit' ? 'Deposit' : 'Withdrawal')}</p>
+                            <p className="text-sm font-semibold text-white">
+                              {isExchange 
+                                ? (item.ratetype === 'BUY' ? 'Buy USDT' : 'Sell USDT') 
+                                : item.method || (isDeposit ? 'Deposit' : 'Withdrawal')}
+                            </p>
                             <p className="text-xs text-gray-500">{item.createdat ? new Date(item.createdat).toLocaleString() : 'Pending time'}</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className={`text-sm font-bold ${item.entryType === 'deposit' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                            {item.entryType === 'deposit' ? '+' : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(item.amount || 0)}`}
+                          <p className={`text-sm font-bold ${isDeposit ? 'text-emerald-400' : isExchange ? 'text-blue-400' : 'text-rose-400'}`}>
+                            {isDeposit ? '+' : isExchange ? (item.ratetype === 'BUY' ? '+' : '-') : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(item.amount || 0)}`}
                           </p>
                           <p className={`text-xs font-medium ${item.status === 'APPROVED' ? 'text-emerald-400' : item.status === 'REJECTED' ? 'text-rose-400' : 'text-amber-400'}`}>
                             {item.status === 'APPROVED' ? 'SUCCESS' : item.status === 'REJECTED' ? 'FAILED' : item.status || 'PENDING'}
