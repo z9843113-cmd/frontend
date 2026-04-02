@@ -298,6 +298,7 @@ const Home = () => {
     if (item.type === 'SOLD_TOKENS') return true;
     if (item.type === 'TRANSFER') return true;
     if (item.type === 'ADMIN_CREDIT') return true;
+    if (item.type === 'ADMIN_DEBIT') return false;
     if (item.type === 'DEBIT') return false;
     return false;
   };
@@ -646,11 +647,14 @@ const Home = () => {
                             <p className="text-sm font-semibold text-white">
                               {isExchange 
                                 ? (item.ratetype === 'BUY' ? 'Buy USDT' : 'Sell USDT') 
+                                : item.type === 'ADMIN_CREDIT' ? 'Admin Credit'
+                                : item.type === 'ADMIN_DEBIT' ? 'Admin Debit'
                                 : item.type === 'REWARD' ? 'Reward' 
                                 : item.type === 'COMMISSION' ? 'Commission'
                                 : item.type === 'SOLD_TOKENS' ? 'Sold Tokens'
                                 : item.type === 'TRANSFER' ? 'Transfer'
                                 : item.method || item.type || (isDeposit ? 'Deposit' : 'Withdrawal')}
+                              {item.note && <span className="text-xs text-gray-500 ml-1">({item.note})</span>}
                             </p>
                             <p className="text-xs text-gray-500">{item.createdat ? new Date(item.createdat).toLocaleString() : 'Pending time'}</p>
                           </div>
