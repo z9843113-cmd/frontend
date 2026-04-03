@@ -14,6 +14,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   const navigate = useNavigate();
   const { setToken, setUser } = useAuthStore();
   const [searchParams] = useSearchParams();
@@ -25,14 +26,51 @@ const Register = () => {
     }
   }, [searchParams]);
 
+  const validateField = (field, value) => {
+    const errors = { ...fieldErrors };
+    
+    switch (field) {
+      case 'name':
+        if (!value.trim()) errors.name = 'Name is required';
+        else if (value.trim().length < 2) errors.name = 'Name must be at least 2 characters';
+        else delete errors.name;
+        break;
+      case 'email':
+        if (!value.trim()) errors.email = 'Email is required';
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) errors.email = 'Please enter a valid email';
+        else delete errors.email;
+        break;
+      case 'mobile':
+        if (value && !/^\d{10}$/.test(value)) errors.mobile = 'Enter 10 digit mobile number';
+        else delete errors.mobile;
+        break;
+      case 'password':
+        if (!value) errors.password = 'Password is required';
+        else if (value.length < 6) errors.password = 'Password must be at least 6 characters';
+        else delete errors.password;
+        break;
+    }
+    
+    setFieldErrors(errors);
+    return !errors[field];
+  };
+
   const validateForm = () => {
-    if (!name.trim()) return 'Please enter your name';
-    if (!email.trim()) return 'Please enter your email';
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return 'Please enter a valid email';
-    if (!password.trim()) return 'Please enter a password';
-    if (password.length < 6) return 'Password must be at least 6 characters';
-    return null;
+    const errors = {};
+    
+    if (!name.trim()) errors.name = 'Name is required';
+    else if (name.trim().length < 2) errors.name = 'Name must be at least 2 characters';
+    
+    if (!email.trim()) errors.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Please enter a valid email';
+    
+    if (mobile && !/^\d{10}$/.test(mobile)) errors.mobile = 'Enter 10 digit mobile number';
+    
+    if (!password) errors.password = 'Password is required';
+    else if (password.length < 6) errors.password = 'Password must be at least 6 characters';
+    
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSendOtp = async () => {
@@ -112,40 +150,48 @@ const Register = () => {
                 <input 
                   type="text" 
                   value={name} 
-                  onChange={(e) => { setName(e.target.value); setError(''); }} 
+                  onChange={(e) => { setName(e.target.value); setError(''); if (fieldErrors.name) validateField('name', e.target.value); }} 
+                  onBlur={(e) => validateField('name', e.target.value)}
                   placeholder="Enter your full name" 
-                  className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-yellow-500 focus:outline-none transition-colors" 
+                  className={`w-full bg-[#1a1a1a] border rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none transition-colors ${fieldErrors.name ? 'border-red-500 focus:border-red-500' : 'border-[#2a2a2a] focus:border-yellow-500'}`} 
                 />
+                {fieldErrors.name && <p className="text-red-400 text-xs mt-1 ml-1">{fieldErrors.name}</p>}
               </div>
               <div className="mb-4">
                 <label className="block text-sm text-gray-400 mb-2 ml-1">Email *</label>
                 <input 
                   type="email" 
                   value={email} 
-                  onChange={(e) => { setEmail(e.target.value); setError(''); }} 
+                  onChange={(e) => { setEmail(e.target.value); setError(''); if (fieldErrors.email) validateField('email', e.target.value); }}
+                  onBlur={(e) => validateField('email', e.target.value)}
                   placeholder="Enter your email" 
-                  className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-yellow-500 focus:outline-none transition-colors" 
+                  className={`w-full bg-[#1a1a1a] border rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none transition-colors ${fieldErrors.email ? 'border-red-500 focus:border-red-500' : 'border-[#2a2a2a] focus:border-yellow-500'}`} 
                 />
+                {fieldErrors.email && <p className="text-red-400 text-xs mt-1 ml-1">{fieldErrors.email}</p>}
               </div>
               <div className="mb-4">
-                <label className="block text-sm text-gray-400 mb-2 ml-1">Mobile Number</label>
+                <label className="block text-sm text-gray-400 mb-2 ml-1">Mobile Number (10 digits)</label>
                 <input 
                   type="tel" 
                   value={mobile} 
-                  onChange={(e) => { setMobile(e.target.value); setError(''); }} 
-                  placeholder="Enter mobile number (optional)" 
-                  className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-yellow-500 focus:outline-none transition-colors" 
+                  onChange={(e) => { const v = e.target.value.replace(/\D/g, '').slice(0,10); setMobile(v); setError(''); if (fieldErrors.mobile) validateField('mobile', v); }}
+                  onBlur={(e) => validateField('mobile', e.target.value)}
+                  placeholder="Enter 10 digit mobile number" 
+                  className={`w-full bg-[#1a1a1a] border rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none transition-colors ${fieldErrors.mobile ? 'border-red-500 focus:border-red-500' : 'border-[#2a2a2a] focus:border-yellow-500'}`} 
                 />
+                {fieldErrors.mobile && <p className="text-red-400 text-xs mt-1 ml-1">{fieldErrors.mobile}</p>}
               </div>
               <div className="mb-4">
                 <label className="block text-sm text-gray-400 mb-2 ml-1">Password *</label>
                 <input 
                   type="password" 
                   value={password} 
-                  onChange={(e) => { setPassword(e.target.value); setError(''); }} 
-                  placeholder="Create a password" 
-                  className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-yellow-500 focus:outline-none transition-colors" 
+                  onChange={(e) => { setPassword(e.target.value); setError(''); if (fieldErrors.password) validateField('password', e.target.value); }}
+                  onBlur={(e) => validateField('password', e.target.value)}
+                  placeholder="Create a password (min 6 characters)" 
+                  className={`w-full bg-[#1a1a1a] border rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:outline-none transition-colors ${fieldErrors.password ? 'border-red-500 focus:border-red-500' : 'border-[#2a2a2a] focus:border-yellow-500'}`} 
                 />
+                {fieldErrors.password && <p className="text-red-400 text-xs mt-1 ml-1">{fieldErrors.password}</p>}
               </div>
               <div className="mb-6">
                 <label className="block text-sm text-gray-400 mb-2 ml-1">
