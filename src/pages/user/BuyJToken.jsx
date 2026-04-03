@@ -21,18 +21,33 @@ const BuyJToken = () => {
   const lastStatusRef = useRef(null);
   const [utr, setUtr] = useState('');
   const [screenshot, setScreenshot] = useState('');
-  const [paymentTimeLeft, setPaymentTimeLeft] = useState(() => {
+  const [paymentTimeLeft, setPaymentTimeLeft] = useState(600);
+  const [lastRequestId, setLastRequestId] = useState(() => localStorage.getItem('jtoken_timer_request_id'));
+  const [userClosedPopup, setUserClosedPopup] = useState(false);
+  
+  // Initialize timer from localStorage only once on mount
+  useEffect(() => {
     const saved = localStorage.getItem('jtoken_timer');
-    const savedRequestId = localStorage.getItem('jtoken_timer_request_id');
     const savedStartTime = localStorage.getItem('jtoken_timer_start');
-    if (saved && savedRequestId && savedStartTime) {
+    const savedRequestId = localStorage.getItem('jtoken_timer_request_id');
+    const closed = localStorage.getItem('jtoken_popup_closed');
+    
+    if (saved && savedStartTime && savedRequestId) {
       const elapsed = Math.floor((Date.now() - parseInt(savedStartTime)) / 1000);
       const remaining = parseInt(saved) - elapsed;
-      return remaining > 0 ? remaining : 0;
+      if (remaining > 0) {
+        setPaymentTimeLeft(remaining);
+      } else {
+        // Timer expired, clear storage
+        localStorage.removeItem('jtoken_timer');
+        localStorage.removeItem('jtoken_timer_start');
+        localStorage.removeItem('jtoken_timer_request_id');
+      }
     }
-    return 600;
-  });
-  const [lastRequestId, setLastRequestId] = useState(() => localStorage.getItem('jtoken_timer_request_id'));
+    if (closed === 'true') {
+      setUserClosedPopup(true);
+    }
+  }, []);
   const getStatusDisplay = (status) => {
     const statusMap = {
       'APPROVED': 'SUCCESS',
@@ -182,28 +197,20 @@ const BuyJToken = () => {
   useEffect(() => {
     if (request?.status === 'PAYMENT_STARTED' || request?.status === 'READY_TO_PAY') {
       setShowWaitPopup(false);
+      
+      // Only reset timer and show popup for new requests or if user hasn't closed
       if (request.id !== lastRequestId) {
         setLastRequestId(request.id);
         localStorage.setItem('jtoken_timer_request_id', request.id);
         setPaymentTimeLeft(600);
         localStorage.setItem('jtoken_timer', 600);
         localStorage.setItem('jtoken_timer_start', Date.now());
-      }
-      setShowPaymentPopup(true);
-    }
-    // Auto open popup if timer is running and popup is closed
-    if (request && (request.status === 'PAYMENT_STARTED' || request.status === 'READY_TO_PAY') && !showPaymentPopup && paymentTimeLeft > 0) {
-      setShowPaymentPopup(true);
-    }
-    // Reset timer if request is new
-    if (request && (request.status === 'PAYMENT_STARTED' || request.status === 'READY_TO_PAY')) {
-      if (request.id !== lastRequestId) {
-        const savedStart = localStorage.getItem('jtoken_timer_start');
-        if (!savedStart) {
-          setPaymentTimeLeft(600);
-          localStorage.setItem('jtoken_timer', 600);
-          localStorage.setItem('jtoken_timer_start', Date.now());
-        }
+        localStorage.removeItem('jtoken_popup_closed');
+        setUserClosedPopup(false);
+        setShowPaymentPopup(true);
+      } else if (!userClosedPopup && paymentTimeLeft > 0) {
+        // Show popup if user hasn't closed it and timer still running
+        setShowPaymentPopup(true);
       }
     }
   }, [request?.status, request?.id]);
@@ -290,13 +297,17 @@ const BuyJToken = () => {
       setSelectedUpi('');
       setPaymentTimeLeft(600);
       setLastRequestId(null);
+      setUserClosedPopup(false);
       localStorage.removeItem('jtoken_timer');
       localStorage.removeItem('jtoken_timer_request_id');
+      localStorage.removeItem('jtoken_timer_start');
+      localStorage.removeItem('jtoken_popup_closed');
       const res = await jTokenPurchaseAPI.getMyRequests();
       const allRequests = res?.data?.purchases || res?.data || res || [];
       setHistory(allRequests);
       const req = allRequests.find(r => !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(r.status));
       setRequest(req);
+      setAmount('');
     } catch (err) {
       setMessage(err?.message || 'Failed to cancel');
     } finally {
@@ -572,7 +583,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
                 <div className="w-3 h-3 rounded-full bg-[#D4AF37] animate-pulse"></div>
                 <h3 className="text-white font-bold text-lg">Payment Details</h3>
               </div>
-              <button onClick={() => setShowPaymentPopup(false)} className="text-gray-400 hover:text-white p-1">
+              <button onClick={() => { setShowPaymentPopup(false); setUserClosedPopup(true); localStorage.setItem('jtoken_popup_closed', 'true'); }} className="text-gray-400 hover:text-white p-1">
                 <FaTimes />
               </button>
             </div>
@@ -696,7 +707,29 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               </div>
               
               <div className="flex gap-2 sm:gap-3 mt-3 sm:mt-4">
-                <button onClick={() => { setShowPaymentPopup(false); }} className="flex-1 py-2 sm:py-3 bg-gray-600 text-white rounded-xl font-semibold text-sm sm:text-base">
+                <button onClick={async () => { 
+                  if (!window.confirm('Cancel this request?')) return;
+                  setShowPaymentPopup(false); 
+                  setUserClosedPopup(true);
+                  localStorage.setItem('jtoken_popup_closed', 'true');
+                  setSubmitting(true);
+                  try {
+                    await jTokenPurchaseAPI.cancel(request.id);
+                    setRequest(null);
+                    setPaymentTimeLeft(600);
+                    setLastRequestId(null);
+                    localStorage.removeItem('jtoken_timer');
+                    localStorage.removeItem('jtoken_timer_start');
+                    localStorage.removeItem('jtoken_timer_request_id');
+                    localStorage.removeItem('jtoken_popup_closed');
+                    setUserClosedPopup(false);
+                    setAmount('');
+                  } catch (err) {
+                    setMessage(err?.message || 'Failed to cancel');
+                  } finally {
+                    setSubmitting(false);
+                  }
+                }} className="flex-1 py-2 sm:py-3 bg-gray-600 text-white rounded-xl font-semibold text-sm sm:text-base">
                   Cancel
                 </button>
                 <button onClick={async () => {
