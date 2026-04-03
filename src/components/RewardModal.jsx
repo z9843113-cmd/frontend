@@ -2,10 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaWallet, FaUniversity, FaTelegramPlane, FaGift, FaTimes, FaCheckCircle, FaChevronRight, FaKey } from 'react-icons/fa';
 
-const RewardModal = ({ onClose, userData, telegramBotUrl }) => {
+const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
   const navigate = useNavigate();
   const [showTelegramInput, setShowTelegramInput] = useState(false);
   const [telegramKey, setTelegramKey] = useState('');
+
+  const upiRewardAmount = parseFloat(rewardSettings?.upiRewardAmount) || 20;
+  const bankRewardAmount = parseFloat(rewardSettings?.bankRewardAmount) || 20;
+  const telegramRewardAmount = parseFloat(rewardSettings?.telegramRewardAmount) || 20;
 
   const tasks = [
     {
@@ -13,7 +17,7 @@ const RewardModal = ({ onClose, userData, telegramBotUrl }) => {
       icon: <FaWallet className="w-8 h-8" />,
       title: 'Add UPI Account',
       description: 'Link your UPI for instant deposits',
-      reward: 20,
+      reward: upiRewardAmount,
       completed: userData?.hasUPI || false,
       path: '/manage-account',
       color: 'from-green-500 to-emerald-600',
@@ -25,7 +29,7 @@ const RewardModal = ({ onClose, userData, telegramBotUrl }) => {
       icon: <FaUniversity className="w-8 h-8" />,
       title: 'Add Bank Account',
       description: 'Link your bank for withdrawals',
-      reward: 20,
+      reward: bankRewardAmount,
       completed: userData?.hasBank || false,
       path: '/manage-account',
       color: 'from-blue-500 to-cyan-600',
@@ -37,7 +41,7 @@ const RewardModal = ({ onClose, userData, telegramBotUrl }) => {
       icon: <FaTelegramPlane className="w-8 h-8" />,
       title: 'Connect Telegram',
       description: 'Get instant notifications',
-      reward: 20,
+      reward: telegramRewardAmount,
       completed: userData?.hasTelegram || false,
       color: 'from-purple-500 to-pink-600',
       bgColor: 'bg-purple-500/20',
@@ -47,8 +51,8 @@ const RewardModal = ({ onClose, userData, telegramBotUrl }) => {
 
   const incompleteTasks = tasks.filter(t => !t.completed);
   const completedTasks = tasks.filter(t => t.completed);
-  const totalReward = 60;
-  const earnedReward = completedTasks.length * 20;
+  const totalReward = upiRewardAmount + bankRewardAmount + telegramRewardAmount;
+  const earnedReward = completedTasks.reduce((sum, t) => sum + t.reward, 0);
 
   const handleComplete = (task) => {
     if (task.id === 'telegram') {

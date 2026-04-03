@@ -48,6 +48,7 @@ const Home = () => {
     return !localStorage.getItem('upiWarningDismissed');
   });
   const [userAccountData, setUserAccountData] = useState({ hasUPI: false, hasBank: false, hasTelegram: false });
+  const [rewardSettings, setRewardSettings] = useState({ upiRewardAmount: 20, bankRewardAmount: 20, telegramRewardAmount: 20 });
   const [paymentEnabled, setPaymentEnabled] = useState(true);
   const [togglingPayment, setTogglingPayment] = useState(false);
   const [banner, setBanner] = useState({
@@ -172,6 +173,12 @@ const Home = () => {
         setUsdtCommission(parseFloat(settingsData?.usdtcommissionpercent) || 0);
         setJTokenCommission(parseFloat(settingsData?.jtokencommissionpercent) || 0);
         setTokenRate(parseFloat(settingsData?.tokenrate) || 0);
+        
+        setRewardSettings({
+          upiRewardAmount: parseFloat(settingsData?.upirewardamount) || 20,
+          bankRewardAmount: parseFloat(settingsData?.bankrewardamount) || 20,
+          telegramRewardAmount: parseFloat(settingsData?.telegramrewardamount) || 20
+        });
         
         console.log('Settings Data:', settingsData);
         console.log('JToken Commission from settings:', settingsData?.jtokencommissionpercent);
@@ -772,7 +779,7 @@ const Home = () => {
       <BottomNav />
 
       {showRewardModal && (
-        <RewardModal onClose={() => setShowRewardModal(false)} userData={userAccountData} telegramBotUrl="https://t.me/zcryptoauthbot" />
+        <RewardModal onClose={() => setShowRewardModal(false)} userData={userAccountData} telegramBotUrl="https://t.me/zcryptoauthbot" rewardSettings={rewardSettings} />
       )}
 
       {/* UPI Warning Popup */}
