@@ -164,9 +164,11 @@ const Home = () => {
         setRecentTransactions(Array.isArray(transactionsData) ? transactionsData : []);
         setUserStats({
           todayDeposit: parseFloat(statsData.todayDeposit || 0),
+          todayInrDeposit: parseFloat(statsData.todayInrDeposit || 0),
           todayExchange: parseFloat(statsData.todayExchange || 0),
           todayJtoken: parseFloat(statsData.todayJtoken || 0),
           totalDeposit: parseFloat(statsData.totalDeposit || 0),
+          totalInrDeposit: parseFloat(statsData.totalInrDeposit || 0),
           totalExchange: parseFloat(statsData.totalExchange || 0),
           totalJtoken: parseFloat(statsData.totalJtoken || 0),
           todayRewards: parseFloat(statsData.todayRewards || 0),
@@ -281,9 +283,11 @@ const Home = () => {
         const statsData = statsRes?.data || statsRes || {};
         setUserStats({
           todayDeposit: parseFloat(statsData.todayDeposit || 0),
+          todayInrDeposit: parseFloat(statsData.todayInrDeposit || 0),
           todayExchange: parseFloat(statsData.todayExchange || 0),
           todayJtoken: parseFloat(statsData.todayJtoken || 0),
           totalDeposit: parseFloat(statsData.totalDeposit || 0),
+          totalInrDeposit: parseFloat(statsData.totalInrDeposit || 0),
           totalExchange: parseFloat(statsData.totalExchange || 0),
           totalJtoken: parseFloat(statsData.totalJtoken || 0),
           todayRewards: parseFloat(statsData.todayRewards || 0),
@@ -346,9 +350,11 @@ const Home = () => {
   const getTodayVolume = () => userStats.todayVolume || 0;
   const getTotalVolume = () => userStats.totalVolume || 0;
   const getTodayDeposit = () => parseFloat(userStats.todayDeposit || 0);
+  const getTodayInrDeposit = () => parseFloat(userStats.todayInrDeposit || 0);
   const getTodayExchange = () => parseFloat(userStats.todayExchange || 0);
   const getTodayJtoken = () => parseFloat(userStats.todayJtoken || 0);
   const getTotalDeposit = () => parseFloat(userStats.totalDeposit || 0);
+  const getTotalInrDeposit = () => parseFloat(userStats.totalInrDeposit || 0);
   const getTotalExchange = () => parseFloat(userStats.totalExchange || 0);
   const getTotalJtoken = () => parseFloat(userStats.totalJtoken || 0);
   const getTodayRewards = () => userStats.todayRewards || 0;
