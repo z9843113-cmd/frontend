@@ -21,7 +21,8 @@ const BuyJToken = () => {
   const lastStatusRef = useRef(null);
   const [utr, setUtr] = useState('');
   const [screenshot, setScreenshot] = useState('');
-  const [paymentTimeLeft, setPaymentTimeLeft] = useState(600); // 10 minutes in seconds
+  const [paymentTimeLeft, setPaymentTimeLeft] = useState(600);
+  const [lastRequestId, setLastRequestId] = useState(null);
   const getStatusDisplay = (status) => {
     const statusMap = {
       'APPROVED': 'SUCCESS',
@@ -171,20 +172,59 @@ const BuyJToken = () => {
   useEffect(() => {
     if (request?.status === 'PAYMENT_STARTED' || request?.status === 'READY_TO_PAY') {
       setShowWaitPopup(false);
+      if (request.id !== lastRequestId) {
+        setLastRequestId(request.id);
+        setPaymentTimeLeft(600);
+      }
       setShowPaymentPopup(true);
-      setPaymentTimeLeft(600); // Reset timer to 10 minutes when popup opens
     }
-  }, [request?.status]);
+  }, [request?.status, request?.id]);
+
+  const handleAutoCancel = async () => {
+    if (request && (request.status === 'PAYMENT_STARTED' || request.status === 'READY_TO_PAY')) {
+      try {
+        await jTokenPurchaseAPI.cancel(request.id);
+        setShowPaymentPopup(false);
+        setRequest(null);
+        setPaymentTimeLeft(600);
+        setLastRequestId(null);
+        alert('Payment time expired. Request cancelled.');
+      } catch (err) {
+        console.error('Auto cancel error:', err);
+      }
+    }
+  };
 
   // Timer countdown for payment
   useEffect(() => {
     if (showPaymentPopup && paymentTimeLeft > 0) {
       const timer = setInterval(() => {
-        setPaymentTimeLeft(prev => prev - 1);
+        setPaymentTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            handleAutoCancel();
+            return 0;
+          }
+          return prev - 1;
+        });
       }, 1000);
       return () => clearInterval(timer);
     }
   }, [showPaymentPopup, paymentTimeLeft]);
+
+  const handleAutoCancel = async () => {
+    if (request && request.status === 'PAYMENT_STARTED') {
+      try {
+        await jTokenPurchaseAPI.cancel(request.id);
+        setShowPaymentPopup(false);
+        setRequest(null);
+        setPaymentTimeLeft(600);
+        alert('Payment time expired. Request cancelled.');
+      } catch (err) {
+        console.error('Auto cancel error:', err);
+      }
+    }
+  };
 
   const handleCreate = async () => {
     if (!amount || parseFloat(amount) < 10) {
@@ -217,9 +257,11 @@ const BuyJToken = () => {
       await jTokenPurchaseAPI.cancel(request.id);
       setRequest(null);
       setShowWaitPopup(false);
+      setShowPaymentPopup(false);
       setSelectedApp('');
       setSelectedUpi('');
-      // Refresh data
+      setPaymentTimeLeft(600);
+      setLastRequestId(null);
       const res = await jTokenPurchaseAPI.getMyRequests();
       const allRequests = res?.data?.purchases || res?.data || res || [];
       setHistory(allRequests);
@@ -624,7 +666,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               </div>
               
               <div className="flex gap-2 sm:gap-3 mt-3 sm:mt-4">
-                <button onClick={() => { setShowPaymentPopup(false); setPaymentTimeLeft(600); }} className="flex-1 py-2 sm:py-3 bg-gray-600 text-white rounded-xl font-semibold text-sm sm:text-base">
+                <button onClick={() => { setShowPaymentPopup(false); setPaymentTimeLeft(600); setLastRequestId(null); }} className="flex-1 py-2 sm:py-3 bg-gray-600 text-white rounded-xl font-semibold text-sm sm:text-base">
                   Cancel
                 </button>
                 <button onClick={async () => {
