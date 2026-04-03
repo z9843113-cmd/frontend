@@ -87,14 +87,10 @@ const BuyJToken = () => {
         setHistory(allRequests);
         
         const pendingReq = allRequests.find(r => !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(r.status));
-        const approvedReq = allRequests.find(r => r.status === 'APPROVED');
         
         if (pendingReq) {
           setRequest(pendingReq);
           lastStatusRef.current = pendingReq.status;
-        } else if (approvedReq) {
-          setRequest(approvedReq);
-          lastStatusRef.current = 'APPROVED';
         } else {
           setRequest(null);
           lastStatusRef.current = 'NONE';
@@ -149,25 +145,14 @@ const BuyJToken = () => {
         setHistory(allRequests);
         
         const activeReq = allRequests.find(r => !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(r.status));
-        const approvedReq = allRequests.find(r => r.status === 'APPROVED');
         
-        console.log('Polling - Active:', activeReq?.status, 'Approved:', !!approvedReq, 'LastStatus:', lastStatusRef.current);
-        
-        if (approvedReq) {
-          if (lastStatusRef.current && !['APPROVED', 'NONE'].includes(lastStatusRef.current)) {
+        if (activeReq) {
+          if (lastStatusRef.current && lastStatusRef.current !== 'NONE' && lastStatusRef.current !== 'APPROVED' && activeReq.status === 'APPROVED') {
             setShowPaymentPopup(false);
             setShowSuccessPopup(true);
-            setApprovedRequest(approvedReq);
+            setApprovedRequest(activeReq);
           }
-          setRequest(approvedReq);
-          lastStatusRef.current = 'APPROVED';
-        } else if (activeReq) {
-          if (lastStatusRef.current === 'APPROVED') {
-            lastStatusRef.current = activeReq.status;
-            setShowSuccessPopup(false);
-          } else if (lastStatusRef.current !== activeReq.status) {
-            lastStatusRef.current = activeReq.status;
-          }
+          lastStatusRef.current = activeReq.status;
           setRequest(activeReq);
           if (activeReq.status === 'PAYMENT_STARTED' || activeReq.status === 'READY_TO_PAY') {
             setShowWaitPopup(false);
@@ -302,7 +287,7 @@ const BuyJToken = () => {
           <p className="text-gray-400 text-sm mt-2">अगर पेमेंट डिटेल्स मैच नहीं होती हैं तो ऑर्डर कैंसिल करें ❗️</p>
         </div>
 
-        {request && (
+        {request && !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(request.status) && (
           <div onClick={() => setShowActivePopup(true)} className="bg-gradient-to-r from-[#D4AF37]/20 to-[#FFD700]/10 border border-[#D4AF37]/30 rounded-2xl p-4 cursor-pointer hover:from-[#D4AF37]/30 hover:to-[#FFD700]/20 transition-all">
             <div className="flex items-center justify-between">
               <div>
