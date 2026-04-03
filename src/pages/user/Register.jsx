@@ -75,20 +75,30 @@ const Register = () => {
   };
 
   const handleSendOtp = async () => {
-    const validationError = validateForm();
-    if (validationError) { setError(validationError); return; }
+    const isValid = validateForm();
+    if (!isValid) {
+      setError('Please fill all required fields correctly');
+      return;
+    }
+    
     setLoading(true);
     setError('');
     setSuccess('');
     console.log('Registering with:', { email, name });
+    console.log('Form valid, calling API...');
     try {
       const response = await authAPI.register({ name, email, mobile, password, referralcode: referralCode });
       console.log('Registration response:', response);
-      setStep('otp');
-      setSuccess('OTP sent to your email!');
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setStep('otp');
+        setSuccess('OTP sent to your email!');
+      }
     } catch (err) {
       console.error('Registration error:', err);
-      setError(err.message || 'Registration failed');
+      const errorMsg = err.response?.data?.error || err.message || 'Registration failed';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -225,6 +235,7 @@ const Register = () => {
                 />
               </div>
               <button
+                type="button"
                 onClick={handleSendOtp}
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold py-3.5 sm:py-4 rounded-xl hover:shadow-lg hover:shadow-yellow-500/30 hover:scale-[1.02] transition-all duration-300 disabled:opacity-50"

@@ -64,11 +64,26 @@ const authFetch = async (url, options = {}) => {
 };
 
 const authAPI = {
-  register: (data) => fetch(`${API_BASE}/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).then(r => r.ok ? r.json() : r.json().then(e => { throw new Error(e.error) })),
+  register: async (data) => {
+    const url = `${API_BASE}/auth/register`;
+    console.log('Register API call:', url, data);
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      console.log('Register response:', response.status, result);
+      if (!response.ok) {
+        throw new Error(result.error || 'Registration failed');
+      }
+      return result;
+    } catch (err) {
+      console.error('Register API error:', err);
+      throw err;
+    }
+  },
   
   verifyOtp: (data) => fetch(`${API_BASE}/auth/verify-otp`, {
     method: 'POST',
