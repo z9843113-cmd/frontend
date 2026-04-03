@@ -23,29 +23,37 @@ const ManageAccount = () => {
   const [userClosedPopup, setUserClosedPopup] = useState(false);
   const [activeTab, setActiveTab] = useState('upi');
   const [submitting, setSubmitting] = useState(false);
-  const shownApprovedRef = useRef(false);
+  const initialLoadRef = useRef(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchData();
+    let lastStatus = null;
+    
     const interval = setInterval(() => {
       userAPI.getUpiVerificationStatus().then(statusRes => {
         const status = statusRes?.verification || statusRes?.data?.verification || null;
+        
+        if (initialLoadRef.current) {
+          lastStatus = status?.status || null;
+          initialLoadRef.current = false;
+          return;
+        }
+        
         if (userClosedPopup) {
           return;
         }
+        
         if (status && ['PENDING', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
           setPendingVerifications([status]);
           setShowVerifyPopup(true);
-          shownApprovedRef.current = false;
-        } else if (status && status.status === 'APPROVED' && !shownApprovedRef.current) {
-          shownApprovedRef.current = true;
+        } else if (status && status.status === 'APPROVED' && lastStatus && ['PENDING', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(lastStatus)) {
           alert('UPI ID verified successfully!');
           setPendingVerifications([]);
           setShowVerifyPopup(false);
           setUserClosedPopup(false);
           fetchData();
-        } else if (status && status.status === 'REJECTED') {
+        } else if (status && status.status === 'REJECTED' && lastStatus && lastStatus !== 'REJECTED') {
           alert('UPI verification rejected. Please try again.');
           setPendingVerifications([]);
           setShowVerifyPopup(false);
@@ -54,6 +62,8 @@ const ManageAccount = () => {
           setPendingVerifications([]);
           setShowVerifyPopup(false);
         }
+        
+        lastStatus = status?.status || null;
       }).catch(() => {});
     }, 2000);
     return () => clearInterval(interval);
