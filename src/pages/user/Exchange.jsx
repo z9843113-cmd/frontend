@@ -110,13 +110,11 @@ const Exchange = () => {
         setAmount('');
         setSelectedRate(null);
         
-        // Show wait popup for 3-4 seconds
-        setWaitMessage('Please wait...');
+        // Show wait popup for 3-4 seconds then auto close
         setShowWaitPopup(true);
         
         setTimeout(() => {
           setShowWaitPopup(false);
-          setPendingRequest({ id: newRequest.id, type: 'EXCHANGE', title: 'USDT Sell Request' });
         }, 3500);
       }
     } catch (err) {
