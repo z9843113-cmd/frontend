@@ -10,12 +10,14 @@ const BuyJToken = () => {
   const [submitting, setSubmitting] = useState(false);
   const [amount, setAmount] = useState('');
   const [request, setRequest] = useState(null);
+  const [prevStatus, setPrevStatus] = useState(null);
   const [history, setHistory] = useState([]);
   const [showActivePopup, setShowActivePopup] = useState(false);
   const [wallet, setWallet] = useState(null);
   const [message, setMessage] = useState('');
   const [showWaitPopup, setShowWaitPopup] = useState(false);
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [utr, setUtr] = useState('');
   const [screenshot, setScreenshot] = useState('');
   const [paymentTimeLeft, setPaymentTimeLeft] = useState(600); // 10 minutes in seconds
@@ -136,12 +138,23 @@ const BuyJToken = () => {
           const allRequests = res?.data?.purchases || res?.purchases || res?.data || res || [];
           setHistory(allRequests);
           const req = allRequests.find(r => !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(r.status));
-          if (req) setRequest(req);
+          if (req) {
+            if (prevStatus && prevStatus !== 'APPROVED' && req.status === 'APPROVED') {
+              setShowSuccessPopup(true);
+              setShowPaymentPopup(false);
+            }
+            if (prevStatus && prevStatus !== 'REJECTED' && req.status === 'REJECTED') {
+              setShowPaymentPopup(false);
+              alert('Your request has been rejected. Please contact support.');
+            }
+            setPrevStatus(req.status);
+            setRequest(req);
+          }
         });
       } catch {}
     }, 2000);
     return () => clearInterval(interval);
-  }, []);
+  }, [prevStatus]);
 
   useEffect(() => {
     if (request?.status === 'PAYMENT_STARTED' || request?.status === 'READY_TO_PAY') {
@@ -629,6 +642,28 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showSuccessPopup && request && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-green-900/30 to-[#0d0d0d] rounded-3xl p-8 border border-green-500/30 w-full max-w-sm text-center">
+            <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-white font-bold text-2xl mb-2">Payment Approved!</h3>
+            <p className="text-gray-300 text-sm mb-4">Your JToken has been credited to your wallet</p>
+            <div className="bg-[#0a0a0a] rounded-xl p-4 mb-6">
+              <p className="text-gray-400 text-xs">Amount</p>
+              <p className="text-[#D4AF37] font-bold text-2xl">₹{parseFloat(request.amount || 0).toFixed(2)}</p>
+              <p className="text-green-400 font-semibold mt-1">{parseFloat(request.tokenamount || 0).toFixed(2)} J Token</p>
+            </div>
+            <button onClick={() => { setShowSuccessPopup(false); setRequest(null); setAmount(''); }} className="w-full py-3 bg-green-600 text-white rounded-xl font-bold">
+              Done
+            </button>
           </div>
         </div>
       )}
