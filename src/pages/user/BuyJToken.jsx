@@ -85,12 +85,19 @@ const BuyJToken = () => {
         setWallet(walletRes?.data || walletRes || null);
         const allRequests = requestsRes?.data?.purchases || requestsRes?.purchases || requestsRes?.data || requestsRes || [];
         setHistory(allRequests);
-        const req = allRequests.find(r => !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(r.status));
-        if (req) {
-          setRequest(req);
-          lastStatusRef.current = req.status;
+        
+        const pendingReq = allRequests.find(r => !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(r.status));
+        const approvedReq = allRequests.find(r => r.status === 'APPROVED');
+        
+        if (pendingReq) {
+          setRequest(pendingReq);
+          lastStatusRef.current = pendingReq.status;
+        } else if (approvedReq) {
+          setRequest(approvedReq);
+          lastStatusRef.current = 'APPROVED';
         } else {
           setRequest(null);
+          lastStatusRef.current = 'NONE';
         }
         
         setUserUpiAccounts(userUpiRes?.data || userUpiRes || []);
@@ -143,21 +150,22 @@ const BuyJToken = () => {
         
         const activeReq = allRequests.find(r => !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(r.status));
         const approvedReq = allRequests.find(r => r.status === 'APPROVED');
-        const rejectedReq = allRequests.find(r => r.status === 'REJECTED');
         
-        if (approvedReq && lastStatusRef.current !== 'APPROVED') {
-          setShowPaymentPopup(false);
-          setShowSuccessPopup(true);
-          setApprovedRequest(approvedReq);
+        console.log('Polling - Active:', activeReq?.status, 'Approved:', !!approvedReq, 'LastStatus:', lastStatusRef.current);
+        
+        if (approvedReq) {
+          if (lastStatusRef.current && !['APPROVED', 'NONE'].includes(lastStatusRef.current)) {
+            setShowPaymentPopup(false);
+            setShowSuccessPopup(true);
+            setApprovedRequest(approvedReq);
+          }
           setRequest(approvedReq);
           lastStatusRef.current = 'APPROVED';
-        } else if (rejectedReq && lastStatusRef.current !== 'REJECTED') {
-          setShowPaymentPopup(false);
-          alert('Your request has been rejected. Please contact support.');
-          setRequest(null);
-          lastStatusRef.current = 'REJECTED';
         } else if (activeReq) {
-          if (lastStatusRef.current !== activeReq.status) {
+          if (lastStatusRef.current === 'APPROVED') {
+            lastStatusRef.current = activeReq.status;
+            setShowSuccessPopup(false);
+          } else if (lastStatusRef.current !== activeReq.status) {
             lastStatusRef.current = activeReq.status;
           }
           setRequest(activeReq);
@@ -674,13 +682,8 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               </svg>
             </div>
             <h3 className="text-white font-bold text-2xl mb-2">Payment Approved!</h3>
-            <p className="text-gray-300 text-sm mb-4">Your JToken has been credited to your wallet</p>
-            <div className="bg-[#0a0a0a] rounded-xl p-4 mb-6">
-              <p className="text-gray-400 text-xs">Amount</p>
-              <p className="text-[#D4AF37] font-bold text-2xl">₹{parseFloat((approvedRequest || request)?.amount || 0).toFixed(2)}</p>
-              <p className="text-green-400 font-semibold mt-1">{parseFloat((approvedRequest || request)?.tokenamount || 0).toFixed(2)} J Token</p>
-            </div>
-            <button onClick={() => { setShowSuccessPopup(false); setApprovedRequest(null); setRequest(null); setAmount(''); }} className="w-full py-3 bg-green-600 text-white rounded-xl font-bold">
+            <p className="text-gray-300 text-sm">Your JToken has been credited to your wallet</p>
+            <button onClick={() => { setShowSuccessPopup(false); setApprovedRequest(null); setRequest(null); setAmount(''); }} className="w-full py-3 bg-green-600 text-white rounded-xl font-bold mt-6">
               Done
             </button>
           </div>
