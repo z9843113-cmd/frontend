@@ -230,14 +230,6 @@ const Team = () => {
             <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#D4AF37] mb-2 sm:mb-3">
               ₹{formatINR(walletData?.referralBalance || 0)}
             </p>
-            {(walletData?.referralBalance || 0) > 0 && (
-              <button
-                onClick={() => { setShowWithdrawModal(true); setWithdrawMessage(''); setWithdrawAmount(''); }}
-                className="w-full py-2 sm:py-2.5 bg-green-500 text-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold hover:bg-green-600 transition-all active:scale-[0.98]"
-              >
-                Withdraw
-              </button>
-            )}
           </div>
 
           {/* Commission % */}
