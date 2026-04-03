@@ -255,9 +255,10 @@ const Home = () => {
     const timeoutId = setTimeout(loadHome, 0);
     const intervalId = setInterval(async () => {
       try {
-        const [walletRes, settingsRes] = await Promise.all([
+        const [walletRes, settingsRes, statsRes] = await Promise.all([
           walletAPI.getWallet(),
-          adminAPI.getSettings().catch(() => ({}))
+          adminAPI.getSettings().catch(() => ({})),
+          userAPI.getUserStats().catch(() => ({}))
         ]);
         const walletData = walletRes?.data || walletRes || null;
         setWallet(walletData);
@@ -270,8 +271,16 @@ const Home = () => {
         if (settingsData?.usdtrate && !walletData?.usdtRate) {
           setUsdtRate(parseFloat(settingsData.usdtrate));
         }
+        // Update stats in real-time
+        const statsData = statsRes?.data || statsRes || {};
+        setUserStats({
+          todayVolume: parseFloat(statsData.todayVolume || 0),
+          totalVolume: parseFloat(statsData.totalVolume || 0),
+          todayProfit: parseFloat(statsData.todayProfit || 0),
+          totalProfit: parseFloat(statsData.totalProfit || 0)
+        });
       } catch (error) {
-        console.error('Failed to refresh wallet', error);
+        console.error('Failed to refresh data', error);
       }
     }, 2000);
 
@@ -322,10 +331,12 @@ const Home = () => {
   const getJTokenCommission = () => jTokenCommission;
   const getUsdtCommission = () => usdtCommission;
 
-  const getTodayVolume = () => userStats.todayVolume;
-  const getTotalVolume = () => userStats.totalVolume;
-  const getTodayVolumeUsdt = () => getTodayVolume() / parseFloat(usdtRate || 83);
-  const getTotalVolumeUsdt = () => getTotalVolume() / parseFloat(usdtRate || 83);
+  const getTodayVolume = () => userStats.todayVolume || 0;
+  const getTotalVolume = () => userStats.totalVolume || 0;
+  const getTodayVolumeUsdt = () => parseFloat(userStats.todayUsdtVolume || 0);
+  const getTotalVolumeUsdt = () => parseFloat(userStats.totalUsdtVolume || 0);
+  const getTodayInrVolume = () => parseFloat(userStats.todayInrVolume || 0);
+  const getTotalInrVolume = () => parseFloat(userStats.totalInrVolume || 0);
   const getTodayProfit = () => userStats.todayProfit;
   const getTotalProfit = () => userStats.totalProfit;
 
@@ -645,21 +656,32 @@ const Home = () => {
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">Today Trading Volume</p>
+            <p className="text-xs text-gray-500">USDT Volume (24h)</p>
             <p className="mt-2 text-xl font-bold text-white">{getTodayVolumeUsdt().toFixed(6)} USDT</p>
-            <p className="mt-1 text-xs text-emerald-400">₹{formatINR(getTodayVolume())}</p>
+            <p className="mt-1 text-xs text-emerald-400">₹{formatINR(getTodayVolumeUsdt() * (usdtRate || 83))}</p>
           </div>
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">Total Trading Volume</p>
+            <p className="text-xs text-gray-500">USDT Volume (Total)</p>
             <p className="mt-2 text-xl font-bold text-white">{getTotalVolumeUsdt().toFixed(6)} USDT</p>
-            <p className="mt-1 text-xs text-emerald-400">₹{formatINR(getTotalVolume())}</p>
+            <p className="mt-1 text-xs text-emerald-400">₹{formatINR(getTotalVolumeUsdt() * (usdtRate || 83))}</p>
           </div>
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">Today Profit</p>
+            <p className="text-xs text-gray-500">JToken Buy (24h)</p>
+            <p className="mt-2 text-xl font-bold text-white">₹{formatINR(getTodayInrVolume())}</p>
+          </div>
+          <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
+            <p className="text-xs text-gray-500">JToken Buy (Total)</p>
+            <p className="mt-2 text-xl font-bold text-white">₹{formatINR(getTotalInrVolume())}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
+          <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
+            <p className="text-xs text-gray-500">Profit (24h)</p>
             <p className={`mt-2 text-xl font-bold ${getTodayProfit() >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>₹{formatINR(getTodayProfit())}</p>
           </div>
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">Total Profit</p>
+            <p className="text-xs text-gray-500">Profit (Total)</p>
             <p className="mt-2 text-xl font-bold text-emerald-400">₹{formatINR(getTotalProfit())}</p>
           </div>
         </div>
