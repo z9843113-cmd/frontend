@@ -183,7 +183,11 @@ const BuyJToken = () => {
           setRequest(activeReq);
           if (activeReq.status === 'PAYMENT_STARTED' || activeReq.status === 'READY_TO_PAY') {
             setShowWaitPopup(false);
-            setShowPaymentPopup(true);
+            // Only show popup if not closed by user
+            const closed = localStorage.getItem('jtoken_popup_closed');
+            if (closed !== 'true') {
+              setShowPaymentPopup(true);
+            }
           }
         } else {
           setRequest(null);
