@@ -189,6 +189,23 @@ const BuyJToken = () => {
     }
   }, [request?.status, request?.id]);
 
+  const handleAutoCancel = async () => {
+    if (request && (request.status === 'PAYMENT_STARTED' || request.status === 'READY_TO_PAY')) {
+      try {
+        await jTokenPurchaseAPI.cancel(request.id);
+        setShowPaymentPopup(false);
+        setRequest(null);
+        setPaymentTimeLeft(600);
+        setLastRequestId(null);
+        localStorage.removeItem('jtoken_timer');
+        localStorage.removeItem('jtoken_timer_request_id');
+        alert('Payment time expired. Request cancelled.');
+      } catch (err) {
+        console.error('Auto cancel error:', err);
+      }
+    }
+  };
+
   // Timer countdown for payment
   useEffect(() => {
     if (showPaymentPopup && paymentTimeLeft > 0) {
