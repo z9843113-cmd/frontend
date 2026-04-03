@@ -197,6 +197,30 @@ const BuyJToken = () => {
     }
   }, [showPaymentPopup, paymentTimeLeft]);
 
+  const handleCreate = async () => {
+    if (!amount || parseFloat(amount) < 10) {
+      setMessage('Minimum amount is ₹10');
+      return;
+    }
+    if (!selectedApp) {
+      setMessage('Please select a payment app');
+      return;
+    }
+    
+    setSubmitting(true);
+    try {
+      const res = await jTokenPurchaseAPI.create({ amount: parseFloat(amount), method: selectedApp, upiId: '' });
+      const newRequest = res?.data?.request || res?.request || res?.data || res;
+      setRequest(newRequest);
+      setShowWaitPopup(true);
+      setMessage('');
+    } catch (err) {
+      setMessage(err?.message || 'Failed to create request');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleCancel = async () => {
     if (!window.confirm('Cancel this request?')) return;
     setSubmitting(true);
