@@ -477,7 +477,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
             <div className="text-center mb-4">
               <p className="text-white font-bold text-lg">Request Details</p>
-              <p className="text-gray-400 text-sm">Order: {request.ordernumber || generateOrderNumber()}</p>
+              <p className="text-gray-400 text-sm">Order: {request.ordernumber || 'N/A'}</p>
             </div>
             <div className="space-y-3">
               <div className="flex justify-between">
@@ -518,8 +518,22 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
             <div className="space-y-3">
               {history.slice(0, 5).map((item) => (
                 <div key={item.id} className="flex items-center justify-between p-3 bg-[#0a0a0a] rounded-xl">
-                  <div>
-                    <p className="text-white font-medium">₹{parseFloat(item.amount || 0).toFixed(2)}</p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-white font-medium">₹{parseFloat(item.amount || 0).toFixed(2)}</p>
+                      {item.ordernumber && (
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(item.ordernumber); }}
+                          className="text-cyan-400 text-xs font-mono hover:text-cyan-300 flex items-center gap-1"
+                          title="Copy order ID"
+                        >
+                          #{item.ordernumber.slice(0, 12)}...
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
                     <p className="text-gray-500 text-xs">{formatDate(item.createdat)}</p>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(item.status)}`}>
@@ -540,9 +554,22 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               <button onClick={() => setShowActivePopup(false)} className="text-gray-400"><FaTimes /></button>
             </div>
             <div className="space-y-3">
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <p className="text-gray-400">Order</p>
-                <p className="text-white font-mono text-sm">{request.ordernumber || 'N/A'}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-white font-mono text-sm">{request.ordernumber || 'N/A'}</p>
+                  {request.ordernumber && (
+                    <button 
+                      onClick={() => navigator.clipboard.writeText(request.ordernumber)}
+                      className="text-cyan-400 hover:text-cyan-300"
+                      title="Copy order ID"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="flex justify-between">
                 <p className="text-gray-400">Amount</p>

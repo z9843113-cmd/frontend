@@ -376,6 +376,9 @@ const AdminJTokenRequests = () => {
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-semibold text-white">{request.email}</p>
                   <span className="rounded-full bg-[#D4AF37]/10 px-3 py-1 text-xs font-bold text-[#D4AF37]">{request.status}</span>
+                  {request.ordernumber && (
+                    <span className="rounded-full bg-cyan-500/10 px-3 py-1 text-xs font-bold text-cyan-400 font-mono">#{request.ordernumber}</span>
+                  )}
                   <div className="flex items-center gap-1">
                     <span className="text-gray-500 text-xs font-mono">{request.userid?.slice(0, 8)}...</span>
                     <button 
