@@ -654,7 +654,7 @@ const Home = () => {
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">Volume (24h)</p>
+            <p className="text-xs text-gray-500">Today Volume</p>
             <p className="mt-2 text-xl font-bold text-white">₹{formatINR(getTodayVolumeUsdt())}</p>
           </div>
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
@@ -662,7 +662,7 @@ const Home = () => {
             <p className="mt-2 text-xl font-bold text-white">₹{formatINR(getTotalVolumeUsdt())}</p>
           </div>
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">Profit (24h)</p>
+            <p className="text-xs text-gray-500">Today Profit</p>
             <p className={`mt-2 text-xl font-bold ${getTodayProfit() >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>₹{formatINR(getTodayProfit())}</p>
           </div>
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
