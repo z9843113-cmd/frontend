@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/BottomNav';
 import { jTokenPurchaseAPI, walletAPI, uploadToCloudinary, userAPI, adminAPI, publicAPI } from '../../services/api';
@@ -10,7 +10,6 @@ const BuyJToken = () => {
   const [submitting, setSubmitting] = useState(false);
   const [amount, setAmount] = useState('');
   const [request, setRequest] = useState(null);
-  const [prevStatus, setPrevStatus] = useState(null);
   const [history, setHistory] = useState([]);
   const [showActivePopup, setShowActivePopup] = useState(false);
   const [wallet, setWallet] = useState(null);
@@ -18,6 +17,8 @@ const BuyJToken = () => {
   const [showWaitPopup, setShowWaitPopup] = useState(false);
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [approvedRequest, setApprovedRequest] = useState(null);
+  const lastStatusRef = useRef(null);
   const [utr, setUtr] = useState('');
   const [screenshot, setScreenshot] = useState('');
   const [paymentTimeLeft, setPaymentTimeLeft] = useState(600); // 10 minutes in seconds
@@ -85,8 +86,12 @@ const BuyJToken = () => {
         const allRequests = requestsRes?.data?.purchases || requestsRes?.purchases || requestsRes?.data || requestsRes || [];
         setHistory(allRequests);
         const req = allRequests.find(r => !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(r.status));
-        if (req) setRequest(req);
-        else setRequest(null);
+        if (req) {
+          setRequest(req);
+          lastStatusRef.current = req.status;
+        } else {
+          setRequest(null);
+        }
         
         setUserUpiAccounts(userUpiRes?.data || userUpiRes || []);
         
@@ -132,29 +137,43 @@ const BuyJToken = () => {
 
   useEffect(() => { 
     const interval = setInterval(() => {
-      try {
-        walletAPI.getWallet().then(res => setWallet(res?.data || res || null));
-        jTokenPurchaseAPI.getMyRequests().then(res => {
-          const allRequests = res?.data?.purchases || res?.purchases || res?.data || res || [];
-          setHistory(allRequests);
-          const req = allRequests.find(r => !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(r.status));
-          if (req) {
-            if (prevStatus && prevStatus !== 'APPROVED' && req.status === 'APPROVED') {
-              setShowSuccessPopup(true);
-              setShowPaymentPopup(false);
-            }
-            if (prevStatus && prevStatus !== 'REJECTED' && req.status === 'REJECTED') {
-              setShowPaymentPopup(false);
-              alert('Your request has been rejected. Please contact support.');
-            }
-            setPrevStatus(req.status);
-            setRequest(req);
+      jTokenPurchaseAPI.getMyRequests().then(res => {
+        const allRequests = res?.data?.purchases || res?.purchases || res?.data || res || [];
+        setHistory(allRequests);
+        
+        const activeReq = allRequests.find(r => !['APPROVED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(r.status));
+        const approvedReq = allRequests.find(r => r.status === 'APPROVED');
+        const rejectedReq = allRequests.find(r => r.status === 'REJECTED');
+        
+        if (approvedReq && lastStatusRef.current !== 'APPROVED') {
+          setShowPaymentPopup(false);
+          setShowSuccessPopup(true);
+          setApprovedRequest(approvedReq);
+          setRequest(approvedReq);
+          lastStatusRef.current = 'APPROVED';
+        } else if (rejectedReq && lastStatusRef.current !== 'REJECTED') {
+          setShowPaymentPopup(false);
+          alert('Your request has been rejected. Please contact support.');
+          setRequest(null);
+          lastStatusRef.current = 'REJECTED';
+        } else if (activeReq) {
+          if (lastStatusRef.current !== activeReq.status) {
+            lastStatusRef.current = activeReq.status;
           }
-        });
-      } catch {}
-    }, 2000);
+          setRequest(activeReq);
+          if (activeReq.status === 'PAYMENT_STARTED' || activeReq.status === 'READY_TO_PAY') {
+            setShowWaitPopup(false);
+            setShowPaymentPopup(true);
+          }
+        } else {
+          setRequest(null);
+        }
+        
+        walletAPI.getWallet().then(res => setWallet(res?.data || res || null));
+      }).catch(err => console.log('Polling error:', err));
+    }, 1500);
     return () => clearInterval(interval);
-  }, [prevStatus]);
+  }, []);
 
   useEffect(() => {
     if (request?.status === 'PAYMENT_STARTED' || request?.status === 'READY_TO_PAY') {
@@ -646,7 +665,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
         </div>
       )}
 
-      {showSuccessPopup && request && (
+      {showSuccessPopup && (approvedRequest || request) && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-gradient-to-br from-green-900/30 to-[#0d0d0d] rounded-3xl p-8 border border-green-500/30 w-full max-w-sm text-center">
             <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
@@ -658,10 +677,10 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
             <p className="text-gray-300 text-sm mb-4">Your JToken has been credited to your wallet</p>
             <div className="bg-[#0a0a0a] rounded-xl p-4 mb-6">
               <p className="text-gray-400 text-xs">Amount</p>
-              <p className="text-[#D4AF37] font-bold text-2xl">₹{parseFloat(request.amount || 0).toFixed(2)}</p>
-              <p className="text-green-400 font-semibold mt-1">{parseFloat(request.tokenamount || 0).toFixed(2)} J Token</p>
+              <p className="text-[#D4AF37] font-bold text-2xl">₹{parseFloat((approvedRequest || request)?.amount || 0).toFixed(2)}</p>
+              <p className="text-green-400 font-semibold mt-1">{parseFloat((approvedRequest || request)?.tokenamount || 0).toFixed(2)} J Token</p>
             </div>
-            <button onClick={() => { setShowSuccessPopup(false); setRequest(null); setAmount(''); }} className="w-full py-3 bg-green-600 text-white rounded-xl font-bold">
+            <button onClick={() => { setShowSuccessPopup(false); setApprovedRequest(null); setRequest(null); setAmount(''); }} className="w-full py-3 bg-green-600 text-white rounded-xl font-bold">
               Done
             </button>
           </div>
