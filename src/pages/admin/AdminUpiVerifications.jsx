@@ -150,11 +150,12 @@ const AdminUpiVerifications = () => {
                         <span className="text-sm sm:text-lg font-bold">U</span>
                       </div>
                         <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-white text-sm sm:text-base truncate">{v.email}</p>
-                        <p className="text-xs sm:text-sm text-gray-400 truncate">Phone: {v.phone}</p>
-                        <p className="text-xs sm:text-sm text-gray-400 truncate">UPI: {v.upiid}</p>
-                        <p className="text-xs text-gray-500">{new Date(v.createdat).toLocaleString()}</p>
-                      </div>
+                          <p className="font-semibold text-white text-sm sm:text-base truncate">{v.email}</p>
+                          <p className="text-xs sm:text-sm text-gray-400 truncate">Phone: {v.phone}</p>
+                          <p className="text-xs sm:text-sm text-gray-400 truncate">UPI: {v.upiid}</p>
+                          {v.appid && <p className="text-xs text-[#D4AF37]">App: {v.appid}</p>}
+                          <p className="text-xs text-gray-500">{new Date(v.createdat).toLocaleString()}</p>
+                        </div>
                     </div>
                     <div className="flex flex-col gap-2">
                       <span className={`rounded-full px-3 py-1 text-xs font-medium w-fit ${getStatusBadge(v.status)}`}>{v.status}</span>
