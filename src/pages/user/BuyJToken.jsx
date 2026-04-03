@@ -527,7 +527,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
                 <div className="w-3 h-3 rounded-full bg-[#D4AF37] animate-pulse"></div>
                 <h3 className="text-white font-bold text-lg">Payment Details</h3>
               </div>
-              <button onClick={() => { setShowPaymentPopup(false); setPaymentTimeLeft(600); localStorage.removeItem('jtoken_timer'); localStorage.removeItem('jtoken_timer_request_id'); }} className="text-gray-400 hover:text-white p-1">
+              <button onClick={() => setShowPaymentPopup(false)} className="text-gray-400 hover:text-white p-1">
                 <FaTimes />
               </button>
             </div>
@@ -651,7 +651,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               </div>
               
               <div className="flex gap-2 sm:gap-3 mt-3 sm:mt-4">
-                <button onClick={() => { setShowPaymentPopup(false); setPaymentTimeLeft(600); setLastRequestId(null); localStorage.removeItem('jtoken_timer'); localStorage.removeItem('jtoken_timer_request_id'); }} className="flex-1 py-2 sm:py-3 bg-gray-600 text-white rounded-xl font-semibold text-sm sm:text-base">
+                <button onClick={() => { setShowPaymentPopup(false); }} className="flex-1 py-2 sm:py-3 bg-gray-600 text-white rounded-xl font-semibold text-sm sm:text-base">
                   Cancel
                 </button>
                 <button onClick={async () => {
