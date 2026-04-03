@@ -36,7 +36,18 @@ const ManageAccount = () => {
         if (status && ['PENDING', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
           setPendingVerifications([status]);
           setShowVerifyPopup(true);
-        } else if (pendingVerifications.length > 0) {
+        } else if (status && status.status === 'APPROVED') {
+          alert('UPI ID verified successfully!');
+          setPendingVerifications([]);
+          setShowVerifyPopup(false);
+          setUserClosedPopup(false);
+          fetchData();
+        } else if (status && status.status === 'REJECTED') {
+          alert('UPI verification rejected. Please try again.');
+          setPendingVerifications([]);
+          setShowVerifyPopup(false);
+          setUserClosedPopup(false);
+        } else if (!status && pendingVerifications.length > 0) {
           setPendingVerifications([]);
           setShowVerifyPopup(false);
         }
