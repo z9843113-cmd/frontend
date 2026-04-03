@@ -22,31 +22,32 @@ const BuyJToken = () => {
   const [utr, setUtr] = useState('');
   const [screenshot, setScreenshot] = useState('');
   const [paymentTimeLeft, setPaymentTimeLeft] = useState(600);
+  const [timerInitialized, setTimerInitialized] = useState(false);
   const [lastRequestId, setLastRequestId] = useState(() => localStorage.getItem('jtoken_timer_request_id'));
   const [userClosedPopup, setUserClosedPopup] = useState(false);
   
   // Initialize timer from localStorage only once on mount
   useEffect(() => {
-    const saved = localStorage.getItem('jtoken_timer');
-    const savedStartTime = localStorage.getItem('jtoken_timer_start');
+    const savedEndTime = localStorage.getItem('jtoken_timer_end');
     const savedRequestId = localStorage.getItem('jtoken_timer_request_id');
     const closed = localStorage.getItem('jtoken_popup_closed');
     
-    if (saved && savedStartTime && savedRequestId) {
-      const elapsed = Math.floor((Date.now() - parseInt(savedStartTime)) / 1000);
-      const remaining = parseInt(saved) - elapsed;
+    if (savedEndTime && savedRequestId) {
+      const remaining = Math.max(0, Math.floor((parseInt(savedEndTime) - Date.now()) / 1000));
       if (remaining > 0) {
         setPaymentTimeLeft(remaining);
       } else {
         // Timer expired, clear storage
+        localStorage.removeItem('jtoken_timer_end');
+        localStorage.removeItem('jtoken_timer_request_id');
         localStorage.removeItem('jtoken_timer');
         localStorage.removeItem('jtoken_timer_start');
-        localStorage.removeItem('jtoken_timer_request_id');
       }
     }
     if (closed === 'true') {
       setUserClosedPopup(true);
     }
+    setTimerInitialized(true);
   }, []);
   const getStatusDisplay = (status) => {
     const statusMap = {
@@ -198,20 +199,18 @@ const BuyJToken = () => {
     if (request?.status === 'PAYMENT_STARTED' || request?.status === 'READY_TO_PAY') {
       setShowWaitPopup(false);
       
-      // Only reset timer and show popup for new requests or if user hasn't closed
+      // Only reset timer and show popup for new requests
       if (request.id !== lastRequestId) {
         setLastRequestId(request.id);
         localStorage.setItem('jtoken_timer_request_id', request.id);
+        const endTime = Date.now() + (600 * 1000);
         setPaymentTimeLeft(600);
-        localStorage.setItem('jtoken_timer', 600);
-        localStorage.setItem('jtoken_timer_start', Date.now());
+        localStorage.setItem('jtoken_timer_end', endTime);
         localStorage.removeItem('jtoken_popup_closed');
         setUserClosedPopup(false);
         setShowPaymentPopup(true);
-      } else if (!userClosedPopup && paymentTimeLeft > 0) {
-        // Show popup if user hasn't closed it and timer still running
-        setShowPaymentPopup(true);
       }
+      // Do NOT auto-show popup if user closed it - only show on first load
     }
   }, [request?.status, request?.id]);
 
@@ -235,7 +234,7 @@ const BuyJToken = () => {
 
   // Timer countdown - runs even when popup is closed
   useEffect(() => {
-    if (request && (request.status === 'PAYMENT_STARTED' || request.status === 'READY_TO_PAY') && paymentTimeLeft > 0) {
+    if (request && (request.status === 'PAYMENT_STARTED' || request.status === 'READY_TO_PAY') && paymentTimeLeft > 0 && timerInitialized) {
       const timer = setInterval(() => {
         setPaymentTimeLeft(prev => {
           if (prev <= 1) {
@@ -243,12 +242,15 @@ const BuyJToken = () => {
             handleAutoCancel();
             return 0;
           }
+          // Save end time to localStorage on each tick
+          const endTime = Date.now() + ((prev - 1) * 1000);
+          localStorage.setItem('jtoken_timer_end', endTime);
           return prev - 1;
         });
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [request?.status, paymentTimeLeft]);
+  }, [request?.status, paymentTimeLeft, timerInitialized]);
 
   // Timer countdown for payment popup (visual only)
   useEffect(() => {
