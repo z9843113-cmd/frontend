@@ -91,7 +91,7 @@ const Exchange = () => {
       return;
     }
     if (amountNum < currentMin) {
-      showError(`Minimum amount for ${selectedRate === 'GAMING' ? 'Gaming' : 'Mix'} Rate is $${currentMin} USDT`);
+      showError(`Can't Be Place ${selectedRate === 'GAMING' ? 'Gaming' : 'Mix'} Funds Order Less Than $${currentMin} USDT`);
       return;
     }
     
@@ -149,8 +149,8 @@ const Exchange = () => {
           </div>
           <div className="space-y-2 sm:space-y-3">
             {[
-              { id: 'GAMING', label: 'Gaming Rate', rate: exchangeRates.gamingRate, desc: `1 USDT = ₹${exchangeRates.gamingRate} INR` },
-              { id: 'MIX', label: 'Mix Rate', rate: exchangeRates.mixRate, desc: `1 USDT = ₹${exchangeRates.mixRate} INR` },
+              { id: 'GAMING', label: 'Gaming funds', rate: exchangeRates.gamingRate, desc: `1 USDT = ₹${exchangeRates.gamingRate} INR` },
+              { id: 'MIX', label: 'Mix funds', rate: exchangeRates.mixRate, desc: `1 USDT = ₹${exchangeRates.mixRate} INR` },
             ].map((option) => (
               <button
                 key={option.id}
