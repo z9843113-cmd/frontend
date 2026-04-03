@@ -18,6 +18,12 @@ const Team = () => {
 
   const referralLink = `https://zcyrpto.netlify.app/register?ref=${user?.referralCode}`;
 
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -326,13 +332,21 @@ const Team = () => {
                           ? 'bg-green-500/20 text-green-400' 
                           : 'bg-yellow-500/20 text-yellow-400'
                       }`}>
-                        {(member.name || member.email || 'U').charAt(0).toUpperCase()}
+                        {(member.name || member.mobile || 'U').charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-white font-medium text-sm sm:text-base truncate">
-                          {member.name || member.email?.split('@')[0] || 'User'}
+                          {member.name || member.mobile || 'User'}
                         </p>
-                        <p className="text-gray-500 text-xs truncate">{member.email || 'No email'}</p>
+                        <p className="text-gray-500 text-xs truncate flex items-center gap-1">
+                          <span className="font-mono">{member.id?.slice(0, 8)}...</span>
+                          <button 
+                            onClick={() => copyToClipboard(member.id)}
+                            className="text-yellow-500 hover:text-yellow-400"
+                          >
+                            <FaCopy className="w-3 h-3" />
+                          </button>
+                        </p>
                         <p className="text-gray-600 text-xs mt-0.5">
                           Joined: {formatDate(member.joinDate)}
                         </p>
