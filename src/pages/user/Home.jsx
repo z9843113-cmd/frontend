@@ -169,8 +169,10 @@ const Home = () => {
           totalDeposit: parseFloat(statsData.totalDeposit || 0),
           totalExchange: parseFloat(statsData.totalExchange || 0),
           totalJtoken: parseFloat(statsData.totalJtoken || 0),
-          todayProfit: parseFloat(statsData.todayProfit || 0),
-          totalProfit: parseFloat(statsData.totalProfit || 0)
+          todayRewards: parseFloat(statsData.todayRewards || 0),
+          todayCommission: parseFloat(statsData.todayCommission || 0),
+          totalRewards: parseFloat(statsData.totalRewards || 0),
+          totalCommission: parseFloat(statsData.totalCommission || 0)
         });
         setUser(profileData);
         setPaymentEnabled(profileData.paymentEnabled !== false);
@@ -284,8 +286,10 @@ const Home = () => {
           totalDeposit: parseFloat(statsData.totalDeposit || 0),
           totalExchange: parseFloat(statsData.totalExchange || 0),
           totalJtoken: parseFloat(statsData.totalJtoken || 0),
-          todayProfit: parseFloat(statsData.todayProfit || 0),
-          totalProfit: parseFloat(statsData.totalProfit || 0)
+          todayRewards: parseFloat(statsData.todayRewards || 0),
+          todayCommission: parseFloat(statsData.todayCommission || 0),
+          totalRewards: parseFloat(statsData.totalRewards || 0),
+          totalCommission: parseFloat(statsData.totalCommission || 0)
         });
       } catch (error) {
         console.error('Failed to refresh data', error);
@@ -347,8 +351,10 @@ const Home = () => {
   const getTotalDeposit = () => parseFloat(userStats.totalDeposit || 0);
   const getTotalExchange = () => parseFloat(userStats.totalExchange || 0);
   const getTotalJtoken = () => parseFloat(userStats.totalJtoken || 0);
-  const getTodayProfit = () => userStats.todayProfit;
-  const getTotalProfit = () => userStats.totalProfit;
+  const getTodayRewards = () => userStats.todayRewards || 0;
+  const getTodayCommission = () => userStats.todayCommission || 0;
+  const getTotalRewards = () => userStats.totalRewards || 0;
+  const getTotalCommission = () => userStats.totalCommission || 0;
 
   const getRecentActivity = () => {
     const depositItems = recentDeposits.map((item) => ({ ...item, entryType: 'deposit' }));
@@ -665,7 +671,7 @@ const Home = () => {
         </div>
 
         <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-          <p className="text-xs text-gray-500 mb-3">Today Trading</p>
+          <p className="text-xs text-gray-500 mb-3">Today Trading Volume</p>
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-400 text-sm">Deposits:</span>
@@ -683,7 +689,7 @@ const Home = () => {
         </div>
 
         <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-          <p className="text-xs text-gray-500 mb-3">Total Trading</p>
+          <p className="text-xs text-gray-500 mb-3">Total Trading Volume</p>
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-400 text-sm">Deposits:</span>
@@ -701,13 +707,31 @@ const Home = () => {
         </div>
 
         <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-          <p className="text-xs text-gray-500">Today Profit</p>
-          <p className={`mt-2 text-xl font-bold ${getTodayProfit() >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>₹{formatINR(getTodayProfit())}</p>
+          <p className="text-xs text-gray-500 mb-3">Today Profit</p>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-gray-400 text-sm">Rewards:</span>
+              <span className="text-emerald-400 font-medium">₹{formatINR(getTodayRewards())}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400 text-sm">Commission:</span>
+              <span className="text-emerald-400 font-medium">₹{formatINR(getTodayCommission())}</span>
+            </div>
+          </div>
         </div>
 
         <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-          <p className="text-xs text-gray-500">Total Profit</p>
-          <p className="mt-2 text-xl font-bold text-emerald-400">₹{formatINR(getTotalProfit())}</p>
+          <p className="text-xs text-gray-500 mb-3">Total Profit</p>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-gray-400 text-sm">Rewards:</span>
+              <span className="text-emerald-400 font-medium">₹{formatINR(getTotalRewards())}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400 text-sm">Commission:</span>
+              <span className="text-emerald-400 font-medium">₹{formatINR(getTotalCommission())}</span>
+            </div>
+          </div>
         </div>
 
         <div className="rounded-[28px] border border-[#242424] bg-gradient-to-br from-[#171717] via-[#111111] to-[#0c0c0c] p-5">
