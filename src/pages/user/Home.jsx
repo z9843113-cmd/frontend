@@ -163,8 +163,12 @@ const Home = () => {
         setRecentExchanges(Array.isArray(exchangeData) ? exchangeData : []);
         setRecentTransactions(Array.isArray(transactionsData) ? transactionsData : []);
         setUserStats({
-          todayTrading: parseFloat(statsData.todayTrading || 0),
-          totalTrading: parseFloat(statsData.totalTrading || 0),
+          todayDeposit: parseFloat(statsData.todayDeposit || 0),
+          todayExchange: parseFloat(statsData.todayExchange || 0),
+          todayJtoken: parseFloat(statsData.todayJtoken || 0),
+          totalDeposit: parseFloat(statsData.totalDeposit || 0),
+          totalExchange: parseFloat(statsData.totalExchange || 0),
+          totalJtoken: parseFloat(statsData.totalJtoken || 0),
           todayProfit: parseFloat(statsData.todayProfit || 0),
           totalProfit: parseFloat(statsData.totalProfit || 0)
         });
@@ -274,8 +278,12 @@ const Home = () => {
         // Update stats in real-time
         const statsData = statsRes?.data || statsRes || {};
         setUserStats({
-          todayTrading: parseFloat(statsData.todayTrading || 0),
-          totalTrading: parseFloat(statsData.totalTrading || 0),
+          todayDeposit: parseFloat(statsData.todayDeposit || 0),
+          todayExchange: parseFloat(statsData.todayExchange || 0),
+          todayJtoken: parseFloat(statsData.todayJtoken || 0),
+          totalDeposit: parseFloat(statsData.totalDeposit || 0),
+          totalExchange: parseFloat(statsData.totalExchange || 0),
+          totalJtoken: parseFloat(statsData.totalJtoken || 0),
           todayProfit: parseFloat(statsData.todayProfit || 0),
           totalProfit: parseFloat(statsData.totalProfit || 0)
         });
@@ -333,8 +341,12 @@ const Home = () => {
 
   const getTodayVolume = () => userStats.todayVolume || 0;
   const getTotalVolume = () => userStats.totalVolume || 0;
-  const getTodayTrading = () => parseFloat(userStats.todayTrading || 0);
-  const getTotalTrading = () => parseFloat(userStats.totalTrading || 0);
+  const getTodayDeposit = () => parseFloat(userStats.todayDeposit || 0);
+  const getTodayExchange = () => parseFloat(userStats.todayExchange || 0);
+  const getTodayJtoken = () => parseFloat(userStats.todayJtoken || 0);
+  const getTotalDeposit = () => parseFloat(userStats.totalDeposit || 0);
+  const getTotalExchange = () => parseFloat(userStats.totalExchange || 0);
+  const getTotalJtoken = () => parseFloat(userStats.totalJtoken || 0);
   const getTodayProfit = () => userStats.todayProfit;
   const getTotalProfit = () => userStats.totalProfit;
 
@@ -652,23 +664,50 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">Today Trading</p>
-            <p className="mt-2 text-xl font-bold text-white">₹{formatINR(getTodayTrading())}</p>
+        <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
+          <p className="text-xs text-gray-500 mb-3">Today Trading</p>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-gray-400 text-sm">Deposits:</span>
+              <span className="text-white font-medium">{getTodayDeposit().toFixed(6)} USDT</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400 text-sm">Exchange:</span>
+              <span className="text-white font-medium">{getTodayExchange().toFixed(6)} USDT</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400 text-sm">J-Token:</span>
+              <span className="text-white font-medium">₹{formatINR(getTodayJtoken())}</span>
+            </div>
           </div>
-          <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">Total Trading</p>
-            <p className="mt-2 text-xl font-bold text-white">₹{formatINR(getTotalTrading())}</p>
+        </div>
+
+        <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
+          <p className="text-xs text-gray-500 mb-3">Total Trading</p>
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-gray-400 text-sm">Deposits:</span>
+              <span className="text-white font-medium">{getTotalDeposit().toFixed(6)} USDT</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400 text-sm">Exchange:</span>
+              <span className="text-white font-medium">{getTotalExchange().toFixed(6)} USDT</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400 text-sm">J-Token:</span>
+              <span className="text-white font-medium">₹{formatINR(getTotalJtoken())}</span>
+            </div>
           </div>
-          <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">Today Profit</p>
-            <p className={`mt-2 text-xl font-bold ${getTodayProfit() >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>₹{formatINR(getTodayProfit())}</p>
-          </div>
-          <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">Total Profit</p>
-            <p className="mt-2 text-xl font-bold text-emerald-400">₹{formatINR(getTotalProfit())}</p>
-          </div>
+        </div>
+
+        <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
+          <p className="text-xs text-gray-500">Today Profit</p>
+          <p className={`mt-2 text-xl font-bold ${getTodayProfit() >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>₹{formatINR(getTodayProfit())}</p>
+        </div>
+
+        <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
+          <p className="text-xs text-gray-500">Total Profit</p>
+          <p className="mt-2 text-xl font-bold text-emerald-400">₹{formatINR(getTotalProfit())}</p>
         </div>
 
         <div className="rounded-[28px] border border-[#242424] bg-gradient-to-br from-[#171717] via-[#111111] to-[#0c0c0c] p-5">
