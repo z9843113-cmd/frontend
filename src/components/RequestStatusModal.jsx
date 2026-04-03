@@ -71,7 +71,7 @@ const RequestStatusModal = ({ isOpen, onClose, type, requestId, title }) => {
   const getStatusMessage = () => {
     if (status === 'APPROVED' || status === 'COMPLETED') return 'Success!';
     if (status === 'REJECTED' || status === 'CANCELLED') return 'Request Rejected';
-    return 'Waiting for approval...';
+    return 'Please wait…';
   };
 
   return (
@@ -99,7 +99,7 @@ const RequestStatusModal = ({ isOpen, onClose, type, requestId, title }) => {
         </p>
 
         {status === 'PENDING' ? (
-          <p className="text-gray-400 text-sm">Your order is being processed. Please wait…</p>
+          <p className="text-gray-400 text-sm">Your order is being processed.</p>
         ) : (
           <p className="text-gray-400 text-sm mb-4">
             {type === 'EXCHANGE' && (status === 'APPROVED' || status === 'COMPLETED') 
