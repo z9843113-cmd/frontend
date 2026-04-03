@@ -1,10 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { depositAPI, walletAPI, userAPI } from '../services/api';
 import { FaSpinner, FaCheck, FaTimes } from 'react-icons/fa';
 
 const RequestStatusModal = ({ isOpen, onClose, type, requestId, title }) => {
   const [status, setStatus] = useState('PENDING');
   const [loading, setLoading] = useState(true);
+  const shownSuccessRef = useRef(false);
+  const prevStatusRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      shownSuccessRef.current = false;
+      prevStatusRef.current = null;
+      setStatus('PENDING');
+    }
+  }, [isOpen, requestId]);
 
   useEffect(() => {
     if (!isOpen || !requestId) return;
@@ -32,7 +42,18 @@ const RequestStatusModal = ({ isOpen, onClose, type, requestId, title }) => {
         }
         
         if (foundStatus) {
+          const prevStatus = prevStatusRef.current;
+          prevStatusRef.current = foundStatus;
           setStatus(foundStatus);
+          
+          // Show success alert only when status changes to APPROVED
+          if (foundStatus === 'APPROVED' && prevStatus && prevStatus !== 'APPROVED' && !shownSuccessRef.current) {
+            shownSuccessRef.current = true;
+            alert('Deposit approved! Your balance has been updated.');
+            setTimeout(() => {
+              onClose();
+            }, 1500);
+          }
         }
       } catch (error) {
         console.error('Error checking status:', error);
