@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userAPI, publicAPI } from '../../services/api';
 import { useAuthStore } from '../../store';
@@ -23,6 +23,7 @@ const ManageAccount = () => {
   const [userClosedPopup, setUserClosedPopup] = useState(false);
   const [activeTab, setActiveTab] = useState('upi');
   const [submitting, setSubmitting] = useState(false);
+  const shownApprovedRef = useRef(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,7 +37,9 @@ const ManageAccount = () => {
         if (status && ['PENDING', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
           setPendingVerifications([status]);
           setShowVerifyPopup(true);
-        } else if (status && status.status === 'APPROVED') {
+          shownApprovedRef.current = false;
+        } else if (status && status.status === 'APPROVED' && !shownApprovedRef.current) {
+          shownApprovedRef.current = true;
           alert('UPI ID verified successfully!');
           setPendingVerifications([]);
           setShowVerifyPopup(false);
