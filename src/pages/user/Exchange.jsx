@@ -16,6 +16,8 @@ const Exchange = () => {
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [pendingRequest, setPendingRequest] = useState(null);
+  const [showWaitPopup, setShowWaitPopup] = useState(false);
+  const [waitMessage, setWaitMessage] = useState('');
   const [usdtRate, setUsdtRate] = useState(0);
   const [usdtCommission, setUsdtCommission] = useState(0);
   const [exchangeRates, setExchangeRates] = useState({ gamingRate: 103, gamingRateMin: 80, mixRate: 108, mixRateMin: 80, minAmount: 100, maxAmount: 50000 });
@@ -104,10 +106,18 @@ const Exchange = () => {
       });
       const newRequest = res?.request || res;
       if (newRequest?.id) {
-        setPendingRequest({ id: newRequest.id, type: 'EXCHANGE', title: 'USDT Sell Request' });
         setShowTradeModal(false);
         setAmount('');
         setSelectedRate(null);
+        
+        // Show wait popup for 3-4 seconds
+        setWaitMessage('Please wait...');
+        setShowWaitPopup(true);
+        
+        setTimeout(() => {
+          setShowWaitPopup(false);
+          setPendingRequest({ id: newRequest.id, type: 'EXCHANGE', title: 'USDT Sell Request' });
+        }, 3500);
       }
     } catch (err) {
       showError(err?.message || 'Failed to submit request');
@@ -323,6 +333,18 @@ const Exchange = () => {
             <button onClick={() => setShowErrorPopup(false)} className="w-full py-3 sm:py-4 bg-gradient-to-r from-red-500 to-red-600 text-white font-bold rounded-xl sm:rounded-2xl text-base sm:text-lg hover:opacity-90 transition-opacity">
               Try Again
             </button>
+          </div>
+        </div>
+      )}
+
+      {showWaitPopup && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] border border-[#D4AF37]/30 rounded-2xl sm:rounded-3xl p-5 sm:p-8 w-full max-w-sm mx-4 text-center">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#D4AF37]/20 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Request Submitted</h3>
+            <p className="text-gray-400 text-sm">Processing your request... Please wait.</p>
           </div>
         </div>
       )}

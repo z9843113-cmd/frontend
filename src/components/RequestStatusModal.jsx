@@ -99,7 +99,7 @@ const RequestStatusModal = ({ isOpen, onClose, type, requestId, title }) => {
         </p>
 
         {status === 'PENDING' ? (
-          <p className="text-gray-400 text-sm">Please wait 3-5 minutes, your request will be reviewed...</p>
+          <p className="text-gray-400 text-sm">Your order is being processed. Please wait…</p>
         ) : (
           <p className="text-gray-400 text-sm mb-4">
             {type === 'EXCHANGE' && (status === 'APPROVED' || status === 'COMPLETED') 
