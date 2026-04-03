@@ -523,7 +523,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
                 </div>
               )}
               
-              {(request.adminnote || request.bankdetails) && (
+              {request.method === 'BANK' && (
                 <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-xl p-4 border border-[#2a2a2a]">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -531,39 +531,24 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
                   </div>
                   <div className="space-y-2">
                     {(() => {
-                      let rawText = request.bankdetails || request.adminnote || '';
+                      let rawText = request.adminnote || '';
                       let fields = [];
                       
-                      if (typeof rawText === 'string') {
+                      if (rawText) {
                         rawText = ' ' + rawText + ' ';
                         
-                        const bankMatch = rawText.match(/Bank:\s*(\S+)/i);
-                        const accMatch = rawText.match(/Account\s*No\.?:\s*(\S+)/i);
-                        const ifscMatch = rawText.match(/IFSC:\s*(\S+)/i);
-                        const payeeMatch = rawText.match(/Payee\s*Name:\s*(\S+)/i);
-                        
-                        console.log('Raw text:', rawText);
-                        console.log('Bank:', bankMatch);
-                        console.log('Acc:', accMatch);
-                        console.log('IFSC:', ifscMatch);
-                        console.log('Payee:', payeeMatch);
+                        const bankMatch = rawText.match(/Bank:\s*(.+?)(?=\n|$)/i);
+                        const accMatch = rawText.match(/Account\s*No\.?:\s*(.+?)(?=\n|$)/i);
+                        const ifscMatch = rawText.match(/IFSC:\s*(.+?)(?=\n|$)/i);
+                        const payeeMatch = rawText.match(/Payee\s*Name:\s*(.+?)(?=\n|$)/i);
                         
                         fields = [
-                          { label: 'Bank Name', value: bankMatch?.[1] || '' },
-                          { label: 'Account No.', value: accMatch?.[1] || '' },
-                          { label: 'IFSC Code', value: ifscMatch?.[1] || '' },
-                          { label: 'Payee Name', value: payeeMatch?.[1] || '' }
-                        ].filter(f => f.value);
-                      } else if (rawText && typeof rawText === 'object') {
-                        fields = [
-                          { label: 'Bank Name', value: rawText.bankName || rawText.bank || '' },
-                          { label: 'Account No.', value: rawText.accountNumber || rawText.accountNo || rawText.ac || '' },
-                          { label: 'IFSC Code', value: rawText.ifscCode || rawText.ifsc || '' },
-                          { label: 'Payee Name', value: rawText.payeeName || rawText.payee || '' }
+                          { label: 'Bank Name', value: bankMatch?.[1]?.trim() || '' },
+                          { label: 'Account No.', value: accMatch?.[1]?.trim() || '' },
+                          { label: 'IFSC Code', value: ifscMatch?.[1]?.trim() || '' },
+                          { label: 'Payee Name', value: payeeMatch?.[1]?.trim() || '' }
                         ].filter(f => f.value);
                       }
-                      
-                      console.log('Fields:', fields);
                       
                       if (fields.length === 0) {
                         return <p className="text-gray-500 text-xs">No bank details available</p>;
@@ -582,6 +567,16 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
                       ));
                     })()}
                   </div>
+                </div>
+              )}
+
+              {request.adminnote && request.method !== 'BANK' && (
+                <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-xl p-4 border border-[#2a2a2a]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                    <p className="text-gray-300 text-sm font-semibold">Note from Admin</p>
+                  </div>
+                  <p className="text-white text-sm">{request.adminnote}</p>
                 </div>
               )}
               
