@@ -163,8 +163,8 @@ const Home = () => {
         setRecentExchanges(Array.isArray(exchangeData) ? exchangeData : []);
         setRecentTransactions(Array.isArray(transactionsData) ? transactionsData : []);
         setUserStats({
-          todayVolume: parseFloat(statsData.todayVolume || 0),
-          totalVolume: parseFloat(statsData.totalVolume || 0),
+          todayTrading: parseFloat(statsData.todayTrading || 0),
+          totalTrading: parseFloat(statsData.totalTrading || 0),
           todayProfit: parseFloat(statsData.todayProfit || 0),
           totalProfit: parseFloat(statsData.totalProfit || 0)
         });
@@ -274,8 +274,8 @@ const Home = () => {
         // Update stats in real-time
         const statsData = statsRes?.data || statsRes || {};
         setUserStats({
-          todayVolume: parseFloat(statsData.todayVolume || 0),
-          totalVolume: parseFloat(statsData.totalVolume || 0),
+          todayTrading: parseFloat(statsData.todayTrading || 0),
+          totalTrading: parseFloat(statsData.totalTrading || 0),
           todayProfit: parseFloat(statsData.todayProfit || 0),
           totalProfit: parseFloat(statsData.totalProfit || 0)
         });
@@ -333,8 +333,8 @@ const Home = () => {
 
   const getTodayVolume = () => userStats.todayVolume || 0;
   const getTotalVolume = () => userStats.totalVolume || 0;
-  const getTodayVolumeUsdt = () => parseFloat(userStats.todayVolume || 0);
-  const getTotalVolumeUsdt = () => parseFloat(userStats.totalVolume || 0);
+  const getTodayTrading = () => parseFloat(userStats.todayTrading || 0);
+  const getTotalTrading = () => parseFloat(userStats.totalTrading || 0);
   const getTodayProfit = () => userStats.todayProfit;
   const getTotalProfit = () => userStats.totalProfit;
 
@@ -654,12 +654,12 @@ const Home = () => {
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">Today Trading Volume</p>
-            <p className="mt-2 text-xl font-bold text-white">₹{formatINR(getTodayVolumeUsdt())}</p>
+            <p className="text-xs text-gray-500">Today Trading</p>
+            <p className="mt-2 text-xl font-bold text-white">₹{formatINR(getTodayTrading())}</p>
           </div>
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">Total Trading Volume</p>
-            <p className="mt-2 text-xl font-bold text-white">₹{formatINR(getTotalVolumeUsdt())}</p>
+            <p className="text-xs text-gray-500">Total Trading</p>
+            <p className="mt-2 text-xl font-bold text-white">₹{formatINR(getTotalTrading())}</p>
           </div>
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
             <p className="text-xs text-gray-500">Today Profit</p>
