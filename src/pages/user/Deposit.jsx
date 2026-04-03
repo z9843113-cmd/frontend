@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { depositAPI, publicAPI, uploadToCloudinary, adminAPI } from '../../services/api';
+import { depositAPI, publicAPI, uploadToCloudinary, adminAPI, userAPI } from '../../services/api';
 import BottomNav from '../../components/BottomNav';
 import RequestStatusModal from '../../components/RequestStatusModal';
 
@@ -20,6 +20,7 @@ const Deposit = () => {
   const [pendingRequest, setPendingRequest] = useState(null);
   const [usdtRate, setUsdtRate] = useState(0);
   const [usdtCommission, setUsdtCommission] = useState(0);
+  const [discountInfo, setDiscountInfo] = useState({ enabled: false, percent: 0, max: 0, available: false, uses: 0 });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,6 +41,19 @@ const Deposit = () => {
       const settings = res?.data || res || {};
       setUsdtRate(parseFloat(settings.usdtrate) || 0);
       setUsdtCommission(parseFloat(settings.usdtcommissionpercent) || 0);
+    }).catch(console.error);
+    
+    // Get discount status
+    userAPI.getDiscountStatus().then((res) => {
+      const data = res?.data || res || {};
+      const deposit = data.deposit || {};
+      setDiscountInfo({
+        enabled: deposit.enabled || false,
+        percent: deposit.percent || 0,
+        max: deposit.max || 0,
+        available: deposit.available || false,
+        uses: deposit.uses || 0
+      });
     }).catch(console.error);
 
     const interval = setInterval(() => {
@@ -242,6 +256,13 @@ const Deposit = () => {
                 const inrValue = parseFloat(amount) * usdtRate;
                 const commissionAmount = inrValue * (usdtCommission / 100);
                 const afterCommission = inrValue + commissionAmount;
+                
+                // Calculate discount bonus
+                let bonusAmount = 0;
+                if (discountInfo.enabled && discountInfo.available && discountInfo.percent > 0) {
+                  bonusAmount = Math.min(inrValue * (discountInfo.percent / 100), discountInfo.max);
+                }
+                
                 return (
                   <div className="mt-2 space-y-1 bg-[#0a0a0a] p-3 rounded-xl border border-[#2a2a2a]">
                     <p className="text-gray-400 text-xs">Exchange Rate: ₹{usdtRate}/USDT</p>
@@ -253,6 +274,12 @@ const Deposit = () => {
                       </>
                     ) : (
                       <p className="text-white text-sm font-bold">You will get: ₹{inrValue.toFixed(2)}</p>
+                    )}
+                    {bonusAmount > 0 && (
+                      <p className="text-emerald-400 text-sm font-bold">🎉 Bonus: +₹{bonusAmount.toFixed(2)} (20% extra!)</p>
+                    )}
+                    {!discountInfo.available && discountInfo.enabled && (
+                      <p className="text-gray-500 text-xs">Deposit discount already used</p>
                     )}
                   </div>
                 );
