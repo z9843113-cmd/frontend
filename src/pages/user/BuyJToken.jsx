@@ -24,8 +24,11 @@ const BuyJToken = () => {
   const [paymentTimeLeft, setPaymentTimeLeft] = useState(() => {
     const saved = localStorage.getItem('jtoken_timer');
     const savedRequestId = localStorage.getItem('jtoken_timer_request_id');
-    if (saved && savedRequestId) {
-      return parseInt(saved);
+    const savedStartTime = localStorage.getItem('jtoken_timer_start');
+    if (saved && savedRequestId && savedStartTime) {
+      const elapsed = Math.floor((Date.now() - parseInt(savedStartTime)) / 1000);
+      const remaining = parseInt(saved) - elapsed;
+      return remaining > 0 ? remaining : 0;
     }
     return 600;
   });
@@ -184,6 +187,7 @@ const BuyJToken = () => {
         localStorage.setItem('jtoken_timer_request_id', request.id);
         setPaymentTimeLeft(600);
         localStorage.setItem('jtoken_timer', 600);
+        localStorage.setItem('jtoken_timer_start', Date.now());
       }
       setShowPaymentPopup(true);
     }
@@ -199,6 +203,7 @@ const BuyJToken = () => {
         setLastRequestId(null);
         localStorage.removeItem('jtoken_timer');
         localStorage.removeItem('jtoken_timer_request_id');
+        localStorage.removeItem('jtoken_timer_start');
         alert('Payment time expired. Request cancelled.');
       } catch (err) {
         console.error('Auto cancel error:', err);
@@ -209,6 +214,9 @@ const BuyJToken = () => {
   // Timer countdown for payment
   useEffect(() => {
     if (showPaymentPopup && paymentTimeLeft > 0) {
+      if (!localStorage.getItem('jtoken_timer_start')) {
+        localStorage.setItem('jtoken_timer_start', Date.now());
+      }
       localStorage.setItem('jtoken_timer', paymentTimeLeft);
       localStorage.setItem('jtoken_timer_request_id', lastRequestId || '');
       
