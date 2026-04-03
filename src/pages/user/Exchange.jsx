@@ -80,6 +80,7 @@ const Exchange = () => {
     }
     const amountNum = parseFloat(amount);
     const usdtBalance = parseFloat(wallet?.usdtbalance || 0);
+    const currentMin = selectedRate === 'GAMING' ? exchangeRates.gamingRateMin : exchangeRates.mixRateMin;
     
     if (!amount || amountNum <= 0) {
       showError('Please enter a valid amount');
@@ -89,8 +90,8 @@ const Exchange = () => {
       showError(`Insufficient USDT balance. You have ${usdtBalance.toFixed(4)} USDT`);
       return;
     }
-    if (amountNum < exchangeRates.minAmount) {
-      showError(`Minimum amount is $${exchangeRates.minAmount}`);
+    if (amountNum < currentMin) {
+      showError(`Minimum amount for ${selectedRate === 'GAMING' ? 'Gaming' : 'Mix'} Rate is $${currentMin} USDT`);
       return;
     }
     
@@ -221,10 +222,10 @@ const Exchange = () => {
                     type="number"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    placeholder={`Min: $${exchangeRates.minAmount}`}
+                    placeholder={`Min: $${selectedRate === 'GAMING' ? exchangeRates.gamingRateMin : selectedRate === 'MIX' ? exchangeRates.mixRateMin : exchangeRates.minAmount}`}
                     className="w-full bg-gradient-to-br from-[#0a0a0a] to-[#151515] border border-[#2a2a2a] rounded-xl sm:rounded-2xl px-3 sm:px-4 py-3 sm:py-4 text-white placeholder-gray-600 focus:border-[#D4AF37] focus:outline-none text-base sm:text-lg font-medium"
                   />
-                  <p className="text-gray-500 text-xs mt-1">Min: ${exchangeRates.minAmount} USDT</p>
+                  <p className="text-gray-500 text-xs mt-1">Min: ${selectedRate === 'GAMING' ? exchangeRates.gamingRateMin : selectedRate === 'MIX' ? exchangeRates.mixRateMin : exchangeRates.minAmount} USDT</p>
                 </div>
 
                 {amount && (() => {
