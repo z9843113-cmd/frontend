@@ -333,10 +333,8 @@ const Home = () => {
 
   const getTodayVolume = () => userStats.todayVolume || 0;
   const getTotalVolume = () => userStats.totalVolume || 0;
-  const getTodayVolumeUsdt = () => parseFloat(userStats.todayUsdtVolume || 0);
-  const getTotalVolumeUsdt = () => parseFloat(userStats.totalUsdtVolume || 0);
-  const getTodayInrVolume = () => parseFloat(userStats.todayInrVolume || 0);
-  const getTotalInrVolume = () => parseFloat(userStats.totalInrVolume || 0);
+  const getTodayVolumeUsdt = () => parseFloat(userStats.todayVolume || 0);
+  const getTotalVolumeUsdt = () => parseFloat(userStats.totalVolume || 0);
   const getTodayProfit = () => userStats.todayProfit;
   const getTotalProfit = () => userStats.totalProfit;
 
@@ -656,21 +654,19 @@ const Home = () => {
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">USDT Volume (24h)</p>
-            <p className="mt-2 text-xl font-bold text-white">{getTodayVolumeUsdt().toFixed(6)} USDT</p>
-            <p className="mt-1 text-xs text-emerald-400">₹{formatINR(getTodayVolumeUsdt() * (usdtRate || 83))}</p>
+            <p className="text-xs text-gray-500">Volume (24h)</p>
+            <p className="mt-2 text-xl font-bold text-white">₹{formatINR(getTodayVolumeUsdt())}</p>
           </div>
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">USDT Volume (Total)</p>
-            <p className="mt-2 text-xl font-bold text-white">{getTotalVolumeUsdt().toFixed(6)} USDT</p>
-            <p className="mt-1 text-xs text-emerald-400">₹{formatINR(getTotalVolumeUsdt() * (usdtRate || 83))}</p>
+            <p className="text-xs text-gray-500">Total Volume</p>
+            <p className="mt-2 text-xl font-bold text-white">₹{formatINR(getTotalVolumeUsdt())}</p>
           </div>
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
             <p className="text-xs text-gray-500">Profit (24h)</p>
             <p className={`mt-2 text-xl font-bold ${getTodayProfit() >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>₹{formatINR(getTodayProfit())}</p>
           </div>
           <div className="rounded-3xl border border-[#242424] bg-gradient-to-br from-[#171717] to-[#0d0d0d] p-5">
-            <p className="text-xs text-gray-500">Profit (Total)</p>
+            <p className="text-xs text-gray-500">Total Profit</p>
             <p className="mt-2 text-xl font-bold text-emerald-400">₹{formatINR(getTotalProfit())}</p>
           </div>
         </div>
