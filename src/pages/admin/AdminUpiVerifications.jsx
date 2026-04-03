@@ -34,6 +34,16 @@ const AdminUpiVerifications = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchVerifications(); }, [page, status]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      adminAPI.getUpiVerifications({ page, limit: 20, status }).then(res => {
+        setVerifications(res.verifications || []);
+        setTotal(res.total || 0);
+      }).catch(() => {});
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [page, status]);
+
   const fetchUserDetails = async (userId) => {
     setLoadingUser(true);
     try {
