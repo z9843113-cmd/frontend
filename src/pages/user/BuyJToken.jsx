@@ -21,8 +21,15 @@ const BuyJToken = () => {
   const lastStatusRef = useRef(null);
   const [utr, setUtr] = useState('');
   const [screenshot, setScreenshot] = useState('');
-  const [paymentTimeLeft, setPaymentTimeLeft] = useState(600);
-  const [lastRequestId, setLastRequestId] = useState(null);
+  const [paymentTimeLeft, setPaymentTimeLeft] = useState(() => {
+    const saved = localStorage.getItem('jtoken_timer');
+    const savedRequestId = localStorage.getItem('jtoken_timer_request_id');
+    if (saved && savedRequestId) {
+      return parseInt(saved);
+    }
+    return 600;
+  });
+  const [lastRequestId, setLastRequestId] = useState(() => localStorage.getItem('jtoken_timer_request_id'));
   const getStatusDisplay = (status) => {
     const statusMap = {
       'APPROVED': 'SUCCESS',
@@ -174,7 +181,9 @@ const BuyJToken = () => {
       setShowWaitPopup(false);
       if (request.id !== lastRequestId) {
         setLastRequestId(request.id);
+        localStorage.setItem('jtoken_timer_request_id', request.id);
         setPaymentTimeLeft(600);
+        localStorage.setItem('jtoken_timer', 600);
       }
       setShowPaymentPopup(true);
     }
@@ -183,6 +192,9 @@ const BuyJToken = () => {
   // Timer countdown for payment
   useEffect(() => {
     if (showPaymentPopup && paymentTimeLeft > 0) {
+      localStorage.setItem('jtoken_timer', paymentTimeLeft);
+      localStorage.setItem('jtoken_timer_request_id', lastRequestId || '');
+      
       const timer = setInterval(() => {
         setPaymentTimeLeft(prev => {
           if (prev <= 1) {
@@ -195,7 +207,7 @@ const BuyJToken = () => {
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [showPaymentPopup, paymentTimeLeft]);
+  }, [showPaymentPopup, paymentTimeLeft, lastRequestId]);
 
   const handleCreate = async () => {
     if (!amount || parseFloat(amount) < 10) {
@@ -233,6 +245,8 @@ const BuyJToken = () => {
       setSelectedUpi('');
       setPaymentTimeLeft(600);
       setLastRequestId(null);
+      localStorage.removeItem('jtoken_timer');
+      localStorage.removeItem('jtoken_timer_request_id');
       const res = await jTokenPurchaseAPI.getMyRequests();
       const allRequests = res?.data?.purchases || res?.data || res || [];
       setHistory(allRequests);
@@ -513,7 +527,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
                 <div className="w-3 h-3 rounded-full bg-[#D4AF37] animate-pulse"></div>
                 <h3 className="text-white font-bold text-lg">Payment Details</h3>
               </div>
-              <button onClick={() => { setShowPaymentPopup(false); setPaymentTimeLeft(600); }} className="text-gray-400 hover:text-white p-1">
+              <button onClick={() => { setShowPaymentPopup(false); setPaymentTimeLeft(600); localStorage.removeItem('jtoken_timer'); localStorage.removeItem('jtoken_timer_request_id'); }} className="text-gray-400 hover:text-white p-1">
                 <FaTimes />
               </button>
             </div>
@@ -637,7 +651,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               </div>
               
               <div className="flex gap-2 sm:gap-3 mt-3 sm:mt-4">
-                <button onClick={() => { setShowPaymentPopup(false); setPaymentTimeLeft(600); setLastRequestId(null); }} className="flex-1 py-2 sm:py-3 bg-gray-600 text-white rounded-xl font-semibold text-sm sm:text-base">
+                <button onClick={() => { setShowPaymentPopup(false); setPaymentTimeLeft(600); setLastRequestId(null); localStorage.removeItem('jtoken_timer'); localStorage.removeItem('jtoken_timer_request_id'); }} className="flex-1 py-2 sm:py-3 bg-gray-600 text-white rounded-xl font-semibold text-sm sm:text-base">
                   Cancel
                 </button>
                 <button onClick={async () => {
@@ -681,7 +695,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
             </div>
             <h3 className="text-white font-bold text-2xl mb-2">Payment Approved!</h3>
             <p className="text-gray-300 text-sm">Your JToken has been credited to your wallet</p>
-            <button onClick={() => { setShowSuccessPopup(false); setApprovedRequest(null); setRequest(null); setAmount(''); }} className="w-full py-3 bg-green-600 text-white rounded-xl font-bold mt-6">
+            <button onClick={() => { setShowSuccessPopup(false); setApprovedRequest(null); setRequest(null); setAmount(''); localStorage.removeItem('jtoken_timer'); localStorage.removeItem('jtoken_timer_request_id'); }} className="w-full py-3 bg-green-600 text-white rounded-xl font-bold mt-6">
               Done
             </button>
           </div>
