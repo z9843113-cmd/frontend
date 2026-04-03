@@ -191,6 +191,21 @@ const BuyJToken = () => {
       }
       setShowPaymentPopup(true);
     }
+    // Auto open popup if timer is running and popup is closed
+    if (request && (request.status === 'PAYMENT_STARTED' || request.status === 'READY_TO_PAY') && !showPaymentPopup && paymentTimeLeft > 0) {
+      setShowPaymentPopup(true);
+    }
+    // Reset timer if request is new
+    if (request && (request.status === 'PAYMENT_STARTED' || request.status === 'READY_TO_PAY')) {
+      if (request.id !== lastRequestId) {
+        const savedStart = localStorage.getItem('jtoken_timer_start');
+        if (!savedStart) {
+          setPaymentTimeLeft(600);
+          localStorage.setItem('jtoken_timer', 600);
+          localStorage.setItem('jtoken_timer_start', Date.now());
+        }
+      }
+    }
   }, [request?.status, request?.id]);
 
   const handleAutoCancel = async () => {
@@ -211,15 +226,9 @@ const BuyJToken = () => {
     }
   };
 
-  // Timer countdown for payment
+  // Timer countdown - runs even when popup is closed
   useEffect(() => {
-    if (showPaymentPopup && paymentTimeLeft > 0) {
-      if (!localStorage.getItem('jtoken_timer_start')) {
-        localStorage.setItem('jtoken_timer_start', Date.now());
-      }
-      localStorage.setItem('jtoken_timer', paymentTimeLeft);
-      localStorage.setItem('jtoken_timer_request_id', lastRequestId || '');
-      
+    if (request && (request.status === 'PAYMENT_STARTED' || request.status === 'READY_TO_PAY') && paymentTimeLeft > 0) {
       const timer = setInterval(() => {
         setPaymentTimeLeft(prev => {
           if (prev <= 1) {
@@ -231,6 +240,17 @@ const BuyJToken = () => {
         });
       }, 1000);
       return () => clearInterval(timer);
+    }
+  }, [request?.status, paymentTimeLeft]);
+
+  // Timer countdown for payment popup (visual only)
+  useEffect(() => {
+    if (showPaymentPopup && paymentTimeLeft > 0) {
+      localStorage.setItem('jtoken_timer', paymentTimeLeft);
+      localStorage.setItem('jtoken_timer_request_id', lastRequestId || '');
+      if (!localStorage.getItem('jtoken_timer_start')) {
+        localStorage.setItem('jtoken_timer_start', Date.now());
+      }
     }
   }, [showPaymentPopup, paymentTimeLeft, lastRequestId]);
 
