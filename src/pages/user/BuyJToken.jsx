@@ -180,21 +180,6 @@ const BuyJToken = () => {
     }
   }, [request?.status, request?.id]);
 
-  const handleAutoCancel = async () => {
-    if (request && (request.status === 'PAYMENT_STARTED' || request.status === 'READY_TO_PAY')) {
-      try {
-        await jTokenPurchaseAPI.cancel(request.id);
-        setShowPaymentPopup(false);
-        setRequest(null);
-        setPaymentTimeLeft(600);
-        setLastRequestId(null);
-        alert('Payment time expired. Request cancelled.');
-      } catch (err) {
-        console.error('Auto cancel error:', err);
-      }
-    }
-  };
-
   // Timer countdown for payment
   useEffect(() => {
     if (showPaymentPopup && paymentTimeLeft > 0) {
@@ -211,44 +196,6 @@ const BuyJToken = () => {
       return () => clearInterval(timer);
     }
   }, [showPaymentPopup, paymentTimeLeft]);
-
-  const handleAutoCancel = async () => {
-    if (request && request.status === 'PAYMENT_STARTED') {
-      try {
-        await jTokenPurchaseAPI.cancel(request.id);
-        setShowPaymentPopup(false);
-        setRequest(null);
-        setPaymentTimeLeft(600);
-        alert('Payment time expired. Request cancelled.');
-      } catch (err) {
-        console.error('Auto cancel error:', err);
-      }
-    }
-  };
-
-  const handleCreate = async () => {
-    if (!amount || parseFloat(amount) < 10) {
-      setMessage('Minimum amount is ₹10');
-      return;
-    }
-    if (!selectedApp) {
-      setMessage('Please select a payment app');
-      return;
-    }
-    
-    setSubmitting(true);
-    try {
-      const res = await jTokenPurchaseAPI.create({ amount: parseFloat(amount), method: selectedApp, upiId: '' });
-      const newRequest = res?.data?.request || res?.request || res?.data || res;
-      setRequest(newRequest);
-      setShowWaitPopup(true);
-      setMessage('');
-    } catch (err) {
-      setMessage(err?.message || 'Failed to create request');
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const handleCancel = async () => {
     if (!window.confirm('Cancel this request?')) return;
