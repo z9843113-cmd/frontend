@@ -328,7 +328,7 @@ const Home = () => {
     const exchangeItems = recentExchanges.map((item) => ({ 
       ...item, 
       entryType: 'exchange',
-      method: item.ratetype === 'BUY' ? 'Buy USDT' : 'Sell USDT'
+      method: item.ratetype === 'GAMING' ? 'Sell USDT' : 'Sell USDT'
     }));
     
     // Only add non-USDT transactions to avoid duplicates
@@ -350,8 +350,7 @@ const Home = () => {
     if (amount < 0) return false;
     if (amount > 0) return true;
     if (item.entryType === 'deposit') return true;
-    if (item.entryType === 'exchange' && item.ratetype === 'BUY') return true;
-    if (item.entryType === 'exchange' && item.ratetype === 'SELL') return false;
+    if (item.entryType === 'exchange') return false; // All exchanges are sells (negative)
     if (item.method === 'REWARD') return true;
     if (item.method === 'USDT_DEPOSIT') return true;
     if (item.method === 'JTOKEN_PURCHASE') return true;
@@ -360,12 +359,15 @@ const Home = () => {
     if (item.type === 'COMMISSION') return true;
     if (item.type === 'SOLD_TOKENS') return true;
     if (item.type === 'TRANSFER') return true;
+    if (item.type === 'USDT_DEPOSIT') return true;
+    if (item.type === 'USDT') return true;
     return false;
   };
 
   const isUSDTTransaction = (item) => {
     return (item.method || '').toUpperCase().includes('USDT') || 
-           (item.type || '').toUpperCase().includes('USDT');
+           (item.type || '').toUpperCase().includes('USDT') ||
+           item.type === 'USDT_DEPOSIT';
   };
 
   console.log('Recent Deposits:', recentDeposits);
@@ -680,22 +682,24 @@ const Home = () => {
                     return (
                       <div key={`${item.id || index}-${item.createdat || index}`} className="flex items-center justify-between rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] p-4">
                         <div className="flex items-center gap-3">
-                          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${isPositive ? 'bg-emerald-500/15 text-emerald-400' : isExchange ? 'bg-blue-500/15 text-blue-400' : 'bg-rose-500/15 text-rose-400'}`}>
-                            {isPositive ? <FaArrowDown className="h-4 w-4" /> : isExchange ? <FaExchangeAlt className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
-                          </div>
-                          <div>
+                           <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${isPositive ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}>
+                             {isPositive ? <FaArrowDown className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
+                           </div>
+                           <div>
                             <p className="text-sm font-semibold text-white">
                               {isExchange 
-                                ? (item.ratetype === 'BUY' ? 'Buy USDT' : 'Sell USDT') 
-                                : item.method || (isDeposit ? 'Deposit' : 'Withdrawal')}
+                                ? 'Sell USDT' 
+                                : item.method === 'USDT_DEPOSIT' || item.type === 'USDT_DEPOSIT' || item.type === 'USDT'
+                                  ? 'USDT Deposit'
+                                  : item.method || (isDeposit ? 'Deposit' : 'Withdrawal')}
                             </p>
                             <p className="text-xs text-gray-500">{item.createdat ? new Date(item.createdat).toLocaleString() : 'Pending time'}</p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className={`text-sm font-bold ${isPositive ? 'text-emerald-400' : isExchange ? 'text-blue-400' : 'text-rose-400'}`}>
-                            {isPositive ? '+' : isExchange ? (item.ratetype === 'BUY' ? '+' : '-') : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(item.amount || 0)}`}
-                          </p>
+                         <div className="text-right">
+                           <p className={`text-sm font-bold ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+                             {isPositive ? '+' : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(Math.abs(item.amount || 0))}`}
+                           </p>
                           <p className={`text-xs font-medium ${item.status === 'APPROVED' ? 'text-emerald-400' : item.status === 'REJECTED' ? 'text-rose-400' : 'text-amber-400'}`}>
                             {item.status === 'APPROVED' ? 'SUCCESS' : item.status === 'REJECTED' ? 'FAILED' : item.status || 'PENDING'}
                           </p>
