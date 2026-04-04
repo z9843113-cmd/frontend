@@ -246,7 +246,8 @@ const Home = () => {
         const accountState = {
           hasUPI: upiData.length > 0,
           hasBank: bankData.length > 0,
-          hasTelegram: !!profileData.telegramId
+          hasTelegram: !!profileData.telegramId,
+          whatsappbound: !!profileData.whatsappnumber
         };
 
         setUserAccountData(accountState);

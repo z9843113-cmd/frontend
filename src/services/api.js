@@ -138,6 +138,7 @@ const userAPI = {
   setPrimaryBank: (data) => authFetch(`${API_BASE}/user/set-primary-bank`, { method: 'POST', body: JSON.stringify(data) }),
   deleteBank: (id) => authFetch(`${API_BASE}/user/bank/${id}`, { method: 'DELETE' }),
   bindMobile: (data) => authFetch(`${API_BASE}/user/bind-mobile`, { method: 'POST', body: JSON.stringify(data) }),
+  bindWhatsApp: (data) => authFetch(`${API_BASE}/user/bind-whatsapp`, { method: 'POST', body: JSON.stringify(data) }),
   bindTelegram: (data) => authFetch(`${API_BASE}/user/bind-telegram`, { method: 'POST', body: JSON.stringify(data) }),
   generateTelegramKey: () => authFetch(`${API_BASE}/user/generate-telegram-key`, { method: 'POST' }),
   setPin: (data) => authFetch(`${API_BASE}/user/set-pin`, { method: 'POST', body: JSON.stringify(data) }),

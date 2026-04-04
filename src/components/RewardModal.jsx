@@ -10,6 +10,7 @@ const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
   const upiRewardAmount = parseFloat(rewardSettings?.upiRewardAmount) || 20;
   const bankRewardAmount = parseFloat(rewardSettings?.bankRewardAmount) || 20;
   const telegramRewardAmount = parseFloat(rewardSettings?.telegramRewardAmount) || 20;
+  const whatsappRewardAmount = 5;
 
   const tasks = [
     {
@@ -25,16 +26,16 @@ const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
       textColor: 'text-green-400'
     },
     {
-      id: 'bank',
-      icon: <FaUniversity className="w-8 h-8" />,
-      title: 'Add Bank Account',
-      description: 'Link your bank for withdrawals',
-      reward: bankRewardAmount,
-      completed: userData?.hasBank || false,
-      path: '/manage-account',
-      color: 'from-blue-500 to-cyan-600',
-      bgColor: 'bg-blue-500/20',
-      textColor: 'text-blue-400'
+      id: 'whatsapp',
+      icon: <span className="w-8 h-8 text-2xl">💬</span>,
+      title: 'Bind WhatsApp',
+      description: 'Enter your WhatsApp number',
+      reward: whatsappRewardAmount,
+      completed: userData?.whatsappbound || false,
+      path: '/profile',
+      color: 'from-green-400 to-emerald-500',
+      bgColor: 'bg-green-400/20',
+      textColor: 'text-green-400'
     },
     {
       id: 'telegram',
@@ -51,7 +52,7 @@ const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
 
   const incompleteTasks = tasks.filter(t => !t.completed);
   const completedTasks = tasks.filter(t => t.completed);
-  const totalReward = upiRewardAmount + bankRewardAmount + telegramRewardAmount;
+  const totalReward = upiRewardAmount + bankRewardAmount + telegramRewardAmount + whatsappRewardAmount;
   const earnedReward = completedTasks.reduce((sum, t) => sum + t.reward, 0);
 
   const handleComplete = (task) => {
