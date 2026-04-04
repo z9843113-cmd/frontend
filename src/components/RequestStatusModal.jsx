@@ -20,15 +20,13 @@ const RequestStatusModal = ({ isOpen, onClose, type, requestId, title }) => {
         
         if (type === 'DEPOSIT') {
           const res = await depositAPI.getHistory();
-          const allDeposits = Array.isArray(res) ? res : (res?.data || []);
-          console.log('Checking deposit status for:', requestId, 'Available:', allDeposits.map(d => ({ id: d.id, status: d.status })));
-          const request = allDeposits.find(d => 
-            d.id === requestId || 
-            String(d.id) === requestId ||
-            String(d.id)?.includes(requestId) ||
-            requestId.includes(String(d.id))
-          );
-          if (request) foundStatus = request.status;
+          const allDeposits = Array.isArray(res) ? res : [];
+          
+          if (allDeposits.length > 0) {
+            const latestDeposit = allDeposits[0];
+            console.log('Latest deposit:', latestDeposit);
+            foundStatus = latestDeposit.status;
+          }
         } else if (type === 'JTOKEN') {
           const res = await walletAPI.getJTokenHistory();
           const request = (res?.data || res || []).find(d => d.id === requestId);
@@ -45,11 +43,18 @@ const RequestStatusModal = ({ isOpen, onClose, type, requestId, title }) => {
         }
         
         if (foundStatus) {
+          console.log('Found status:', foundStatus);
           setStatus(foundStatus);
           
-          if (foundStatus === 'APPROVED') {
-            setTimeout(() => onClose(), 1500);
+          if (foundStatus === 'APPROVED' || foundStatus === 'COMPLETED') {
+            console.log('Status is APPROVED, will close modal');
+            setTimeout(() => {
+              console.log('Calling onClose');
+              onClose();
+            }, 1500);
           }
+        } else {
+          console.log('No status found, still PENDING');
         }
       } catch (error) {
         console.error('Error checking status:', error);
