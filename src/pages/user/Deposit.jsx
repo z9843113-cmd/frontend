@@ -256,10 +256,11 @@ const Deposit = () => {
                 const inrValue = parseFloat(amount) * usdtRate;
                 const commissionAmount = inrValue * (usdtCommission / 100);
                 const afterCommission = inrValue + commissionAmount;
+                const isCryptoMethod = method && (method.includes('USDT') || method.toUpperCase().includes('USDT'));
                 
-                // Calculate discount bonus
+                // Calculate discount bonus - only for INR deposits, not crypto
                 let bonusAmount = 0;
-                if (discountInfo.enabled && discountInfo.available && discountInfo.percent > 0) {
+                if (!isCryptoMethod && discountInfo.enabled && discountInfo.available && discountInfo.percent > 0) {
                   bonusAmount = Math.min(inrValue * (discountInfo.percent / 100), discountInfo.max);
                 }
                 
@@ -275,10 +276,13 @@ const Deposit = () => {
                     ) : (
                       <p className="text-white text-sm font-bold">You will get: ₹{inrValue.toFixed(2)}</p>
                     )}
-                    {bonusAmount > 0 && (
-                      <p className="text-emerald-400 text-sm font-bold">🎉 Bonus: +₹{bonusAmount.toFixed(2)} (20% extra!)</p>
+                    {isCryptoMethod && (
+                      <p className="text-gray-500 text-xs">Note: Bonus applies to INR deposits only</p>
                     )}
-                    {!discountInfo.available && discountInfo.enabled && (
+                    {bonusAmount > 0 && !isCryptoMethod && (
+                      <p className="text-emerald-400 text-sm font-bold">🎉 Bonus: +₹{bonusAmount.toFixed(2)} ({discountInfo.percent}% extra!)</p>
+                    )}
+                    {!discountInfo.available && discountInfo.enabled && !isCryptoMethod && (
                       <p className="text-gray-500 text-xs">Deposit discount already used</p>
                     )}
                   </div>
