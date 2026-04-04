@@ -36,7 +36,12 @@ const Home = () => {
   const [recentWithdrawals, setRecentWithdrawals] = useState([]);
   const [recentExchanges, setRecentExchanges] = useState([]);
   const [recentTransactions, setRecentTransactions] = useState([]);
-  const [userStats, setUserStats] = useState({ todayVolume: 0, totalVolume: 0, todayProfit: 0, totalProfit: 0 });
+  const [userStats, setUserStats] = useState({
+    todayVolume: 0, totalVolume: 0, todayProfit: 0, totalProfit: 0,
+    todayDeposit: 0, todayInrDeposit: 0, todayExchange: 0, todayJtoken: 0,
+    totalDeposit: 0, totalInrDeposit: 0, totalExchange: 0, totalJtoken: 0,
+    todayRewards: 0, todayCommission: 0, totalRewards: 0, totalCommission: 0
+  });
   const [loading, setLoading] = useState(true);
   const [usdtRate, setUsdtRate] = useState(0);
   const [tokenRate, setTokenRate] = useState(0);
@@ -182,6 +187,7 @@ const Home = () => {
           totalRewards: parseFloat(statsData.totalRewards || 0),
           totalCommission: parseFloat(statsData.totalJtokenCommission || 0)
         });
+        console.log('>>> setUserStats called at line 189 with:', statsData);
         setUser(profileData);
         setPaymentEnabled(profileData.paymentEnabled !== false);
         setUsdtCommission(parseFloat(settingsData?.usdtcommissionpercent) || 0);
