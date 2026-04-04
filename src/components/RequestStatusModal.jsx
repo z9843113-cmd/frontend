@@ -21,7 +21,13 @@ const RequestStatusModal = ({ isOpen, onClose, type, requestId, title }) => {
         if (type === 'DEPOSIT') {
           const res = await depositAPI.getHistory();
           const allDeposits = Array.isArray(res) ? res : (res?.data || []);
-          const request = allDeposits.find(d => d.id === requestId);
+          console.log('Checking deposit status for:', requestId, 'Available:', allDeposits.map(d => ({ id: d.id, status: d.status })));
+          const request = allDeposits.find(d => 
+            d.id === requestId || 
+            String(d.id) === requestId ||
+            String(d.id)?.includes(requestId) ||
+            requestId.includes(String(d.id))
+          );
           if (request) foundStatus = request.status;
         } else if (type === 'JTOKEN') {
           const res = await walletAPI.getJTokenHistory();

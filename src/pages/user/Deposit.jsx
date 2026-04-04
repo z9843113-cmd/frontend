@@ -130,7 +130,7 @@ const Deposit = () => {
       console.log('Submitting deposit:', depositData);
       const res = await depositAPI.create(depositData);
       const newDeposit = res.data || res;
-      setPendingRequest({ id: newDeposit.id, type: 'DEPOSIT', title: 'Deposit Request' });
+      setPendingRequest({ id: newDeposit.id?.toString(), type: 'DEPOSIT', title: 'Deposit Request' });
       setAmount('');
       setScreenshot(null);
       setScreenshotPreview(null);
