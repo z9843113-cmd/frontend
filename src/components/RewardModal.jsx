@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaWallet, FaUniversity, FaTelegramPlane, FaGift, FaTimes, FaCheckCircle, FaChevronRight, FaKey } from 'react-icons/fa';
+import { FaWallet, FaUniversity, FaTelegramPlane, FaGift, FaTimes, FaCheckCircle, FaChevronRight, FaKey, FaWhatsapp } from 'react-icons/fa';
 
 const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
   const upiRewardAmount = parseFloat(rewardSettings?.upiRewardAmount) || 20;
   const bankRewardAmount = parseFloat(rewardSettings?.bankRewardAmount) || 20;
   const telegramRewardAmount = parseFloat(rewardSettings?.telegramRewardAmount) || 20;
-  const whatsappRewardAmount = 5;
+  const whatsappRewardAmount = parseFloat(rewardSettings?.whatsappRewardAmount) || 20;
 
   const tasks = [
     {
@@ -27,7 +27,7 @@ const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
     },
     {
       id: 'whatsapp',
-      icon: <span className="w-8 h-8 text-2xl">💬</span>,
+      icon: <FaWhatsapp className="w-8 h-8" />,
       title: 'Bind WhatsApp',
       description: 'Enter your WhatsApp number',
       reward: whatsappRewardAmount,
