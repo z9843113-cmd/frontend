@@ -76,9 +76,20 @@ const Home = () => {
     const actions = ['Bought', 'Deposited', 'Sold', 'Transferred'];
     
     const UsdtIcon = () => (
-      <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12" cy="12" r="12" fill="#26A17B"/>
-        <path d="M12 7.5C9.5 7.5 7.5 9.5 7.5 12c0 2.5 2 4.5 4.5 4.5h3c2.5 0 4.5-2 4.5-4.5 0-2.5-2-4.5-4.5-4.5h-3zm1.5 3h1.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-1.5v-3zm-3 0h1.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5H10.5v-3z" fill="white"/>
+      <svg viewBox="0 0 512 512" className="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="usdtGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#26A17B"/>
+            <stop offset="100%" stopColor="#1A8F6A"/>
+          </linearGradient>
+        </defs>
+        <circle cx="256" cy="256" r="256" fill="url(#usdtGrad)"/>
+        <g fill="#FFFFFF">
+          <rect x="128" y="140" width="256" height="40" rx="8"/>
+          <ellipse cx="256" cy="220" rx="150" ry="45"/>
+          <rect x="230" y="140" width="52" height="220" rx="8"/>
+          <rect x="160" y="330" width="192" height="40" rx="8"/>
+        </g>
       </svg>
     );
     
