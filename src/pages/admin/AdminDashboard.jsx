@@ -39,8 +39,20 @@ const AdminDashboard = () => {
         adminAPI.getWithdrawals({})
       ]);
       
-      const deposits = depositsRes?.data || depositsRes || [];
-      const withdrawals = withdrawalsRes?.data || withdrawalsRes || [];
+      let deposits = [];
+      let withdrawals = [];
+      
+      if (Array.isArray(depositsRes)) {
+        deposits = depositsRes;
+      } else if (depositsRes?.data && Array.isArray(depositsRes.data)) {
+        deposits = depositsRes.data;
+      }
+      
+      if (Array.isArray(withdrawalsRes)) {
+        withdrawals = withdrawalsRes;
+      } else if (withdrawalsRes?.data && Array.isArray(withdrawalsRes.data)) {
+        withdrawals = withdrawalsRes.data;
+      }
       
       const depositByDay = {};
       const withdrawByDay = {};
