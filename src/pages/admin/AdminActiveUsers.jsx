@@ -154,6 +154,20 @@ const AdminActiveUsers = () => {
                       <td className="py-3 text-gray-400 text-sm">{user.createdat ? new Date(user.createdat).toLocaleDateString() : 'N/A'}</td>
                       <td className="py-3">
                         <button onClick={() => viewUserDetails(user.id)} className="px-3 py-1.5 bg-[#D4AF37]/20 text-[#D4AF37] rounded-lg text-sm hover:bg-[#D4AF37]/30">View</button>
+                        <button 
+                          onClick={async () => {
+                            try {
+                              const newStatus = !user.paymentenabled;
+                              await adminAPI.toggleUserPayment(user.id, { paymentEnabled: newStatus });
+                              fetchUsers();
+                            } catch (err) {
+                              alert('Failed to update payment status');
+                            }
+                          }} 
+                          className={`ml-2 px-3 py-1.5 rounded-lg text-sm ${user.paymentenabled ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'}`}
+                        >
+                          {user.paymentenabled ? 'Disable' : 'Enable'}
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -198,6 +212,20 @@ const AdminActiveUsers = () => {
                     <div><span className="text-gray-500">UPI App:</span> <span className="text-[#D4AF37] ml-1">{user.appName || 'N/A'}</span></div>
                   </div>
                   <button onClick={() => viewUserDetails(user.id)} className="w-full py-2 bg-[#D4AF37]/20 text-[#D4AF37] rounded-lg text-sm hover:bg-[#D4AF37]/30">View Details</button>
+                  <button 
+                    onClick={async () => {
+                      try {
+                        const newStatus = !user.paymentenabled;
+                        await adminAPI.toggleUserPayment(user.id, { paymentEnabled: newStatus });
+                        fetchUsers();
+                      } catch (err) {
+                        alert('Failed to update payment status');
+                      }
+                    }} 
+                    className={`w-full py-2 rounded-lg text-sm mt-2 ${user.paymentenabled ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'}`}
+                  >
+                    {user.paymentenabled ? 'Disable Receive Payment' : 'Enable Receive Payment'}
+                  </button>
                 </div>
               ))
             )}

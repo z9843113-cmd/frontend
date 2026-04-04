@@ -204,6 +204,7 @@ const adminAPI = {
   getUsers: (params) => authFetch(`${API_BASE}/admin/users?${new URLSearchParams(params)}`),
   getUserDetails: (userId) => authFetch(`${API_BASE}/admin/user/${userId}`),
   toggleUserBlock: (userId, data) => authFetch(`${API_BASE}/admin/user/${userId}/block`, { method: 'PUT', body: JSON.stringify(data) }),
+  toggleUserPayment: (userId, data) => authFetch(`${API_BASE}/admin/user/${userId}/payment-toggle`, { method: 'PUT', body: JSON.stringify(data) }),
   getDeposits: (params) => authFetch(`${API_BASE}/admin/deposits?${new URLSearchParams(params || {})}`),
   approveDeposit: (depositId) => authFetch(`${API_BASE}/admin/deposit/${depositId}/approve`, { method: 'POST' }),
   rejectDeposit: (depositId) => authFetch(`${API_BASE}/admin/deposit/${depositId}/reject`, { method: 'POST' }),
