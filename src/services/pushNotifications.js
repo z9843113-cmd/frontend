@@ -5,37 +5,70 @@ const pushNotificationService = {
   subscription: null,
   
   async init() {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      console.log('Push notifications not supported');
+    console.log('[Push] Initializing push notifications...');
+    
+    if (!('serviceWorker' in navigator)) {
+      console.log('[Push] Service workers not supported');
+      return;
+    }
+    
+    if (!('PushManager' in window)) {
+      console.log('[Push] PushManager not supported');
       return;
     }
     
     try {
+      console.log('[Push] Requesting notification permission...');
       const permission = await Notification.requestPermission();
+      console.log('[Push] Permission:', permission);
+      
       if (permission !== 'granted') {
-        console.log('Notification permission denied');
+        console.log('[Push] Notification permission not granted:', permission);
         return;
       }
       
+      console.log('[Push] Getting service worker registration...');
       const registration = await navigator.serviceWorker.ready;
+      console.log('[Push] SW ready, checking existing subscription...');
+      
+      const existingSub = await registration.pushManager.getSubscription();
+      if (existingSub) {
+        console.log('[Push] Already subscribed, using existing:', existingSub.endpoint);
+        this.subscription = existingSub;
+        return;
+      }
+      
+      console.log('[Push] Getting VAPID public key...');
+      const publicKey = await this.getPublicKey();
+      if (!publicKey) {
+        console.log('[Push] No public key, cannot subscribe');
+        return;
+      }
+      
+      console.log('[Push] Subscribing to push...');
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(await this.getPublicKey())
+        applicationServerKey: this.urlBase64ToUint8Array(publicKey)
       });
       
+      console.log('[Push] New subscription:', subscription.endpoint);
+      this.subscription = subscription;
+      
       await userAPI.subscribePush(subscription);
-      console.log('Push subscription successful');
+      console.log('[Push] Subscription saved to backend');
     } catch (error) {
-      console.log('Push subscription error:', error);
+      console.log('[Push] Error:', error.message, error);
     }
   },
   
   async getPublicKey() {
     try {
       const res = await userAPI.getPushKey();
-      return res.data?.publicKey || res.publicKey;
+      const key = res.data?.publicKey || res.publicKey;
+      console.log('[Push] Got public key:', key ? 'yes' : 'no');
+      return key;
     } catch (error) {
-      console.log('Error getting push key:', error);
+      console.log('[Push] Error getting push key:', error.message);
       return null;
     }
   },
@@ -60,7 +93,7 @@ const pushNotificationService = {
         await subscription.unsubscribe();
       }
     } catch (error) {
-      console.log('Unsubscribe error:', error);
+      console.log('[Push] Unsubscribe error:', error);
     }
   }
 };

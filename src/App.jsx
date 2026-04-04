@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
+import PushNotificationInit from './components/PushNotificationInit';
 
 import Login from './pages/user/Login';
 import Register from './pages/user/Register';
@@ -45,6 +46,7 @@ const Layout = ({ children }) => {
 function App() {
   return (
     <BrowserRouter>
+      <PushNotificationInit />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
