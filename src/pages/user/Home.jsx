@@ -268,6 +268,7 @@ const Home = () => {
         const [walletRes, settingsRes, statsRes] = await Promise.all([
           walletAPI.getWallet(),
           adminAPI.getSettings().catch(() => ({})),
+          publicAPI.getSettings().catch(() => ({})),
           userAPI.getUserStats().catch(() => ({}))
         ]);
         const walletData = walletRes?.data || walletRes || null;
