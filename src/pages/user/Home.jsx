@@ -403,13 +403,15 @@ const Home = () => {
     if (item.type === 'TRANSFER') return true;
     if (item.type === 'USDT_DEPOSIT') return true;
     if (item.type === 'USDT') return true;
+    if (item.type === 'DEPOSIT_DISCOUNT') return true;
     return false;
   };
 
   const isUSDTTransaction = (item) => {
     return (item.method || '').toUpperCase().includes('USDT') || 
            (item.type || '').toUpperCase().includes('USDT') ||
-           item.type === 'USDT_DEPOSIT';
+           item.type === 'USDT_DEPOSIT' ||
+           item.type === 'DEPOSIT_DISCOUNT';
   };
 
   console.log('Recent Deposits:', recentDeposits);
@@ -825,6 +827,7 @@ const Home = () => {
                       : item.type === 'SOLD_TOKENS' ? 'Sold Tokens'
                       : item.type === 'TRANSFER' ? 'Transfer'
                       : item.type === 'JTOKEN_PURCHASE' ? 'JToken Purchase'
+                      : item.type === 'DEPOSIT_DISCOUNT' ? 'First Deposit Bonus'
                       : item.method || item.type || (isDeposit ? 'Deposit' : 'Withdrawal');
                     
                     return (
