@@ -3,20 +3,89 @@ import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../../services/api';
 import { useAuthStore } from '../../store';
 import AdminNotificationBell from '../../components/AdminNotificationBell';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from 'recharts';
+
+const COLORS = ['#D4AF37', '#10B981', '#F59E0B', '#EF4444', '#3B82F6'];
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [chartData, setChartData] = useState([]);
+  const [depositWithdrawData, setDepositWithdrawData] = useState([]);
   const { logout } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => { 
-    adminAPI.getDashboard()
-      .then(data => setStats(data?.data || data))
-      .catch(console.error)
-      .finally(() => setLoading(false)); 
+    fetchDashboardData();
   }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      const data = await adminAPI.getDashboard();
+      const dashboardData = data?.data || data;
+      setStats(dashboardData);
+      
+      const today = new Date();
+      const last7Days = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        last7Days.push(date.toISOString().split('T')[0]);
+      }
+      
+      const [depositsRes, withdrawalsRes] = await Promise.all([
+        adminAPI.getDeposits({}),
+        adminAPI.getWithdrawals({})
+      ]);
+      
+      const deposits = depositsRes?.data || depositsRes || [];
+      const withdrawals = withdrawalsRes?.data || withdrawalsRes || [];
+      
+      const depositByDay = {};
+      const withdrawByDay = {};
+      
+      last7Days.forEach(day => {
+        depositByDay[day] = 0;
+        withdrawByDay[day] = 0;
+      });
+      
+      deposits.filter(d => d.status === 'APPROVED').forEach(d => {
+        const day = new Date(d.createdat).toISOString().split('T')[0];
+        if (depositByDay[day] !== undefined) {
+          depositByDay[day] += parseFloat(d.amount || 0);
+        }
+      });
+      
+      withdrawals.filter(w => w.status === 'APPROVED').forEach(w => {
+        const day = new Date(w.createdat).toISOString().split('T')[0];
+        if (withdrawByDay[day] !== undefined) {
+          withdrawByDay[day] += parseFloat(w.amount || 0);
+        }
+      });
+      
+      const chartDataFormatted = last7Days.map(day => ({
+        date: new Date(day).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        deposits: Math.round(depositByDay[day]),
+        withdrawals: Math.round(withdrawByDay[day])
+      }));
+      
+      setChartData(chartDataFormatted);
+      
+      const totalApprovedDeposits = deposits.filter(d => d.status === 'APPROVED').reduce((sum, d) => sum + parseFloat(d.amount || 0), 0);
+      const totalApprovedWithdrawals = withdrawals.filter(w => w.status === 'APPROVED').reduce((sum, w) => sum + parseFloat(w.amount || 0), 0);
+      
+      setDepositWithdrawData([
+        { name: 'Deposits', value: totalApprovedDeposits, color: '#10B981' },
+        { name: 'Withdrawals', value: totalApprovedWithdrawals, color: '#EF4444' }
+      ]);
+      
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const menuItems = [
     { icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v-6a1 1 0 00-1-1h-3m-9 16v2a1 1 0 001 1h2', label: 'Home', path: '/admin/dashboard' },
@@ -141,6 +210,58 @@ const AdminDashboard = () => {
             <p className="text-3xl font-bold text-red-400">₹{parseFloat(stats?.totalWithdrawals || 0).toFixed(2)}</p>
           </div>
         </div>
+
+        {chartData.length > 0 && (
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
+            <h3 className="text-white font-bold mb-4">Last 7 Days - Deposits vs Withdrawals</h3>
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+                  <XAxis dataKey="date" stroke="#6b7280" fontSize={12} />
+                  <YAxis stroke="#6b7280" fontSize={12} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '12px' }}
+                    labelStyle={{ color: '#fff' }}
+                  />
+                  <Legend />
+                  <Bar dataKey="deposits" name="Deposits" fill="#10B981" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="withdrawals" name="Withdrawals" fill="#EF4444" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
+
+        {depositWithdrawData.length > 0 && depositWithdrawData[0].value + depositWithdrawData[1].value > 0 && (
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
+            <h3 className="text-white font-bold mb-4">Deposits vs Withdrawals Distribution</h3>
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={depositWithdrawData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                  >
+                    {depositWithdrawData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '12px' }}
+                    formatter={(value) => `₹${value.toFixed(2)}`}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
 
         <div className="rounded-3xl border border-[#3a3020] bg-[radial-gradient(circle_at_top_left,_rgba(212,175,55,0.16),_transparent_35%),linear-gradient(135deg,#171717_0%,#101010_60%,#090909_100%)] p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
