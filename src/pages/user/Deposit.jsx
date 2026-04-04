@@ -131,6 +131,20 @@ const Deposit = () => {
       const res = await depositAPI.create(depositData);
       const newDeposit = res.data || res;
       setPendingRequest({ id: newDeposit.id?.toString(), type: 'DEPOSIT', title: 'Deposit Request' });
+      
+      // Refresh discount status after deposit
+      userAPI.getDiscountStatus().then((res) => {
+        const data = res?.data || res || {};
+        const deposit = data.deposit || {};
+        setDiscountInfo({
+          enabled: deposit.enabled || false,
+          percent: deposit.percent || 0,
+          max: deposit.max || 0,
+          available: deposit.available || false,
+          uses: deposit.uses || 0
+        });
+      }).catch(console.error);
+      
       setAmount('');
       setScreenshot(null);
       setScreenshotPreview(null);
