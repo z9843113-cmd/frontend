@@ -364,16 +364,16 @@ const Home = () => {
 
   const getTodayVolume = () => userStats.todayVolume || 0;
   const getTotalVolume = () => userStats.totalVolume || 0;
-  const getTodayDeposit = () => parseFloat(userStats.todayDeposit || 0);
+  const getTodayDeposit = () => { const v = parseFloat(userStats.todayDeposit || 0); console.log('>>> getTodayDeposit:', v, 'userStats:', userStats); return v; };
   const getTodayInrDeposit = () => parseFloat(userStats.todayInrDeposit || 0);
-  const getTodayExchange = () => parseFloat(userStats.todayExchange || 0);
-  const getTodayJtoken = () => parseFloat(userStats.todayJtoken || 0);
-  const getTotalDeposit = () => parseFloat(userStats.totalDeposit || 0);
+  const getTodayExchange = () => { const v = parseFloat(userStats.todayExchange || 0); console.log('>>> getTodayExchange:', v); return v; };
+  const getTodayJtoken = () => { const v = parseFloat(userStats.todayJtoken || 0); console.log('>>> getTodayJtoken:', v); return v; };
+  const getTotalDeposit = () => { const v = parseFloat(userStats.totalDeposit || 0); console.log('>>> getTotalDeposit:', v); return v; };
   const getTotalInrDeposit = () => parseFloat(userStats.totalInrDeposit || 0);
-  const getTotalExchange = () => parseFloat(userStats.totalExchange || 0);
-  const getTotalJtoken = () => parseFloat(userStats.totalJtoken || 0);
-  const getTodayRewards = () => userStats.todayRewards || 0;
-  const getTodayCommission = () => userStats.todayCommission || 0;
+  const getTotalExchange = () => { const v = parseFloat(userStats.totalExchange || 0); console.log('>>> getTotalExchange:', v); return v; };
+  const getTotalJtoken = () => { const v = parseFloat(userStats.totalJtoken || 0); console.log('>>> getTotalJtoken:', v); return v; };
+  const getTodayRewards = () => { const v = userStats.todayRewards || 0; console.log('>>> getTodayRewards:', v); return v; };
+  const getTodayCommission = () => { const v = userStats.todayCommission || 0; console.log('>>> getTodayCommission:', v); return v; };
   const getTotalRewards = () => userStats.totalRewards || 0;
   const getTotalCommission = () => userStats.totalCommission || 0;
 
@@ -698,15 +698,15 @@ const Home = () => {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-400 text-sm">Deposits:</span>
-              <span className="text-white font-medium">{getTodayDeposit().toFixed(6)} USDT</span>
+              <span className="text-white font-medium" style={{color: '#10b981'}}>{getTodayDeposit().toFixed(6)} USDT</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400 text-sm">Exchange:</span>
-              <span className="text-white font-medium">{getTodayExchange().toFixed(6)} USDT</span>
+              <span className="text-white font-medium" style={{color: '#10b981'}}>{getTodayExchange().toFixed(6)} USDT</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400 text-sm">J-Token:</span>
-              <span className="text-white font-medium">₹{formatINR(getTodayJtoken())}</span>
+              <span className="text-white font-medium" style={{color: '#10b981'}}>₹{formatINR(getTodayJtoken())}</span>
             </div>
           </div>
         </div>
