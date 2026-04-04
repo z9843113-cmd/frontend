@@ -277,11 +277,11 @@ const Home = () => {
     const timeoutId = setTimeout(loadHome, 0);
     const intervalId = setInterval(async () => {
       try {
-        const [walletRes, settingsRes, statsRes] = await Promise.all([
+        const [walletRes, adminSettingsRes, publicSettingsRes, statsRes] = await Promise.all([
           walletAPI.getWallet(),
           adminAPI.getSettings().catch(() => ({})),
           publicAPI.getSettings().catch(() => ({})),
-          userAPI.getUserStats().catch(() => ({}))
+          userAPI.getUserStats().catch(() => ({ data: {} }))
         ]);
         const walletData = walletRes?.data || walletRes || null;
         setWallet(walletData);
@@ -290,12 +290,15 @@ const Home = () => {
         } else if (walletData?.usdtrate) {
           setUsdtRate(parseFloat(walletData.usdtrate));
         }
-        const settingsData = settingsRes?.data || settingsRes || {};
+        const adminSettingsData = adminSettingsRes?.data || adminSettingsRes || {};
+        const publicSettingsData = publicSettingsRes?.data || publicSettingsRes || {};
+        const settingsData = { ...adminSettingsData, ...publicSettingsData };
         if (settingsData?.usdtrate && !walletData?.usdtRate) {
           setUsdtRate(parseFloat(settingsData.usdtrate));
         }
         // Update stats in real-time
         const statsData = statsRes?.data || statsRes || {};
+        console.log('>>> Interval statsData:', statsData);
         setUserStats({
           todayDeposit: parseFloat(statsData.todayDeposit || 0),
           todayInrDeposit: parseFloat(statsData.todayInrDeposit || 0),
