@@ -3,6 +3,7 @@ import { userAPI } from '../services/api';
 
 const pushNotificationService = {
   subscription: null,
+  retryCount: 0,
   
   async init() {
     console.log('[Push] Initializing push notifications...');
@@ -27,14 +28,28 @@ const pushNotificationService = {
         return;
       }
       
-      console.log('[Push] Getting service worker registration...');
-      const registration = await navigator.serviceWorker.ready;
-      console.log('[Push] SW ready, checking existing subscription...');
+      console.log('[Push] Registering service worker...');
+      const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+      console.log('[Push] SW registered:', registration.scope);
       
-      const existingSub = await registration.pushManager.getSubscription();
-      if (existingSub) {
-        console.log('[Push] Already subscribed, using existing:', existingSub.endpoint);
-        this.subscription = existingSub;
+      console.log('[Push] Waiting for SW to be ready...');
+      await navigator.serviceWorker.ready;
+      console.log('[Push] SW is ready');
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      console.log('[Push] Getting existing subscription...');
+      let subscription = await registration.pushManager.getSubscription();
+      
+      if (subscription) {
+        console.log('[Push] Already subscribed:', subscription.endpoint);
+        this.subscription = subscription;
+        try {
+          await userAPI.subscribePush(subscription);
+          console.log('[Push] Existing subscription saved to backend');
+        } catch (e) {
+          console.log('[Push] Could not save existing sub:', e.message);
+        }
         return;
       }
       
@@ -45,11 +60,31 @@ const pushNotificationService = {
         return;
       }
       
-      console.log('[Push] Subscribing to push...');
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(publicKey)
-      });
+      console.log('[Push] Subscribing to push with key...');
+      console.log('[Push] VAPID key length:', publicKey.length);
+      
+      try {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: this.urlBase64ToUint8Array(publicKey)
+        });
+        console.log('[Push] Subscription successful:', subscription.endpoint);
+      } catch (subError) {
+        console.log('[Push] Subscribe error:', subError.name, subError.message);
+        
+        if (this.retryCount < 2) {
+          this.retryCount++;
+          console.log('[Push] Retrying...', this.retryCount);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: this.urlBase64ToUint8Array(publicKey)
+          });
+        } else {
+          console.log('[Push] All retries failed, giving up');
+          return;
+        }
+      }
       
       console.log('[Push] New subscription:', subscription.endpoint);
       this.subscription = subscription;
@@ -57,7 +92,10 @@ const pushNotificationService = {
       await userAPI.subscribePush(subscription);
       console.log('[Push] Subscription saved to backend');
     } catch (error) {
-      console.log('[Push] Error:', error.message, error);
+      console.log('[Push] Final Error:', error.name, error.message);
+      if (error.name === 'AbortError') {
+        console.log('[Push] Push service not available on this device/browser');
+      }
     }
   },
   
