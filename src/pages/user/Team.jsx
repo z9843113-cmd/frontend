@@ -228,7 +228,7 @@ const Team = () => {
               <p className="text-gray-400 text-xs sm:text-sm">Referral Earnings</p>
             </div>
             <p className="text-xl sm:text-2xl md:text-3xl font-bold text-[#D4AF37] mb-2 sm:mb-3">
-              ₹{formatINR(walletData?.referralBalance || 0)}
+              ₹{formatINR(teamData?.totalEarnings || walletData?.referralBalance || 0)}
             </p>
           </div>
 
