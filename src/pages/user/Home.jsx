@@ -185,7 +185,8 @@ const Home = () => {
         setRewardSettings({
           upiRewardAmount: parseFloat(settingsData?.upirewardamount) || 20,
           bankRewardAmount: parseFloat(settingsData?.bankrewardamount) || 20,
-          telegramRewardAmount: parseFloat(settingsData?.telegramrewardamount) || 20
+          telegramRewardAmount: parseFloat(settingsData?.telegramrewardamount) || 20,
+          whatsappRewardAmount: parseFloat(settingsData?.whatsapprewardamount) || 20
         });
         
         console.log('Settings Data:', settingsData);
