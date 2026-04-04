@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../../services/api';
 import { useAuthStore } from '../../store';
+import pushNotificationService from '../../services/pushNotifications';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -36,6 +37,8 @@ const Login = () => {
       } else {
         navigate('/home');
       }
+      
+      pushNotificationService.init();
     } catch (err) {
       setError(err.response?.data?.error || err.message || 'Invalid credentials');
     } finally {

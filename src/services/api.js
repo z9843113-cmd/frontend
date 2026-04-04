@@ -152,7 +152,10 @@ const userAPI = {
   getUserStats: () => authFetch(`${API_BASE}/user/stats`),
   getJTokenApps: () => authFetch(`${API_BASE}/user/jtoken-apps`),
   getPaymentApps: () => authFetch(`${API_BASE}/user/payment-apps`),
-  getDiscountStatus: () => authFetch(`${API_BASE}/user/discount-status`)
+  getDiscountStatus: () => authFetch(`${API_BASE}/user/discount-status`),
+  getPushKey: () => authFetch(`${API_BASE}/user/push-key`),
+  subscribePush: (subscription) => authFetch(`${API_BASE}/user/push-subscribe`, { method: 'POST', body: JSON.stringify({ subscription }) }),
+  unsubscribePush: () => authFetch(`${API_BASE}/user/push-unsubscribe`, { method: 'POST' })
 };
 
 const walletAPI = { 
