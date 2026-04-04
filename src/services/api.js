@@ -236,7 +236,11 @@ const adminAPI = {
   getExchangeRequests: (params) => authFetch(`${API_BASE}/admin/exchange-requests?${new URLSearchParams(params || {})}`),
   approveExchangeRequest: (requestId) => authFetch(`${API_BASE}/admin/exchange-request/${requestId}/approve`, { method: 'POST' }),
   rejectExchangeRequest: (requestId, data) => authFetch(`${API_BASE}/admin/exchange-request/${requestId}/reject`, { method: 'POST', body: JSON.stringify(data || {}) }),
-  resetDatabase: (adminPassword, confirmPassword) => authFetch(`${API_BASE}/admin/reset-non-admins`, { method: 'POST', body: JSON.stringify({ adminPassword, confirmPassword }) })
+  resetDatabase: (adminPassword, confirmPassword) => authFetch(`${API_BASE}/admin/reset-non-admins`, { method: 'POST', body: JSON.stringify({ adminPassword, confirmPassword }) }),
+  getSubadmins: () => authFetch(`${API_BASE}/subadmin`),
+  createSubadmin: (data) => authFetch(`${API_BASE}/subadmin`, { method: 'POST', body: JSON.stringify(data) }),
+  updateSubadmin: (subadminId, data) => authFetch(`${API_BASE}/subadmin/${subadminId}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteSubadmin: (subadminId) => authFetch(`${API_BASE}/subadmin/${subadminId}`, { method: 'DELETE' })
 };
 
 export { authAPI, userAPI, walletAPI, depositAPI, withdrawalAPI, referralAPI, jTokenPurchaseAPI, publicAPI, adminAPI, uploadToCloudinary };

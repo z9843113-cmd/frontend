@@ -172,9 +172,9 @@ const Home = () => {
           totalExchange: parseFloat(statsData.totalExchange || 0),
           totalJtoken: parseFloat(statsData.totalJtoken || 0),
           todayRewards: parseFloat(statsData.todayRewards || 0),
-          todayCommission: parseFloat(statsData.todayCommission || 0),
+          todayCommission: parseFloat(statsData.todayJtokenCommission || 0),
           totalRewards: parseFloat(statsData.totalRewards || 0),
-          totalCommission: parseFloat(statsData.totalCommission || 0)
+          totalCommission: parseFloat(statsData.totalJtokenCommission || 0)
         });
         setUser(profileData);
         setPaymentEnabled(profileData.paymentEnabled !== false);
@@ -293,9 +293,9 @@ const Home = () => {
           totalExchange: parseFloat(statsData.totalExchange || 0),
           totalJtoken: parseFloat(statsData.totalJtoken || 0),
           todayRewards: parseFloat(statsData.todayRewards || 0),
-          todayCommission: parseFloat(statsData.todayCommission || 0),
+          todayCommission: parseFloat(statsData.todayJtokenCommission || 0),
           totalRewards: parseFloat(statsData.totalRewards || 0),
-          totalCommission: parseFloat(statsData.totalCommission || 0)
+          totalCommission: parseFloat(statsData.totalJtokenCommission || 0)
         });
       } catch (error) {
         console.error('Failed to refresh data', error);
