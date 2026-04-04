@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../../services/api';
 import { useAuthStore } from '../../store';
 import AdminNotificationBell from '../../components/AdminNotificationBell';
-import { FaSearch, FaFilter, FaHistory, FaArrowLeft, FaArrowRight, FaExchangeAlt, FaCoins, FaGift, FaArrowDown, FaArrowUp, FaUser, FaCheckCircle, FaClock, FaTimesCircle } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaHistory, FaArrowLeft, FaArrowRight, FaExchangeAlt, FaCoins, FaGift, FaArrowDown, FaArrowUp, FaUser, FaCheckCircle, FaClock, FaTimesCircle, FaCopy } from 'react-icons/fa';
 
 const AdminJTokenHistory = () => {
   const [history, setHistory] = useState([]);
@@ -241,7 +241,20 @@ const AdminJTokenHistory = () => {
                           </span>
                           {orderId !== 'N/A' && (
                             <span className="flex items-center gap-1 text-[#D4AF37]">
-                              <span className="font-mono">#{orderId}</span>
+                              <span 
+                                className="font-mono cursor-pointer hover:text-[#FFD700]" 
+                                onClick={() => { navigator.clipboard.writeText(orderId); }}
+                                title="Click to copy"
+                              >
+                                #{orderId}
+                              </span>
+                              <button 
+                                onClick={() => { navigator.clipboard.writeText(orderId); }} 
+                                className="p-1 hover:text-[#FFD700]"
+                                title="Copy order ID"
+                              >
+                                <FaCopy className="w-3 h-3" />
+                              </button>
                             </span>
                           )}
                         </div>

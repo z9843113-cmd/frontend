@@ -125,6 +125,10 @@ const AdminUsers = () => {
                       <p className="text-white font-medium">{userDetails.user?.mobile || 'Not set'}</p>
                     </div>
                     <div className="bg-[#0a0a0a] rounded-xl p-3">
+                      <p className="text-gray-500 text-xs">WhatsApp</p>
+                      <p className="text-white font-medium">{userDetails.user?.whatsappnumber || 'Not set'}</p>
+                    </div>
+                    <div className="bg-[#0a0a0a] rounded-xl p-3">
                       <p className="text-gray-500 text-xs">Referral Code</p>
                       <p className="text-[#D4AF37] font-mono font-bold">{userDetails.user?.referralcode}</p>
                     </div>
