@@ -118,7 +118,7 @@ const Home = () => {
   useEffect(() => {
     const loadHome = async () => {
       try {
-        const [walletRes, depositsRes, withdrawalsRes, profileRes, upiRes, bankRes, ratesRes, settingsRes, statsRes, exchangeRes, transactionsRes] = await Promise.all([
+        const [walletRes, depositsRes, withdrawalsRes, profileRes, upiRes, bankRes, ratesRes, adminSettingsRes, publicSettingsRes, statsRes, exchangeRes, transactionsRes] = await Promise.all([
           walletAPI.getWallet(),
           depositAPI.getHistory(),
           withdrawalAPI.getHistory(),
@@ -126,7 +126,8 @@ const Home = () => {
           userAPI.getUpiAccounts(),
           userAPI.getBankAccounts ? userAPI.getBankAccounts() : Promise.resolve({ data: [] }),
           publicAPI.getCryptoRates(),
-          adminAPI.getSettings(),
+          adminAPI.getSettings().catch(() => ({})),
+          publicAPI.getSettings().catch(() => ({})),
           userAPI.getUserStats().catch(() => ({ data: {} })),
           userAPI.getMyExchangeRequests().catch(() => ({ data: [] })),
           userAPI.getTransactions().catch(() => [])
@@ -141,12 +142,17 @@ const Home = () => {
         const upiData = upiRes?.data || upiRes || [];
         const bankData = bankRes?.data || bankRes || [];
         const ratesData = ratesRes?.data || ratesRes || [];
-        const settingsData = settingsRes?.data || settingsRes || {};
-        console.log('Settings Response:', settingsRes);
+        const adminSettingsData = adminSettingsRes?.data || adminSettingsRes || {};
+        const publicSettingsData = publicSettingsRes?.data || publicSettingsRes || {};
+        const settingsData = { ...adminSettingsData, ...publicSettingsData };
+        console.log('Admin Settings Response:', adminSettingsRes);
+        console.log('Public Settings Response:', publicSettingsRes);
         console.log('Settings Data for banner:', settingsData);
         console.log('Banner enabled value:', settingsData.bannerenabled);
         console.log('Banner title value:', settingsData.bannertitle);
         const statsData = statsRes?.data || statsRes || {};
+        console.log('STATS Response:', statsRes);
+        console.log('STATS Data:', statsData);
         const tether = Array.isArray(ratesData) ? ratesData.find((rate) => rate.id === 'tether') : null;
 
         console.log('Banner data from settings:', {
