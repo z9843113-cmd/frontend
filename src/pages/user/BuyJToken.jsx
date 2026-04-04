@@ -600,7 +600,7 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
             <div className="animate-spin w-16 h-16 border-4 border-[#D4AF37] border-t-transparent rounded-full mx-auto mb-6"></div>
             <h3 className="text-white font-bold text-xl mb-2">Wait for Order</h3>
             <p className="text-gray-400 text-sm">Payment details will be received soon</p>
-            <p className="text-gray-500 text-xs mt-4">Please wait while admin assigns payment details...</p>
+            
             <button onClick={() => { setShowWaitPopup(false); setRequest(null); }} className="mt-6 text-gray-500 text-sm hover:text-white">
               Cancel Request
             </button>
