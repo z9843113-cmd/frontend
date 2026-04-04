@@ -223,6 +223,17 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-sm mb-2">Total USDT Deposits</p>
+            <p className="text-3xl font-bold text-emerald-400">${parseFloat(stats?.totalUsdtDeposits || 0).toFixed(2)}</p>
+          </div>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-sm mb-2">Total Exchanges</p>
+            <p className="text-3xl font-bold text-cyan-400">₹{parseFloat(stats?.totalExchanges || 0).toFixed(2)}</p>
+          </div>
+        </div>
+
         {chartData.length > 0 && (
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
             <h3 className="text-white font-bold mb-4">Last 7 Days - Deposits vs Withdrawals</h3>
