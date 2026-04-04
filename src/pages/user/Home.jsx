@@ -76,9 +76,9 @@ const Home = () => {
     const actions = ['Bought', 'Deposited', 'Sold', 'Transferred'];
     
     const UsdtIcon = () => (
-      <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12" cy="12" r="10" fill="#10B981"/>
-        <path d="M12 6v12M9 9h2a3 3 0 110 6M9 15h2a3 3 0 110-6" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+      <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="12" fill="#26A17B"/>
+        <path d="M12 7.5C9.5 7.5 7.5 9.5 7.5 12c0 2.5 2 4.5 4.5 4.5h3c2.5 0 4.5-2 4.5-4.5 0-2.5-2-4.5-4.5-4.5h-3zm1.5 3h1.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-1.5v-3zm-3 0h1.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5H10.5v-3z" fill="white"/>
       </svg>
     );
     
