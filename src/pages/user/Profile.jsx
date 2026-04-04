@@ -613,7 +613,7 @@ const Profile = () => {
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-bold text-white mb-1">{user?.name || 'User'}</h3>
-              <p className="text-gray-400 text-sm">{user?.email}</p>
+              <p className="text-gray-400 text-sm">{user?.email ? user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3') : ''}</p>
               {user?.id && (
                 <div className="flex items-center gap-2 mt-2">
                   <p className="text-gray-500 text-xs font-mono">{user.id.slice(0, 8)}...</p>
