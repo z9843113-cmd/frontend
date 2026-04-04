@@ -230,7 +230,7 @@ const AdminDashboard = () => {
           </div>
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
             <p className="text-gray-400 text-sm mb-2">Total Exchanges</p>
-            <p className="text-3xl font-bold text-cyan-400">₹{parseFloat(stats?.totalExchanges || 0).toFixed(2)}</p>
+            <p className="text-3xl font-bold text-cyan-400">${parseFloat(stats?.totalExchanges || 0).toFixed(2)}</p>
           </div>
         </div>
 
