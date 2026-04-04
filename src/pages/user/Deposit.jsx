@@ -253,37 +253,31 @@ const Deposit = () => {
                 required
               />
               {amount && (() => {
-                const inrValue = parseFloat(amount) * usdtRate;
-                const commissionAmount = inrValue * (usdtCommission / 100);
-                const afterCommission = inrValue + commissionAmount;
-                const isCryptoMethod = method && (method.includes('USDT') || method.toUpperCase().includes('USDT'));
+                const usdtAmount = parseFloat(amount);
+                const commissionAmount = usdtAmount * (usdtCommission / 100);
+                const afterCommission = usdtAmount + commissionAmount;
                 
-                // Calculate discount bonus - only for INR deposits, not crypto
+                // Calculate discount bonus - first time users get bonus in USDT
                 let bonusAmount = 0;
-                if (!isCryptoMethod && discountInfo.enabled && discountInfo.available && discountInfo.percent > 0) {
-                  bonusAmount = Math.min(inrValue * (discountInfo.percent / 100), discountInfo.max);
+                if (discountInfo.enabled && discountInfo.available && discountInfo.percent > 0) {
+                  bonusAmount = Math.min(usdtAmount * (discountInfo.percent / 100), discountInfo.max);
                 }
                 
                 return (
                   <div className="mt-2 space-y-1 bg-[#0a0a0a] p-3 rounded-xl border border-[#2a2a2a]">
-                    <p className="text-gray-400 text-xs">Exchange Rate: ₹{usdtRate}/USDT</p>
-                    <p className="text-green-400 text-sm font-medium">Total: ₹{inrValue.toFixed(2)} INR</p>
                     {usdtCommission > 0 ? (
                       <>
-                        <p className="text-yellow-400 text-xs">Commission ({usdtCommission}%): +₹{commissionAmount.toFixed(2)}</p>
-                        <p className="text-white text-sm font-bold">You will get: ₹{afterCommission.toFixed(2)}</p>
+                        <p className="text-yellow-400 text-xs">Commission ({usdtCommission}%): +{commissionAmount.toFixed(4)} USDT</p>
+                        <p className="text-white text-sm font-bold">You will get: {afterCommission.toFixed(4)} USDT</p>
                       </>
                     ) : (
-                      <p className="text-white text-sm font-bold">You will get: ₹{inrValue.toFixed(2)}</p>
+                      <p className="text-white text-sm font-bold">You will get: {usdtAmount.toFixed(4)} USDT</p>
                     )}
-                    {isCryptoMethod && (
-                      <p className="text-gray-500 text-xs">Note: Bonus applies to INR deposits only</p>
+                    {bonusAmount > 0 && (
+                      <p className="text-emerald-400 text-sm font-bold">🎉 Bonus: +{bonusAmount.toFixed(4)} USDT ({discountInfo.percent}% extra!)</p>
                     )}
-                    {bonusAmount > 0 && !isCryptoMethod && (
-                      <p className="text-emerald-400 text-sm font-bold">🎉 Bonus: +₹{bonusAmount.toFixed(2)} ({discountInfo.percent}% extra!)</p>
-                    )}
-                    {!discountInfo.available && discountInfo.enabled && !isCryptoMethod && (
-                      <p className="text-gray-500 text-xs">Deposit discount already used</p>
+                    {!discountInfo.available && discountInfo.enabled && (
+                      <p className="text-gray-500 text-xs">Deposit bonus already used</p>
                     )}
                   </div>
                 );
