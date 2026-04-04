@@ -248,27 +248,32 @@ const AdminJTokenHistory = () => {
                       </div>
                       
                         <div className="flex lg:flex-col gap-4 lg:min-w-[180px]">
-                        <div className="flex-1 rounded-2xl bg-[#0d0d0d] p-4 text-center">
-                          <p className="text-xs text-gray-500 mb-1">
-                            {(entry.itemtype || entry.type)?.includes('JTOKEN') ? 'J Token' : 'Amount'}
-                          </p>
-                          <p className={`text-xl font-bold ${
-                            (entry.itemtype || entry.type) === 'USDT_DEPOSIT' || (entry.itemtype || entry.type) === 'EXCHANGE' ? 'text-emerald-400' :
-                            (entry.itemtype || entry.type)?.includes('JTOKEN') ? 'text-violet-400' : 'text-emerald-400'
-                          }`}>
-                            {(entry.itemtype || entry.type) === 'USDT_DEPOSIT' || (entry.itemtype || entry.type) === 'EXCHANGE'
-                              ? `$${parseFloat(entry.amount || 0).toFixed(2)}`
-                              : (entry.itemtype || entry.type)?.includes('JTOKEN') 
-                                ? `${parseFloat(entry.tokenamount || 0).toFixed(2)} J`
+                          <div className="flex-1 rounded-2xl bg-[#0d0d0d] p-4 text-center">
+                            <p className="text-xs text-gray-500 mb-1">
+                              {(entry.itemtype || entry.type)?.includes('JTOKEN') ? 'J Token' : 'Amount'}
+                            </p>
+                            <p className={`text-xl font-bold ${
+                              (entry.itemtype || entry.type) === 'USDT_DEPOSIT' || (entry.itemtype || entry.type) === 'EXCHANGE' ? 'text-emerald-400' :
+                              (entry.itemtype || entry.type)?.includes('JTOKEN') ? 'text-violet-400' : 'text-emerald-400'
+                            }`}>
+                              {(entry.itemtype || entry.type) === 'USDT_DEPOSIT' || (entry.itemtype || entry.type) === 'EXCHANGE'
+                                ? `$${parseFloat(entry.amount || 0).toFixed(2)}`
                                 : `₹${parseFloat(entry.amount || 0).toFixed(2)}`
-                            }
-                          </p>
+                              }
+                            </p>
+                          </div>
+                          <div className="flex-1 rounded-2xl bg-[#0d0d0d] p-4 text-center">
+                            <p className="text-xs text-gray-500 mb-1">
+                              {(entry.itemtype || entry.type)?.includes('JTOKEN') ? 'J Token' : 'INR Value'}
+                            </p>
+                            <p className="text-xl font-bold text-[#D4AF37]">
+                              {(entry.itemtype || entry.type)?.includes('JTOKEN')
+                                ? `${parseFloat(entry.tokenamount || 0).toFixed(2)} J`
+                                : `₹${parseFloat(entry.inrvalue || entry.amount || 0).toFixed(2)}`
+                              }
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex-1 rounded-2xl bg-[#0d0d0d] p-4 text-center">
-                          <p className="text-xs text-gray-500 mb-1">INR Value</p>
-                          <p className="text-xl font-bold text-[#D4AF37]">₹{parseFloat(entry.inrvalue || entry.amount || 0).toFixed(2)}</p>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 );
