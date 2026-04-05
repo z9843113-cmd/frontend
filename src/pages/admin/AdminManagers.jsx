@@ -76,7 +76,7 @@ const AdminManagers = () => {
     try {
       const data = { name: editData.name };
       if (editData.password) data.password = editData.password;
-      await adminAPI.updateSubadmin(editData.id, data);
+      await adminAPI.updateManager(editData.id, data);
       setMessage('Manager updated successfully!');
       fetchManagers();
       setTimeout(() => { setShowEditModal(false); setMessage(''); }, 1500);
@@ -90,7 +90,7 @@ const AdminManagers = () => {
     if (!window.confirm('Are you sure you want to delete this manager?')) return;
     setDeleting(managerId);
     try {
-      await adminAPI.deleteSubadmin(managerId);
+      await adminAPI.deleteManager(managerId);
       fetchManagers();
     } catch (e) {
       alert(e.response?.data?.error || 'Failed to delete manager');

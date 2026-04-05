@@ -244,6 +244,8 @@ const adminAPI = {
   deleteSubadmin: (subadminId) => authFetch(`${API_BASE}/subadmin/${subadminId}`, { method: 'DELETE' }),
   getManagers: () => authFetch(`${API_BASE}/managers`),
   createManager: (data) => authFetch(`${API_BASE}/create-manager`, { method: 'POST', body: JSON.stringify(data) }),
+  updateManager: (id, data) => authFetch(`${API_BASE}/managers/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteManager: (id) => authFetch(`${API_BASE}/managers/${id}`, { method: 'DELETE' }),
   getReferralsByCode: (code) => authFetch(`${API_BASE}/referrals/${code}`),
   getManagerStats: () => authFetch(`${API_BASE}/user/manager-stats`)
 };
