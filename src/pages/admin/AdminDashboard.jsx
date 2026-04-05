@@ -206,43 +206,43 @@ const AdminDashboard = () => {
       </div>
 
       <div className="p-5 space-y-5 max-w-2xl mx-auto lg:ml-80 pb-24">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">Total Users</p>
-            <p className="text-3xl font-bold text-white">{stats?.totalUsers || 0}</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Users</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white min-w-0 truncate">{stats?.totalUsers || 0}</p>
           </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">Verified Users</p>
-            <p className="text-3xl font-bold text-green-400">{stats?.verifiedUsers || 0}</p>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Verified Users</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-400 min-w-0 truncate">{stats?.verifiedUsers || 0}</p>
           </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">Pending Deposits</p>
-            <p className="text-3xl font-bold text-yellow-400">{stats?.pendingDeposits || 0}</p>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Pending Deposits</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-400 min-w-0 truncate">{stats?.pendingDeposits || 0}</p>
           </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">Pending Withdrawals</p>
-            <p className="text-3xl font-bold text-yellow-400">{stats?.pendingWithdrawals || 0}</p>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Pending Withdrawals</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-400 min-w-0 truncate">{stats?.pendingWithdrawals || 0}</p>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">Total Deposits</p>
-            <p className="text-3xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent">₹{parseFloat(stats?.totalDeposits || 0).toFixed(2)}</p>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Deposits</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent min-w-0 truncate">₹{parseFloat(stats?.totalDeposits || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">Total Withdrawals</p>
-            <p className="text-3xl font-bold text-red-400">₹{parseFloat(stats?.totalWithdrawals || 0).toFixed(2)}</p>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Withdrawals</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-red-400 min-w-0 truncate">₹{parseFloat(stats?.totalWithdrawals || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">Total USDT Deposits</p>
-            <p className="text-3xl font-bold text-emerald-400">${parseFloat(stats?.totalUsdtDeposits || 0).toFixed(2)}</p>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total USDT Deposits</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-emerald-400 min-w-0 truncate">${parseFloat(stats?.totalUsdtDeposits || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">Total Exchanges</p>
-            <p className="text-3xl font-bold text-cyan-400">${parseFloat(stats?.totalExchanges || 0).toFixed(2)}</p>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Exchanges</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-cyan-400 min-w-0 truncate">${parseFloat(stats?.totalExchanges || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
         </div>
 
@@ -312,33 +312,33 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">J Token Issued</p>
-            <p className="text-3xl font-bold text-[#D4AF37]">{parseFloat(stats?.totalJTokenIssued || 0).toFixed(2)}</p>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">J Token Issued</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-[#D4AF37] min-w-0 truncate">{parseFloat(stats?.totalJTokenIssued || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">J Token Redeemed</p>
-            <p className="text-3xl font-bold text-emerald-400">{parseFloat(stats?.totalJTokenRedeemed || 0).toFixed(2)}</p>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">J Token Redeemed</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-emerald-400 min-w-0 truncate">{parseFloat(stats?.totalJTokenRedeemed || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">J Token In Wallets</p>
-            <p className="text-3xl font-bold text-white">{parseFloat(stats?.totalJTokenInWallets || 0).toFixed(2)}</p>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">J Token In Wallets</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-white min-w-0 truncate">{parseFloat(stats?.totalJTokenInWallets || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">Reward Payouts</p>
-            <p className="text-3xl font-bold text-sky-400">₹{parseFloat(stats?.totalRewardPayouts || 0).toFixed(2)}</p>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Reward Payouts</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-sky-400 min-w-0 truncate">₹{parseFloat(stats?.totalRewardPayouts || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">Today Reward Payouts</p>
-            <p className="text-3xl font-bold text-emerald-400">₹{parseFloat(stats?.todayRewardPayouts || 0).toFixed(2)}</p>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Today Reward Payouts</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-emerald-400 min-w-0 truncate">₹{parseFloat(stats?.todayRewardPayouts || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-sm mb-2">J Token / USDT Commission</p>
-            <p className="text-3xl font-bold text-white">{parseFloat(stats?.jTokenCommissionPercent || 0).toFixed(1)}% / {parseFloat(stats?.usdtCommissionPercent || 0).toFixed(1)}%</p>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Commission</p>
+            <p className="text-lg sm:text-xl md:text-2xl font-bold text-white min-w-0 truncate">{parseFloat(stats?.jTokenCommissionPercent || 0).toFixed(1)}% / {parseFloat(stats?.usdtCommissionPercent || 0).toFixed(1)}%</p>
           </div>
         </div>
       </div>
