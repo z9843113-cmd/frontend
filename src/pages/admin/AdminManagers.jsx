@@ -8,8 +8,12 @@ const AdminManagers = () => {
   const [managers, setManagers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '', name: '', referrerCode: '' });
+  const [editData, setEditData] = useState({ id: '', email: '', name: '', password: '' });
   const [creating, setCreating] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(null);
   const [message, setMessage] = useState('');
   const [selectedManager, setSelectedManager] = useState(null);
   const [referralUsers, setReferralUsers] = useState([]);
@@ -54,11 +58,44 @@ const AdminManagers = () => {
       setMessage('Manager created! Referral Code: ' + (res?.referralCode || 'N/A'));
       setFormData({ email: '', password: '', name: '', referrerCode: '' });
       fetchManagers();
-      setTimeout(() => setShowModal(false), 2000);
+      setTimeout(() => { setShowModal(false); setMessage(''); }, 2000);
     } catch (e) {
       setMessage(e.response?.data?.error || 'Failed to create manager');
     }
     finally { setCreating(false); }
+  };
+
+  const handleEdit = (manager) => {
+    setEditData({ id: manager.id, email: manager.email, name: manager.name, password: '' });
+    setShowEditModal(true);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const data = { name: editData.name };
+      if (editData.password) data.password = editData.password;
+      await adminAPI.updateSubadmin(editData.id, data);
+      setMessage('Manager updated successfully!');
+      fetchManagers();
+      setTimeout(() => { setShowEditModal(false); setMessage(''); }, 1500);
+    } catch (e) {
+      setMessage(e.response?.data?.error || 'Failed to update manager');
+    }
+    finally { setSaving(false); }
+  };
+
+  const handleDelete = async (managerId) => {
+    if (!window.confirm('Are you sure you want to delete this manager?')) return;
+    setDeleting(managerId);
+    try {
+      await adminAPI.deleteSubadmin(managerId);
+      fetchManagers();
+    } catch (e) {
+      alert(e.response?.data?.error || 'Failed to delete manager');
+    }
+    finally { setDeleting(null); }
   };
 
   const menuItems = [
@@ -78,7 +115,7 @@ const AdminManagers = () => {
   const handleLogout = () => { logout(); navigate('/login'); };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] font-['Ubuntu',sans-serif]">
+    <div className="min-h-screen bg-[#0a0a0a] pb-24 lg:pb-8 font-['Ubuntu',sans-serif]">
       <div className="sticky top-0 z-30 bg-gradient-to-r from-[#0d0d0d] via-[#1a1a1a] to-[#0d0d0d] backdrop-blur-2xl border-b border-[#D4AF37]/20">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
@@ -93,7 +130,7 @@ const AdminManagers = () => {
       </div>
 
       <div className="max-w-7xl mx-auto p-4">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <h1 className="text-2xl font-bold text-white">Managers</h1>
           <button onClick={() => setShowModal(true)} className="bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold px-4 py-2 rounded-lg">
             + Add Manager
@@ -107,43 +144,62 @@ const AdminManagers = () => {
         ) : managers.length === 0 ? (
           <p className="text-gray-500 text-center py-8">No managers yet</p>
         ) : (
-          <div className="bg-[#121212] rounded-2xl border border-[#1d1d1d] overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-[#1a1a1a]">
-                <tr>
-                  <th className="text-left p-4 text-gray-400 text-sm">Name</th>
-                  <th className="text-left p-4 text-gray-400 text-sm">Email</th>
-                  <th className="text-left p-4 text-gray-400 text-sm">Referral Code</th>
-                  <th className="text-left p-4 text-gray-400 text-sm">Created</th>
-                  <th className="text-left p-4 text-gray-400 text-sm">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {managers.map(m => (
-                  <tr key={m.id} className="border-t border-[#1d1d1d]">
-                    <td className="p-4 text-white font-medium">{m.name}</td>
-                    <td className="p-4 text-gray-300">{m.email}</td>
-                    <td className="p-4 text-[#D4AF37] font-mono">{m.referralcode}</td>
-                    <td className="p-4 text-gray-500 text-sm">{m.createdat ? new Date(m.createdat).toLocaleDateString('en-IN') : 'N/A'}</td>
-                    <td className="p-4">
-                      <button 
-                        onClick={() => handleViewReferrals(m)}
-                        className="text-sm bg-[#D4AF37]/20 text-[#D4AF37] px-3 py-1.5 rounded-lg hover:bg-[#D4AF37]/30"
-                      >
-                        View Referrals
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="space-y-3 lg:space-y-0">
+            <div className="hidden lg:grid grid-cols-6 bg-[#1a1a1a] rounded-t-xl p-4 text-gray-400 text-sm font-semibold">
+              <div className="col-span-1">Name</div>
+              <div className="col-span-2">Email</div>
+              <div className="col-span-1">Referral Code</div>
+              <div className="col-span-1">Created</div>
+              <div className="col-span-1">Actions</div>
+            </div>
+            {managers.map(m => (
+              <div key={m.id} className="bg-[#121212] rounded-xl border border-[#1d1d1d] p-4 lg:p-0 lg:border-none lg:grid lg:grid-cols-6 lg:items-center">
+                <div className="lg:col-span-1 mb-2 lg:mb-0">
+                  <p className="text-gray-400 text-xs lg:hidden">Name</p>
+                  <p className="text-white font-medium">{m.name}</p>
+                </div>
+                <div className="lg:col-span-2 mb-2 lg:mb-0">
+                  <p className="text-gray-400 text-xs lg:hidden">Email</p>
+                  <p className="text-gray-300 text-sm">{m.email}</p>
+                </div>
+                <div className="lg:col-span-1 mb-2 lg:mb-0">
+                  <p className="text-gray-400 text-xs lg:hidden">Referral Code</p>
+                  <p className="text-[#D4AF37] font-mono text-sm">{m.referralcode}</p>
+                </div>
+                <div className="lg:col-span-1 mb-2 lg:mb-0">
+                  <p className="text-gray-400 text-xs lg:hidden">Created</p>
+                  <p className="text-gray-500 text-sm">{m.createdat ? new Date(m.createdat).toLocaleDateString('en-IN') : 'N/A'}</p>
+                </div>
+                <div className="lg:col-span-1 flex flex-wrap gap-2">
+                  <button 
+                    onClick={() => handleViewReferrals(m)}
+                    className="text-xs sm:text-sm bg-[#D4AF37]/20 text-[#D4AF37] px-2 sm:px-3 py-1.5 rounded-lg hover:bg-[#D4AF37]/30"
+                  >
+                    View
+                  </button>
+                  <button 
+                    onClick={() => handleEdit(m)}
+                    className="text-xs sm:text-sm bg-blue-500/20 text-blue-400 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-blue-500/30"
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(m.id)}
+                    disabled={deleting === m.id}
+                    className="text-xs sm:text-sm bg-red-500/20 text-red-400 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-red-500/30 disabled:opacity-50"
+                  >
+                    {deleting === m.id ? '...' : 'Delete'}
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#121212] border border-[#D4AF37]/30 rounded-2xl p-6 w-full max-w-md">
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-[#121212] border border-[#D4AF37]/30 rounded-2xl p-6 w-full max-w-md my-8">
             <h2 className="text-xl font-bold text-white mb-4">Add New Manager</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
@@ -168,7 +224,7 @@ const AdminManagers = () => {
               </div>
               {message && <p className={message.includes('Failed') ? 'text-rose-400' : 'text-emerald-400'}>{message}</p>}
               <div className="flex gap-3">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-3 bg-[#1a1a1a] text-white rounded-lg">Cancel</button>
+                <button type="button" onClick={() => { setShowModal(false); setMessage(''); }} className="flex-1 py-3 bg-[#1a1a1a] text-white rounded-lg">Cancel</button>
                 <button type="submit" disabled={creating} className="flex-1 py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-lg">
                   {creating ? 'Creating...' : 'Create'}
                 </button>
@@ -178,8 +234,40 @@ const AdminManagers = () => {
         </div>
       )}
 
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-[#121212] border border-[#D4AF37]/30 rounded-2xl p-6 w-full max-w-md my-8">
+            <h2 className="text-xl font-bold text-white mb-4">Edit Manager</h2>
+            <form onSubmit={handleUpdate} className="space-y-4">
+              <div>
+                <label className="text-gray-400 text-sm">Name</label>
+                <input type="text" required value={editData.name} onChange={e => setEditData({...editData, name: e.target.value})}
+                  className="w-full bg-[#0a0a0a] border border-[#1d1d1d] rounded-lg p-3 text-white" />
+              </div>
+              <div>
+                <label className="text-gray-400 text-sm">Email (read-only)</label>
+                <input type="email" value={editData.email} disabled
+                  className="w-full bg-[#0a0a0a] border border-[#1d1d1d] rounded-lg p-3 text-gray-500" />
+              </div>
+              <div>
+                <label className="text-gray-400 text-sm">New Password (leave blank to keep current)</label>
+                <input type="password" value={editData.password} onChange={e => setEditData({...editData, password: e.target.value})}
+                  className="w-full bg-[#0a0a0a] border border-[#1d1d1d] rounded-lg p-3 text-white" />
+              </div>
+              {message && <p className={message.includes('Failed') ? 'text-rose-400' : 'text-emerald-400'}>{message}</p>}
+              <div className="flex gap-3">
+                <button type="button" onClick={() => { setShowEditModal(false); setMessage(''); }} className="flex-1 py-3 bg-[#1a1a1a] text-white rounded-lg">Cancel</button>
+                <button type="submit" disabled={saving} className="flex-1 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold rounded-lg">
+                  {saving ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {selectedManager && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setSelectedManager(null)}>
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center p-4 pt-10 overflow-y-auto" onClick={() => setSelectedManager(null)}>
           <div className="bg-[#121212] border border-[#D4AF37]/30 rounded-2xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-white">
