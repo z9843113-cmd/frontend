@@ -48,7 +48,7 @@ const AdminSettings = () => {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
 
-  useEffect(() => { fetchSettings(); fetchSupportLinks(); }, []);
+  useEffect(() => { fetchSettings(); fetchSupportLinks(); fetchPermissionSettings(); }, []);
   useEffect(() => {
     const timer = setTimeout(() => { setMessage(''); }, 3000);
     return () => clearTimeout(timer);
@@ -58,7 +58,7 @@ const AdminSettings = () => {
     try {
       const res = await adminAPI.getSettings();
       const data = res?.data || res || {};
-      setPermissionSettings({ managerJTokenCreditDebit: data.managerjtokentocreditdebit || false });
+      setPermissionSettings({ managerJTokenCreditDebit: data.managerjtokencreditdebit || false });
     } catch (err) { console.error('Failed to fetch permission settings'); }
   };
   
@@ -149,6 +149,7 @@ const AdminSettings = () => {
       setPermissionSettings({ ...permissionSettings, [permissionField]: permissionValue });
       setPermissionMessage('Permission updated successfully!');
       setShowPermissionModal(false);
+      setPermissionPassword('');
       setTimeout(() => setPermissionMessage(''), 3000);
     } catch (err) {
       setPermissionMessage(err.response?.data?.error || 'Failed to update permission');
