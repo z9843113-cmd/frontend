@@ -200,18 +200,18 @@ const AdminUsers = () => {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
                     Wallet Balance
                   </h4>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-[#0a0a0a] rounded-xl p-3 text-center">
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="bg-[#0a0a0a] rounded-xl p-2 sm:p-3 text-center">
                       <p className="text-gray-500 text-xs">INR Balance</p>
-                      <p className="text-green-400 font-bold text-lg">₹{parseFloat(userDetails.wallet?.inrbalance || 0).toFixed(2)}</p>
+                      <p className="text-green-400 font-bold text-sm sm:text-lg break-all">₹{parseFloat(userDetails.wallet?.inrbalance || 0).toFixed(2)}</p>
                     </div>
-                    <div className="bg-[#0a0a0a] rounded-xl p-3 text-center">
+                    <div className="bg-[#0a0a0a] rounded-xl p-2 sm:p-3 text-center">
                       <p className="text-gray-500 text-xs">USDT</p>
-                      <p className="text-emerald-400 font-bold text-lg">{parseFloat(userDetails.wallet?.usdtbalance || 0).toFixed(4)} USDT</p>
+                      <p className="text-emerald-400 font-bold text-sm sm:text-lg break-all">{parseFloat(userDetails.wallet?.usdtbalance || 0).toFixed(4)} USDT</p>
                     </div>
-                    <div className="bg-[#0a0a0a] rounded-xl p-3 text-center">
+                    <div className="bg-[#0a0a0a] rounded-xl p-2 sm:p-3 text-center">
                       <p className="text-gray-500 text-xs">J Token</p>
-                      <p className="text-purple-400 font-bold text-lg">{parseFloat(userDetails.wallet?.tokenbalance || 0).toFixed(2)}</p>
+                      <p className="text-purple-400 font-bold text-sm sm:text-lg break-all">{parseFloat(userDetails.wallet?.tokenbalance || 0).toFixed(2)}</p>
                     </div>
                   </div>
                 </div>

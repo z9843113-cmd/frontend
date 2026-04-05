@@ -542,23 +542,23 @@ const Home = () => {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm text-gray-400">Total wallet balance</p>
-                <h2 className="mt-2 bg-gradient-to-r from-[#D4AF37] to-[#FFE08A] bg-clip-text text-4xl font-bold text-transparent sm:text-5xl">
+                <h2 className="mt-2 bg-gradient-to-r from-[#D4AF37] to-[#FFE08A] bg-clip-text text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-transparent break-all">
                   ₹{formatINR(getTotalBalance())}
                 </h2>
               </div>
-              <div className={`rounded-full border px-3 py-1 text-xs font-semibold ${getActiveStatus() ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-amber-500/30 bg-amber-500/10 text-amber-300'}`}>
+              <div className={`rounded-full border px-3 py-1 text-xs font-semibold shrink-0 ${getActiveStatus() ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-amber-500/30 bg-amber-500/10 text-amber-300'}`}>
                 {getActiveStatus() ? 'Rewards Active' : 'Complete setup'}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-white/5 bg-black/20 p-4">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="rounded-2xl border border-white/5 bg-black/20 p-3 sm:p-4">
                 <p className="text-xs text-gray-500">INR Wallet</p>
-                <p className="mt-2 text-xl font-semibold text-white">₹{formatINR(wallet?.inrbalance || 0)}</p>
+                <p className="mt-1 sm:mt-2 text-lg sm:text-xl font-semibold text-white break-all">₹{formatINR(wallet?.inrbalance || 0)}</p>
               </div>
-              <div className="rounded-2xl border border-white/5 bg-black/20 p-4">
+              <div className="rounded-2xl border border-white/5 bg-black/20 p-3 sm:p-4">
                 <p className="text-xs text-gray-500">USDT Wallet</p>
-                <p className="mt-2 text-xl font-semibold text-white">{parseFloat(wallet?.usdtbalance || 0).toFixed(4)}</p>
+                <p className="mt-1 sm:mt-2 text-lg sm:text-xl font-semibold text-white break-all">{parseFloat(wallet?.usdtbalance || 0).toFixed(4)}</p>
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between rounded-2xl bg-[#0b0b0b] px-4 py-3">
@@ -787,14 +787,15 @@ const Home = () => {
           <div className="space-y-3">
             {recentActivity.filter(item => isUSDTTransaction(item)).slice(0, 5).map((item, index) => {
               const isUSDT = true;
-              const isExchange = item.entryType === 'exchange';
+              const isExchange = item.entryType === 'exchange' || item.type === 'EXCHANGE';
               const isDeposit = item.entryType === 'deposit';
               const isPositive = isPositiveTransaction(item);
+              const isNegative = !isPositive || isExchange;
               return (
                 <div key={item.id || index} className="flex items-center justify-between rounded-2xl border border-[#1d1d1d] bg-[#0d0d0d] p-4">
                   <div className="flex items-center gap-3">
-                    <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${isPositive ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}>
-                      {isPositive ? <FaArrowDown className="h-4 w-4" /> : <FaArrowUp className="h-4 w-4" />}
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${isNegative ? 'bg-rose-500/15 text-rose-400' : 'bg-emerald-500/15 text-emerald-400'}`}>
+                      {isNegative ? <FaArrowUp className="h-4 w-4" /> : <FaArrowDown className="h-4 w-4" />}
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-white">
@@ -808,11 +809,11 @@ const Home = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className={`text-sm font-bold ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {isPositive ? '+' : '-'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(Math.abs(item.amount || 0))}`}
+                    <p className={`text-sm font-bold ${isNegative ? 'text-rose-400' : 'text-emerald-400'}`}>
+                      {isNegative ? '-' : '+'}{isUSDT ? `${parseFloat(item.amount || 0).toFixed(4)} USDT` : `₹${formatINR(Math.abs(item.amount || 0))}`}
                     </p>
-                    <p className={`text-xs font-medium ${item.status === 'APPROVED' ? 'text-emerald-400' : item.status === 'REJECTED' ? 'text-rose-400' : 'text-amber-400'}`}>
-                      {item.status === 'APPROVED' ? 'SUCCESS' : item.status === 'REJECTED' ? 'FAILED' : item.status || 'PENDING'}
+                    <p className={`text-xs font-medium ${isExchange ? 'text-rose-400' : item.status === 'APPROVED' ? 'text-emerald-400' : item.status === 'REJECTED' ? 'text-rose-400' : 'text-amber-400'}`}>
+                      {isExchange ? 'SOLD' : item.status === 'APPROVED' ? 'SUCCESS' : item.status === 'REJECTED' ? 'FAILED' : item.status || 'PENDING'}
                     </p>
                   </div>
                 </div>
@@ -861,11 +862,11 @@ const Home = () => {
                     </div>
                   </div>
                   <div className="flex items-center justify-between w-full pl-10 sm:pl-0 sm:w-auto sm:items-end">
-                    <p className={`text-sm font-bold ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    <p className={`text-sm font-bold ${isExchange ? 'text-rose-400' : isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {isPositive ? '+' : '-'}₹{formatINR(Math.abs(item.amount || 0))}
                     </p>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded ${isPositive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
-                      {isPositive ? 'CREDIT' : 'DEBIT'}
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded ${isExchange ? 'bg-rose-500/20 text-rose-400' : isPositive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                      {isExchange ? 'SOLD' : isPositive ? 'CREDIT' : 'DEBIT'}
                     </span>
                   </div>
                 </div>
