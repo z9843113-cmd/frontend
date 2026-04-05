@@ -33,6 +33,11 @@ const AdminSettings = () => {
   const [message, setMessage] = useState('');
   const [supportMessage, setSupportMessage] = useState('');
   const [permissionMessage, setPermissionMessage] = useState('');
+  const [permissionSaving, setPermissionSaving] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [permissionField, setPermissionField] = useState('');
+  const [permissionValue, setPermissionValue] = useState(false);
+  const [permissionPassword, setPermissionPassword] = useState('');
   const [bannerMessage, setBannerMessage] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -127,14 +132,29 @@ const AdminSettings = () => {
   };
 
   const handlePermissionSubmit = async (field, value) => {
+    setPermissionField(field);
+    setPermissionValue(value);
+    setPermissionPassword('');
+    setShowPermissionModal(true);
+  };
+
+  const handlePermissionConfirm = async () => {
+    if (!permissionPassword) {
+      setPermissionMessage('Please enter admin password');
+      return;
+    }
+    setPermissionSaving(true);
     try {
-      await adminAPI.updateSettings({ [field]: value });
-      setPermissionSettings({ ...permissionSettings, [field]: value });
+      await adminAPI.updateSettings({ [permissionField]: permissionValue, adminPassword: permissionPassword });
+      setPermissionSettings({ ...permissionSettings, [permissionField]: permissionValue });
       setPermissionMessage('Permission updated successfully!');
+      setShowPermissionModal(false);
       setTimeout(() => setPermissionMessage(''), 3000);
     } catch (err) {
-      setPermissionMessage('Failed to update permission');
+      setPermissionMessage(err.response?.data?.error || 'Failed to update permission');
       setTimeout(() => setPermissionMessage(''), 3000);
+    } finally {
+      setPermissionSaving(false);
     }
   };
 
@@ -555,6 +575,31 @@ const AdminSettings = () => {
           </div>
         )}
       </div>
+
+      {showPermissionModal && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#121212] border border-[#D4AF37]/30 rounded-2xl p-6 w-full max-w-md">
+            <h2 className="text-xl font-bold text-white mb-4">Confirm Action</h2>
+            <p className="text-gray-400 mb-4">
+              {permissionValue ? 'Enable' : 'Disable'} JToken Credit/Debit for Managers requires admin password.
+            </p>
+            <input
+              type="password"
+              value={permissionPassword}
+              onChange={(e) => setPermissionPassword(e.target.value)}
+              placeholder="Enter admin password"
+              className="w-full bg-[#0a0a0a] border border-[#1d1d1d] rounded-lg p-3 text-white mb-4"
+            />
+            {permissionMessage && <p className="text-red-400 text-sm mb-4">{permissionMessage}</p>}
+            <div className="flex gap-3">
+              <button onClick={() => setShowPermissionModal(false)} className="flex-1 py-3 bg-[#1a1a1a] text-white rounded-lg">Cancel</button>
+              <button onClick={handlePermissionConfirm} disabled={permissionSaving} className="flex-1 py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-lg">
+                {permissionSaving ? 'Saving...' : 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="fixed bottom-0 left-0 right-0 bg-[#0d0d0d]/95 backdrop-blur-2xl border-t border-[#1a1a1a] lg:hidden z-50">
         <div className="flex items-center justify-around py-2 px-1">
