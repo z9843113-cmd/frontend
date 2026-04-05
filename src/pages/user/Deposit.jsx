@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { depositAPI, publicAPI, uploadToCloudinary, adminAPI, userAPI } from '../../services/api';
 import BottomNav from '../../components/BottomNav';
-import RequestStatusModal from '../../components/RequestStatusModal';
+import { FaSpinner, FaClock, FaCheck, FaTimes } from 'react-icons/fa';
 
 const Deposit = () => {
   const [amount, setAmount] = useState('');
@@ -21,6 +21,8 @@ const Deposit = () => {
   const [usdtRate, setUsdtRate] = useState(0);
   const [usdtCommission, setUsdtCommission] = useState(0);
   const [discountInfo, setDiscountInfo] = useState({ enabled: false, percent: 0, max: 0, available: false, uses: 0 });
+  const [showWaitPopup, setShowWaitPopup] = useState(false);
+  const [waitMessage, setWaitMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -130,7 +132,14 @@ const Deposit = () => {
       console.log('Submitting deposit:', depositData);
       const res = await depositAPI.create(depositData);
       const newDeposit = res.data?.deposit || res.data || res;
-      setPendingRequest({ id: newDeposit?.id?.toString() || Date.now().toString(), type: 'DEPOSIT', title: 'Deposit Request' });
+      
+      // Show wait popup for 3-4 seconds then auto close - shows in history as pending
+      setWaitMessage('Please wait patiently. Your deposit is being processed and will be credited to your account automatically.');
+      setShowWaitPopup(true);
+      
+      setTimeout(() => {
+        setShowWaitPopup(false);
+      }, 3500);
       
       // Refresh discount status after deposit
       userAPI.getDiscountStatus().then((res) => {
@@ -431,13 +440,18 @@ const Deposit = () => {
 
       <BottomNav />
 
-      <RequestStatusModal 
-        isOpen={!!pendingRequest}
-        onClose={() => setPendingRequest(null)}
-        type={pendingRequest?.type}
-        requestId={pendingRequest?.id}
-        title={pendingRequest?.title}
-      />
+      {showWaitPopup && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] border border-[#D4AF37]/30 rounded-2xl sm:rounded-3xl p-5 sm:p-8 w-full max-w-sm mx-4 text-center">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-yellow-500/20 flex items-center justify-center mx-auto mb-4 sm:mb-6 border border-yellow-500/30">
+              <FaClock className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-400" />
+            </div>
+            <h3 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent mb-2 sm:mb-3">Pending</h3>
+            <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base">{waitMessage}</p>
+            <p className="text-gray-500 text-xs">Check history for status</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
