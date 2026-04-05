@@ -246,22 +246,47 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {chartData.length > 0 && (
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-5 border border-[#2a2a2a]">
-            <h3 className="text-white font-bold mb-4">Last 7 Days - Deposits vs Withdrawals</h3>
-            <div className="h-64 w-full">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total INR Deposit / JToken Buy</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent min-w-0 truncate">₹{parseFloat(stats?.jTokenPurchaseAmount || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+          </div>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">JToken Commission</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-orange-400 min-w-0 truncate">₹{parseFloat(stats?.totalJTokenCommission || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Pending JToken Orders Value</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-yellow-400 min-w-0 truncate">₹{parseFloat(stats?.pendingJTokenOrdersValue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            <p className="text-xs text-gray-500 mt-1">{stats?.pendingDeposits || 0} Deposits | {stats?.pendingWithdrawals || 0} Withdrawals</p>
+          </div>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Reward Payouts</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-pink-400 min-w-0 truncate">₹{parseFloat(stats?.totalRewardPayouts || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            <p className="text-xs text-gray-500 mt-1">Today: ₹{parseFloat(stats?.todayRewardPayouts || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+          </div>
+        </div>
+
+        {stats?.commissionChart && stats.commissionChart.length > 0 && (
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <h3 className="text-white font-bold text-sm sm:text-lg mb-3 sm:mb-4">Last 7 Days - JToken Purchase & Commission</h3>
+            <div className="h-48 sm:h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
+                <BarChart data={stats.commissionChart}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
-                  <XAxis dataKey="date" stroke="#6b7280" fontSize={12} />
-                  <YAxis stroke="#6b7280" fontSize={12} />
+                  <XAxis dataKey="date" stroke="#6b7280" fontSize={10} />
+                  <YAxis stroke="#6b7280" fontSize={10} />
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '12px' }}
                     labelStyle={{ color: '#fff' }}
+                    formatter={(value) => `₹${value.toLocaleString('en-IN')}`}
                   />
                   <Legend />
-                  <Bar dataKey="deposits" name="Deposits" fill="#10B981" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="withdrawals" name="Withdrawals" fill="#EF4444" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="jtokenPurchase" name="JToken Buy" fill="#D4AF37" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="commission" name="Commission" fill="#10B981" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
