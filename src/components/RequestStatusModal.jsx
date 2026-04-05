@@ -20,13 +20,21 @@ const RequestStatusModal = ({ isOpen, onClose, type, requestId, title }) => {
         
         if (type === 'DEPOSIT') {
           const res = await depositAPI.getHistory();
-          const allDeposits = Array.isArray(res) ? res : [];
+          let allDeposits = [];
+          if (Array.isArray(res)) allDeposits = res;
+          else if (res?.data) allDeposits = Array.isArray(res.data) ? res.data : [];
+          else if (res?.rows) allDeposits = res.rows;
           
-          if (allDeposits.length > 0) {
-            const latestDeposit = allDeposits[0];
-            console.log('Latest deposit:', latestDeposit);
-            foundStatus = latestDeposit.status;
+          console.log('Modal - Deposits:', allDeposits);
+          console.log('Modal - requestId:', requestId);
+          
+          let request = allDeposits.find(d => String(d.id) === String(requestId));
+          if (!request && requestId) {
+            request = allDeposits[0];
           }
+          console.log('Modal - Found request:', request);
+          if (request) foundStatus = request.status;
+          console.log('Modal - Found status:', foundStatus);
         } else if (type === 'JTOKEN') {
           const res = await walletAPI.getJTokenHistory();
           const request = (res?.data || res || []).find(d => d.id === requestId);
@@ -42,19 +50,19 @@ const RequestStatusModal = ({ isOpen, onClose, type, requestId, title }) => {
           if (request) foundStatus = request.status;
         }
         
-        if (foundStatus) {
-          console.log('Found status:', foundStatus);
+        if (foundStatus && foundStatus !== status) {
+          console.log('Modal - Updating status from', status, 'to', foundStatus);
           setStatus(foundStatus);
           
-          if (foundStatus === 'APPROVED' || foundStatus === 'COMPLETED') {
-            console.log('Status is APPROVED, will close modal');
+          if (foundStatus === 'APPROVED' || foundStatus === 'COMPLETED' || foundStatus === 'REJECTED' || foundStatus === 'CANCELLED') {
+            console.log('Modal - Status is terminal, closing modal in 1.5s');
             setTimeout(() => {
-              console.log('Calling onClose');
+              console.log('Modal - Calling onClose');
               onClose();
             }, 1500);
           }
         } else {
-          console.log('No status found, still PENDING');
+          console.log('Modal - No status change, current:', status, 'found:', foundStatus);
         }
       } catch (error) {
         console.error('Error checking status:', error);
@@ -65,7 +73,7 @@ const RequestStatusModal = ({ isOpen, onClose, type, requestId, title }) => {
     const interval = setInterval(checkStatus, 2000);
 
     return () => clearInterval(interval);
-  }, [isOpen, requestId, type]);
+  }, [isOpen, requestId, type, status, onClose]);
 
   const handleClose = () => {
     onClose();

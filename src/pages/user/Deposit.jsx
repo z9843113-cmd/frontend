@@ -129,8 +129,8 @@ const Deposit = () => {
       };
       console.log('Submitting deposit:', depositData);
       const res = await depositAPI.create(depositData);
-      const newDeposit = res.data || res;
-      setPendingRequest({ id: newDeposit.id?.toString(), type: 'DEPOSIT', title: 'Deposit Request' });
+      const newDeposit = res.data?.deposit || res.data || res;
+      setPendingRequest({ id: newDeposit?.id?.toString() || Date.now().toString(), type: 'DEPOSIT', title: 'Deposit Request' });
       
       // Refresh discount status after deposit
       userAPI.getDiscountStatus().then((res) => {
