@@ -55,6 +55,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         
+        {/* USER ROUTES */}
         <Route path="/home" element={
           <ProtectedRoute>
             <Layout><Home /></Layout>
@@ -107,6 +108,7 @@ function App() {
           </ProtectedRoute>
         } />
 
+        {/* ADMIN/MANAGER ROUTES */}
         <Route path="/admin/dashboard" element={
           <ProtectedRoute roles={['ADMIN', 'MANAGER']}>
             <Layout><AdminDashboard /></Layout>
@@ -142,6 +144,11 @@ function App() {
             <Layout><AdminUpiVerifications /></Layout>
           </ProtectedRoute>
         } />
+        <Route path="/admin/crypto" element={
+          <ProtectedRoute roles={['ADMIN']}>
+            <Layout><AdminCrypto /></Layout>
+          </ProtectedRoute>
+        } />
         <Route path="/admin/jtoken" element={
           <ProtectedRoute roles={['ADMIN', 'MANAGER']}>
             <Layout><AdminJToken /></Layout>
@@ -160,41 +167,6 @@ function App() {
         <Route path="/admin/exchange" element={
           <ProtectedRoute roles={['ADMIN', 'MANAGER']}>
             <Layout><AdminExchange /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/users" element={
-          <ProtectedRoute roles={['ADMIN', 'SUBADMIN', 'MANAGER']}>
-            <Layout><AdminUsers /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/active-users" element={
-          <ProtectedRoute roles={['ADMIN', 'SUBADMIN', 'MANAGER']}>
-            <Layout><AdminActiveUsers /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/deposits" element={
-          <ProtectedRoute roles={['ADMIN', 'SUBADMIN', 'MANAGER']}>
-            <Layout><AdminDeposits /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/withdrawals" element={
-          <ProtectedRoute roles={['ADMIN', 'SUBADMIN', 'MANAGER']}>
-            <Layout><AdminWithdrawals /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/upi-apps" element={
-          <ProtectedRoute roles={['ADMIN', 'SUBADMIN']}>
-            <Layout><AdminUpiApps /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/upi-verifications" element={
-          <ProtectedRoute roles={['ADMIN', 'SUBADMIN', 'MANAGER']}>
-            <Layout><AdminUpiVerifications /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/crypto" element={
-          <ProtectedRoute roles={['ADMIN', 'SUBADMIN']}>
-            <Layout><AdminCrypto /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/admin/settings" element={
@@ -210,26 +182,6 @@ function App() {
         <Route path="/admin/managers" element={
           <ProtectedRoute roles={['ADMIN']}>
             <Layout><AdminManagers /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/jtoken" element={
-          <ProtectedRoute roles={['ADMIN', 'SUBADMIN', 'MANAGER']}>
-            <Layout><AdminJToken /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/jtoken-history" element={
-          <ProtectedRoute roles={['ADMIN', 'SUBADMIN', 'MANAGER']}>
-            <Layout><AdminJTokenHistory /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/jtoken-requests" element={
-          <ProtectedRoute roles={['ADMIN', 'SUBADMIN', 'MANAGER']}>
-            <Layout><AdminJTokenRequests /></Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/admin/exchange" element={
-          <ProtectedRoute roles={['ADMIN', 'SUBADMIN', 'MANAGER']}>
-            <Layout><AdminExchange /></Layout>
           </ProtectedRoute>
         } />
 

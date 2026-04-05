@@ -32,7 +32,7 @@ const Login = () => {
       setToken(token);
       setUser(user);
       
-      if (user.role === 'ADMIN' || user.role === 'SUBADMIN') {
+      if (user.role === 'ADMIN' || user.role === 'MANAGER') {
         navigate('/admin/dashboard');
       } else {
         navigate('/home');

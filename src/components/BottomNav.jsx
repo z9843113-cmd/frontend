@@ -16,15 +16,31 @@ const BottomNav = () => {
     { path: '/profile', label: 'Profile', Icon: FaUserCog },
   ];
 
+  const managerLinks = [
+    { path: '/admin/dashboard', label: 'Home', Icon: FaHome },
+    { path: '/admin/users', label: 'Users', Icon: FaUsers },
+    { path: '/admin/deposits', label: 'Deposits', Icon: FaUserPlus },
+    { path: '/admin/withdrawals', label: 'Withdraw', Icon: FaExchangeAlt },
+    { path: '/admin/jtoken-requests', label: 'Requests', Icon: FaUserCog },
+    { path: '/admin/settings', label: 'Settings', Icon: FaCog },
+  ];
+
   const adminLinks = [
     { path: '/admin/dashboard', label: 'Home', Icon: FaHome },
     { path: '/admin/users', label: 'Users', Icon: FaUsers },
     { path: '/admin/deposits', label: 'Deposits', Icon: FaUserPlus },
-    { path: '/admin/exchange', label: 'Exchange', Icon: FaExchangeAlt },
+    { path: '/admin/withdrawals', label: 'Withdraw', Icon: FaExchangeAlt },
+    { path: '/admin/jtoken-requests', label: 'Requests', Icon: FaUserCog },
     { path: '/admin/settings', label: 'Settings', Icon: FaCog },
   ];
 
-  const links = user?.role === 'ADMIN' || user?.role === 'SUBADMIN' ? adminLinks : userLinks;
+  const getLinks = () => {
+    if (user?.role === 'ADMIN') return adminLinks;
+    if (user?.role === 'MANAGER') return managerLinks;
+    return userLinks;
+  };
+
+  const links = getLinks();
   const currentIndex = links.findIndex(link => location.pathname === link.path);
 
   return (

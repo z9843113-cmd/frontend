@@ -11,6 +11,9 @@ const AdminManagers = () => {
   const [formData, setFormData] = useState({ email: '', password: '', name: '', referrerCode: '' });
   const [creating, setCreating] = useState(false);
   const [message, setMessage] = useState('');
+  const [selectedManager, setSelectedManager] = useState(null);
+  const [referralUsers, setReferralUsers] = useState([]);
+  const [loadingReferrals, setLoadingReferrals] = useState(false);
   const { logout, user } = useAuthStore();
   const navigate = useNavigate();
 
@@ -25,6 +28,21 @@ const AdminManagers = () => {
       setManagers(res || []);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
+  };
+
+  const fetchManagerReferrals = async (manager) => {
+    if (!manager.referralcode) return;
+    setLoadingReferrals(true);
+    try {
+      const res = await adminAPI.getReferralsByCode(manager.referralcode);
+      setReferralUsers(res || []);
+    } catch (e) { console.error(e); }
+    finally { setLoadingReferrals(false); }
+  };
+
+  const handleViewReferrals = (manager) => {
+    setSelectedManager(manager);
+    fetchManagerReferrals(manager);
   };
 
   const handleCreate = async (e) => {
@@ -97,6 +115,7 @@ const AdminManagers = () => {
                   <th className="text-left p-4 text-gray-400 text-sm">Email</th>
                   <th className="text-left p-4 text-gray-400 text-sm">Referral Code</th>
                   <th className="text-left p-4 text-gray-400 text-sm">Created</th>
+                  <th className="text-left p-4 text-gray-400 text-sm">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -106,6 +125,14 @@ const AdminManagers = () => {
                     <td className="p-4 text-gray-300">{m.email}</td>
                     <td className="p-4 text-[#D4AF37] font-mono">{m.referralcode}</td>
                     <td className="p-4 text-gray-500 text-sm">{m.createdat ? new Date(m.createdat).toLocaleDateString('en-IN') : 'N/A'}</td>
+                    <td className="p-4">
+                      <button 
+                        onClick={() => handleViewReferrals(m)}
+                        className="text-sm bg-[#D4AF37]/20 text-[#D4AF37] px-3 py-1.5 rounded-lg hover:bg-[#D4AF37]/30"
+                      >
+                        View Referrals
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -147,6 +174,46 @@ const AdminManagers = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {selectedManager && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setSelectedManager(null)}>
+          <div className="bg-[#121212] border border-[#D4AF37]/30 rounded-2xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-white">
+                {selectedManager.name}'s Referrals
+              </h2>
+              <button onClick={() => setSelectedManager(null)} className="text-gray-400 hover:text-white text-xl">✕</button>
+            </div>
+            
+            <div className="mb-4 p-3 bg-[#1a1a1a] rounded-lg">
+              <p className="text-gray-400 text-sm">Referral Code: <span className="text-[#D4AF37] font-mono">{selectedManager.referralcode}</span></p>
+              <p className="text-gray-400 text-sm">Total Referrals: <span className="text-white font-bold">{referralUsers.length}</span></p>
+            </div>
+
+            {loadingReferrals ? (
+              <p className="text-gray-500 text-center py-4">Loading...</p>
+            ) : referralUsers.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">No users joined using this referral code</p>
+            ) : (
+              <div className="space-y-2">
+                {referralUsers.map(user => (
+                  <div key={user.id} className="p-3 bg-[#0a0a0a] rounded-lg flex items-center justify-between">
+                    <div>
+                      <p className="text-white font-medium">{user.name || 'N/A'}</p>
+                      <p className="text-gray-400 text-sm">{user.email}</p>
+                      <p className="text-gray-500 text-xs">Joined: {user.createdat ? new Date(user.createdat).toLocaleDateString('en-IN') : 'N/A'}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[#D4AF37] text-sm">₹{parseFloat(user.inrbalance || 0).toFixed(2)}</p>
+                      <p className="text-gray-500 text-xs">{user.isblocked ? 'Blocked' : 'Active'}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

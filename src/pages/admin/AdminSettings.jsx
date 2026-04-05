@@ -27,10 +27,12 @@ const AdminSettings = () => {
     jtokenDiscountMaxUses: 1
   });
   const [supportLinks, setSupportLinks] = useState({ whatsappSupport: '', telegramSupport: '', telegramGroup: '' });
+  const [permissionSettings, setPermissionSettings] = useState({ managerJTokenCreditDebit: false });
   const [savingSupport, setSavingSupport] = useState(false);
   const [savingBanner, setSavingBanner] = useState(false);
   const [message, setMessage] = useState('');
   const [supportMessage, setSupportMessage] = useState('');
+  const [permissionMessage, setPermissionMessage] = useState('');
   const [bannerMessage, setBannerMessage] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -42,6 +44,20 @@ const AdminSettings = () => {
   const navigate = useNavigate();
 
   useEffect(() => { fetchSettings(); fetchSupportLinks(); }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => { setMessage(''); }, 3000);
+    return () => clearTimeout(timer);
+  }, [message]);
+  
+  const fetchPermissionSettings = async () => {
+    try {
+      const res = await adminAPI.getSettings();
+      const data = res?.data || res || {};
+      setPermissionSettings({ managerJTokenCreditDebit: data.managerjtokentocreditdebit || false });
+    } catch (err) { console.error('Failed to fetch permission settings'); }
+  };
+  
+  useEffect(() => { fetchPermissionSettings(); }, []);
   const fetchSettings = async () => { try { const res = await adminAPI.getSettings(); const data = res?.data || res || {}; setSettings(data); setFormData({ 
         usdtRate: parseFloat(data?.usdtrate) || 83, 
         tokenRate: parseFloat(data?.tokenrate) || 0.01, 
@@ -108,6 +124,18 @@ const AdminSettings = () => {
     try { await adminAPI.updateSettings(bannerData); setBannerMessage('Banner settings updated successfully!'); }
     catch { setBannerMessage('Failed to update banner settings'); }
     finally { setSavingBanner(false); }
+  };
+
+  const handlePermissionSubmit = async (field, value) => {
+    try {
+      await adminAPI.updateSettings({ [field]: value });
+      setPermissionSettings({ ...permissionSettings, [field]: value });
+      setPermissionMessage('Permission updated successfully!');
+      setTimeout(() => setPermissionMessage(''), 3000);
+    } catch (err) {
+      setPermissionMessage('Failed to update permission');
+      setTimeout(() => setPermissionMessage(''), 3000);
+    }
   };
 
   const handleDeleteClick = (e) => {
@@ -263,6 +291,35 @@ const AdminSettings = () => {
             </div>
             <button type="submit" disabled={savingSupport} className="w-full py-4 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold rounded-2xl disabled:opacity-50">{savingSupport ? 'Saving...' : 'Save Support Links'}</button>
           </form>
+        </div>
+
+        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
+          <h3 className="text-lg font-semibold text-white mb-6">Manager Permissions</h3>
+          <p className="text-gray-400 text-sm mb-4">Control what Managers can access in the admin panel.</p>
+          
+          {permissionMessage && <div className={`mb-4 px-4 py-2 rounded-xl ${permissionMessage.includes('success') ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>{permissionMessage}</div>}
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 rounded-2xl bg-[#0a0a0a] border border-[#2a2a2a]">
+              <div>
+                <p className="text-white font-medium">JToken Credit/Debit</p>
+                <p className="text-gray-400 text-sm">Allow Managers to credit or debit INR and J Token for users</p>
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <div className="relative">
+                  <input 
+                    type="checkbox" 
+                    checked={permissionSettings.managerJTokenCreditDebit}
+                    onChange={(e) => handlePermissionSubmit('managerJTokenCreditDebit', e.target.checked)}
+                    className="sr-only"
+                  />
+                  <div className={`w-12 h-7 rounded-full transition-colors ${permissionSettings.managerJTokenCreditDebit ? 'bg-green-500' : 'bg-gray-600'}`}>
+                    <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform mt-1 ${permissionSettings.managerJTokenCreditDebit ? 'translate-x-6 ml-0.5' : 'translate-x-1'}`} />
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
         </div>
 
         <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
