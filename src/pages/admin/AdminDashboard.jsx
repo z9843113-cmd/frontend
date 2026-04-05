@@ -339,20 +339,33 @@ const AdminDashboard = () => {
 
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">J Token Issued</p>
-            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-[#D4AF37] min-w-0 truncate">{parseFloat(stats?.totalJTokenIssued || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">J Token Issued (INR)</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-[#D4AF37] min-w-0 truncate">₹{parseFloat(stats?.jTokenPurchaseAmount || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">J Token Redeemed</p>
-            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-emerald-400 min-w-0 truncate">{parseFloat(stats?.totalJTokenRedeemed || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">J Token Balance</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-emerald-400 min-w-0 truncate">{parseFloat(stats?.totalJTokenInWallets || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">J Token In Wallets</p>
-            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-white min-w-0 truncate">{parseFloat(stats?.totalJTokenInWallets || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Commission Earned</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-orange-400 min-w-0 truncate">₹{parseFloat(stats?.totalJTokenCommission || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Reward Payouts</p>
-            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-sky-400 min-w-0 truncate">₹{parseFloat(stats?.totalRewardPayouts || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Pending JToken Orders</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-yellow-400 min-w-0 truncate">₹{parseFloat(stats?.pendingJTokenOrdersValue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Rewards Given</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-pink-400 min-w-0 truncate">₹{parseFloat(stats?.totalRewardPayouts || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            <p className="text-xs text-gray-500 mt-1">Today: ₹{parseFloat(stats?.todayRewardPayouts || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+          </div>
+          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
+            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Pending Req (Deposit/Withdraw)</p>
+            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-yellow-400 min-w-0 truncate">₹{parseFloat((stats?.pendingDepositAmount || 0) + (stats?.pendingWithdrawalAmount || 0)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            <p className="text-xs text-gray-500 mt-1">{stats?.pendingDeposits || 0} Deposits | {stats?.pendingWithdrawals || 0} Withdrawals</p>
           </div>
         </div>
 
