@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:9001/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = import.meta.env.VITE_CLOUDINARY_API_KEY;
 const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
@@ -241,7 +241,11 @@ const adminAPI = {
   getSubadmins: () => authFetch(`${API_BASE}/subadmin`),
   createSubadmin: (data) => authFetch(`${API_BASE}/subadmin`, { method: 'POST', body: JSON.stringify(data) }),
   updateSubadmin: (subadminId, data) => authFetch(`${API_BASE}/subadmin/${subadminId}`, { method: 'PUT', body: JSON.stringify(data) }),
-  deleteSubadmin: (subadminId) => authFetch(`${API_BASE}/subadmin/${subadminId}`, { method: 'DELETE' })
+  deleteSubadmin: (subadminId) => authFetch(`${API_BASE}/subadmin/${subadminId}`, { method: 'DELETE' }),
+  getManagers: () => authFetch(`${API_BASE}/managers`),
+  createManager: (data) => authFetch(`${API_BASE}/create-manager`, { method: 'POST', body: JSON.stringify(data) }),
+  getReferralsByCode: (code) => authFetch(`${API_BASE}/referrals/${code}`),
+  getManagerStats: () => authFetch(`${API_BASE}/user/manager-stats`)
 };
 
 export { authAPI, userAPI, walletAPI, depositAPI, withdrawalAPI, referralAPI, jTokenPurchaseAPI, publicAPI, adminAPI, uploadToCloudinary };

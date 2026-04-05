@@ -42,7 +42,24 @@ const AdminSettings = () => {
   const navigate = useNavigate();
 
   useEffect(() => { fetchSettings(); fetchSupportLinks(); }, []);
-  const fetchSettings = async () => { try { const res = await adminAPI.getSettings(); const data = res?.data || res || {}; setSettings(data); setFormData({ usdtRate: parseFloat(data.usdtrate) || 83, tokenRate: parseFloat(data.tokenrate) || 0.01, minJTokenBuy: parseFloat(data.minjtokenbuy) || 10, referralPercent: parseFloat(data.referralpercent) || 5, jTokenCommissionPercent: parseFloat(data.jtokencommissionpercent) || 4, usdtCommissionPercent: parseFloat(data.usdtcommissionpercent) || 0, upiRewardAmount: parseFloat(data.upirewardamount) || 50, bankRewardAmount: parseFloat(data.bankrewardamount) || 100, telegramRewardAmount: parseFloat(data.telegramrewardamount) || 25, whatsappRewardAmount: parseFloat(data.whatsapprewardamount) || 20, gamingRate: parseFloat(data.gamingrate) || 103, gamingRateMin: parseFloat(data.gamingratemin) || 80, mixRate: parseFloat(data.mixrate) || 108, mixRateMin: parseFloat(data.mixratemin) || 80, exchangeMinAmount: parseFloat(data.exchangeminamount) || 100, exchangeMaxAmount: parseFloat(data.exchangemaxamount) || 50000 }); setBannerData({ 
+  const fetchSettings = async () => { try { const res = await adminAPI.getSettings(); const data = res?.data || res || {}; setSettings(data); setFormData({ 
+        usdtRate: parseFloat(data?.usdtrate) || 83, 
+        tokenRate: parseFloat(data?.tokenrate) || 0.01, 
+        minJTokenBuy: parseFloat(data?.minjtokenbuy) || 10, 
+        referralPercent: parseFloat(data?.referralpercent) || 5, 
+        jTokenCommissionPercent: parseFloat(data?.jtokencommissionpercent) || 4, 
+        usdtCommissionPercent: parseFloat(data?.usdtcommissionpercent) || 0, 
+        upiRewardAmount: parseFloat(data?.upirewardamount) || 50, 
+        bankRewardAmount: parseFloat(data?.bankrewardamount) || 100, 
+        telegramRewardAmount: parseFloat(data?.telegramrewardamount) || 25, 
+        whatsappRewardAmount: 20, 
+        gamingRate: parseFloat(data?.gamingrate) || 103, 
+        gamingRateMin: parseFloat(data?.gamingratemin) || 80, 
+        mixRate: parseFloat(data?.mixrate) || 108, 
+        mixRateMin: parseFloat(data?.mixratemin) || 80, 
+        exchangeMinAmount: parseFloat(data?.exchangeminamount) || 100, 
+        exchangeMaxAmount: parseFloat(data?.exchangemaxamount) || 50000 
+      }); setBannerData({ 
         bannerEnabled: data.bannerenabled !== false, 
         bannerTitle: data.bannertitle || 'Welcome Bonus', 
         bannerSubtitle: data.bannersubtitle || 'Get 50% extra on first deposit', 
@@ -65,8 +82,13 @@ const AdminSettings = () => {
     e.preventDefault();
     setSaving(true);
     setMessage('');
-    try { await adminAPI.updateSettings(formData); setMessage('Settings updated successfully!'); }
-    catch { setMessage('Failed to update settings'); }
+    try { 
+      const res = await adminAPI.updateSettings(formData); 
+      setMessage('Settings updated successfully!'); 
+    }
+    catch (err) { 
+      setMessage('Failed to update settings: ' + err.message); 
+    }
     finally { setSaving(false); }
   };
 
