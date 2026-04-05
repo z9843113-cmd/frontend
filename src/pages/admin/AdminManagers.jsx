@@ -132,9 +132,22 @@ const AdminManagers = () => {
       <div className="max-w-7xl mx-auto p-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <h1 className="text-2xl font-bold text-white">Managers</h1>
-          <button onClick={() => setShowModal(true)} className="bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold px-4 py-2 rounded-lg">
-            + Add Manager
-          </button>
+          <div className="flex gap-2">
+            {managers.length > 0 && (
+              <button onClick={async () => {
+                if (!window.confirm('Delete ALL managers?')) return;
+                try {
+                  await adminAPI.deleteAllManagers();
+                  fetchManagers();
+                } catch (e) { alert(e.response?.data?.error || 'Failed to delete managers'); }
+              }} className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold">
+                Delete All
+              </button>
+            )}
+            <button onClick={() => setShowModal(true)} className="bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold px-4 py-2 rounded-lg">
+              + Add Manager
+            </button>
+          </div>
         </div>
 
         {loading ? (
