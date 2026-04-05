@@ -19,18 +19,18 @@ const BottomNav = () => {
   const managerLinks = [
     { path: '/admin/dashboard', label: 'Home', Icon: FaHome },
     { path: '/admin/users', label: 'Users', Icon: FaUsers },
+    { path: '/admin/active-users', label: 'Active', Icon: FaUsers },
     { path: '/admin/deposits', label: 'Deposits', Icon: FaUserPlus },
     { path: '/admin/withdrawals', label: 'Withdraw', Icon: FaExchangeAlt },
-    { path: '/admin/jtoken-requests', label: 'Requests', Icon: FaUserCog },
     { path: '/admin/settings', label: 'Settings', Icon: FaCog },
   ];
 
   const adminLinks = [
     { path: '/admin/dashboard', label: 'Home', Icon: FaHome },
     { path: '/admin/users', label: 'Users', Icon: FaUsers },
+    { path: '/admin/active-users', label: 'Active', Icon: FaUsers },
     { path: '/admin/deposits', label: 'Deposits', Icon: FaUserPlus },
     { path: '/admin/withdrawals', label: 'Withdraw', Icon: FaExchangeAlt },
-    { path: '/admin/jtoken-requests', label: 'Requests', Icon: FaUserCog },
     { path: '/admin/settings', label: 'Settings', Icon: FaCog },
   ];
 
