@@ -420,7 +420,7 @@ const Deposit = () => {
                     <span className={`px-4 py-2 rounded-xl text-sm font-medium ${deposit.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : deposit.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
                       {deposit.status === 'APPROVED' ? 'SUCCESS' : deposit.status === 'REJECTED' ? 'FAILED' : deposit.status}
                     </span>
-                    <p className="text-gray-500 text-sm mt-1">{deposit.createdat ? new Date(deposit.createdat).toLocaleDateString() : 'N/A'}</p>
+                    <p className="text-gray-500 text-sm mt-1">{deposit.createdat ? new Date(deposit.createdat).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A'}</p>
                   </div>
                 </div>
               ))}

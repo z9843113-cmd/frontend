@@ -293,6 +293,7 @@ const Exchange = () => {
                   <div>
                     <p className="text-[#D4AF37] font-bold text-sm">${parseFloat(req.amount || 0).toFixed(2)} USDT</p>
                     <p className="text-gray-500 text-xs">{req.ratetype} @ ₹{req.rate}</p>
+                    <p className="text-gray-600 text-xs mt-1">{req.createdat ? new Date(req.createdat).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}</p>
                   </div>
                   <div className="text-right">
                     <span className={`px-2 py-1 rounded-lg text-xs font-medium ${req.status === 'APPROVED' ? 'bg-green-500/20 text-green-400' : req.status === 'REJECTED' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}`}>{req.status === 'APPROVED' ? 'SUCCESS' : req.status}</span>
