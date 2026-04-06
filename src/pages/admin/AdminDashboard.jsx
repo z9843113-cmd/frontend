@@ -211,10 +211,10 @@ const AdminDashboard = () => {
             <div className="flex-1">
               <p className="text-[#D4AF37] text-xs sm:text-sm font-bold uppercase tracking-widest mb-2">Current Company Balance</p>
               <p className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white min-w-0 truncate tracking-tight">
-                ₹{parseFloat(((parseFloat(stats?.totalJTokenInWallets || 0) + parseFloat(stats?.totalJTokenRedeemed || 0)) * (stats?.tokenRate || 1)).toFixed(2)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                ₹{parseFloat((stats?.totalINRInWallets || 0).toFixed(2)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               </p>
               <p className="text-gray-400 text-sm mt-3 font-medium">
-                {parseFloat((parseFloat(stats?.totalJTokenInWallets || 0) + parseFloat(stats?.totalJTokenRedeemed || 0)).toFixed(2)).toLocaleString('en-IN', { maximumFractionDigits: 2 })} JToken @ ₹{parseFloat(stats?.tokenRate || 0).toFixed(2)}/JToken
+                Total INR in all user wallets
               </p>
             </div>
             <div className="flex items-center gap-4">
