@@ -225,10 +225,7 @@ const AdminDashboard = () => {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Deposits</p>
-            <p className="text-lg sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent min-w-0 truncate">₹{parseFloat(stats?.totalDeposits || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
-          </div>
+          
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
             <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Withdrawals</p>
             <p className="text-lg sm:text-2xl md:text-3xl font-bold text-red-400 min-w-0 truncate">₹{parseFloat(stats?.totalWithdrawals || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
