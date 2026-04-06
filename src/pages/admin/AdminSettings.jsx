@@ -48,6 +48,8 @@ const AdminSettings = () => {
   const [passwordMessage, setPasswordMessage] = useState('');
   const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [savingPassword, setSavingPassword] = useState(false);
+  const [logoutAllMessage, setLogoutAllMessage] = useState('');
+  const [loggingOutAll, setLoggingOutAll] = useState(false);
   const { logout } = useAuthStore();
   const navigate = useNavigate();
 
@@ -389,6 +391,33 @@ const AdminSettings = () => {
               {savingPassword ? 'Changing...' : 'Change Password'}
             </button>
           </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-red-500/30">
+          <h3 className="text-lg font-semibold text-white mb-2">Logout All Devices</h3>
+          <p className="text-gray-400 text-sm mb-4">This will log you out from all other devices. Only current device will stay logged in.</p>
+          
+          {logoutAllMessage && <div className={`mb-4 px-4 py-2 rounded-xl ${logoutAllMessage.includes('success') ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>{logoutAllMessage}</div>}
+          
+          <button 
+            onClick={async () => {
+              if (!window.confirm('Are you sure you want to logout from all other devices?')) return;
+              setLogoutAllMessage('');
+              setLoggingOutAll(true);
+              try {
+                await adminAPI.logoutAll();
+                setLogoutAllMessage('Logged out from all other devices successfully!');
+              } catch (err) {
+                setLogoutAllMessage(err.message || 'Failed to logout from all devices');
+              } finally {
+                setLoggingOutAll(false);
+              }
+            }}
+            disabled={loggingOutAll}
+            className="w-full py-4 bg-red-600 text-white font-bold rounded-2xl disabled:opacity-50"
+          >
+            {loggingOutAll ? 'Logging out...' : 'Logout from All Devices'}
+          </button>
         </div>
 
         <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
