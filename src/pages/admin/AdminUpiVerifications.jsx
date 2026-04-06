@@ -120,7 +120,7 @@ const AdminUpiVerifications = () => {
       <div className="sticky top-0 z-30 border-b border-[#1a1a1a] bg-[#0d0d0d]/95 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
           <div className="flex items-center gap-4">
-            <button onClick={() => navigate('/admin')} className="rounded-2xl bg-[#1a1a1a] px-4 py-2 text-white hover:bg-[#252525]">
+            <button onClick={() => navigate('/admin/dashboard')} className="rounded-2xl bg-[#1a1a1a] px-4 py-2 text-white hover:bg-[#252525]">
               ← Back
             </button>
             <h1 className="text-xl font-bold text-white">UPI Verifications</h1>
