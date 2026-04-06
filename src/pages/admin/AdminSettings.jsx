@@ -186,11 +186,13 @@ const AdminSettings = () => {
     setSavingPassword(true);
     setPasswordMessage('');
     try {
+      console.log('Changing password for user:', req.user.id);
       await adminAPI.changePassword({ currentPassword: passwordData.currentPassword, newPassword: passwordData.newPassword });
       setPasswordMessage('Password changed successfully!');
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (err) {
-      setPasswordMessage(err.response?.data?.error || 'Failed to change password');
+      console.log('Password change error:', err);
+      setPasswordMessage(err.message || 'Failed to change password');
     } finally {
       setSavingPassword(false);
     }
