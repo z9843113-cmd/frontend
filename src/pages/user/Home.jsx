@@ -438,7 +438,6 @@ const Home = () => {
   const isUSDTTransaction = (item) => {
     if (item.entryType === 'exchange') return true;
     if ((item.method || '').toUpperCase().includes('USDT')) return true;
-    if ((item.type || '').toUpperCase().includes('USDT')) return true;
     if (item.type === 'USDT_DEPOSIT') return true;
     return false;
   };

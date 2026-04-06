@@ -99,10 +99,19 @@ const AdminManagers = () => {
   };
 
   const handleToggleJTokenRequest = async (manager, currentStatus) => {
+    const newStatus = !currentStatus;
+    
+    setManagers(managers.map(m => 
+      m.id === manager.id 
+        ? { ...m, managerJTokenRequestEnabled: newStatus } 
+        : m
+    ));
+    
     try {
-      await adminAPI.toggleManagerJTokenRequest(manager.id, !currentStatus);
+      await adminAPI.toggleManagerJTokenRequest(manager.id, newStatus);
       fetchManagers();
     } catch (e) {
+      fetchManagers();
       alert(e.response?.data?.error || 'Failed to update permission');
     }
   };
@@ -192,14 +201,14 @@ const AdminManagers = () => {
                 <div className="lg:col-span-1 mb-2 lg:mb-0">
                   <p className="text-gray-400 text-xs lg:hidden">JToken Request</p>
                   <button
-                    onClick={() => handleToggleJTokenRequest(m, m.managerJTokenRequestEnabled)}
+                    onClick={() => handleToggleJTokenRequest(m, m.managerJTokenRequestEnabled === true)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
-                      m.managerJTokenRequestEnabled 
+                      m.managerJTokenRequestEnabled === true
                         ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
                         : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
                     }`}
                   >
-                    {m.managerJTokenRequestEnabled ? '✓ Enabled' : '✕ Disabled'}
+                    {m.managerJTokenRequestEnabled === true ? '✓ Enabled' : '✕ Disabled'}
                   </button>
                 </div>
                 <div className="lg:col-span-1 mb-2 lg:mb-0">
