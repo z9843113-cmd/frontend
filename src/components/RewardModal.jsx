@@ -93,7 +93,7 @@ const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
             <h3 className="text-white font-bold mb-2">Steps to claim reward:</h3>
             <ol className="text-gray-400 text-sm space-y-2">
               <li>1. Click "Open Telegram" below</li>
-              <li>2. A message will auto-type</li>
+              <li>2. Send A message will auto-type</li>
             
             </ol>
           </div>
