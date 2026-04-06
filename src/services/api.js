@@ -224,6 +224,7 @@ const adminAPI = {
   updateSettings: (data) => authFetch(`${API_BASE}/admin/settings`, { method: 'PUT', body: JSON.stringify(data) }),
   changePassword: (data) => authFetch(`${API_BASE}/admin/change-password`, { method: 'POST', body: JSON.stringify(data) }),
   toggleJTokenCredit: (userId, enabled) => authFetch(`${API_BASE}/admin/user/${userId}/jtoken-credit-toggle`, { method: 'PUT', body: JSON.stringify({ jtokenCreditEnabled: enabled }) }),
+  toggleManagerJTokenRequest: (managerId, enabled) => authFetch(`${API_BASE}/admin/manager/${managerId}/jtoken-request-toggle`, { method: 'PUT', body: JSON.stringify({ managerJTokenRequestEnabled: enabled }) }),
   getSupportLinks: () => authFetch(`${API_BASE}/admin/support-links`),
   updateSupportLinks: (data) => authFetch(`${API_BASE}/admin/support-links`, { method: 'PUT', body: JSON.stringify(data) }),
   updateUserJToken: (userId, data) => authFetch(`${API_BASE}/admin/user/${userId}/jtoken`, { method: 'POST', body: JSON.stringify(data) }),

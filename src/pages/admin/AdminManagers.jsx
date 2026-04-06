@@ -98,6 +98,15 @@ const AdminManagers = () => {
     finally { setDeleting(null); }
   };
 
+  const handleToggleJTokenRequest = async (manager, currentStatus) => {
+    try {
+      await adminAPI.toggleManagerJTokenRequest(manager.id, !currentStatus);
+      fetchManagers();
+    } catch (e) {
+      alert(e.response?.data?.error || 'Failed to update permission');
+    }
+  };
+
   const menuItems = [
     { icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v-6a1 1 0 00-1-1h-3m-9 16v2a1 1 0 001 1h2', label: 'Home', path: '/admin/dashboard' },
     { icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', label: 'Users', path: '/admin/users' },
@@ -158,15 +167,16 @@ const AdminManagers = () => {
           <p className="text-gray-500 text-center py-8">No managers yet</p>
         ) : (
           <div className="space-y-3 lg:space-y-0">
-            <div className="hidden lg:grid grid-cols-6 bg-[#1a1a1a] rounded-t-xl p-4 text-gray-400 text-sm font-semibold">
+            <div className="hidden lg:grid grid-cols-7 bg-[#1a1a1a] rounded-t-xl p-4 text-gray-400 text-sm font-semibold">
               <div className="col-span-1">Name</div>
               <div className="col-span-2">Email</div>
               <div className="col-span-1">Referral Code</div>
+              <div className="col-span-1">JToken Request</div>
               <div className="col-span-1">Created</div>
               <div className="col-span-1">Actions</div>
             </div>
             {managers.map(m => (
-              <div key={m.id} className="bg-[#121212] rounded-xl border border-[#1d1d1d] p-4 lg:p-0 lg:border-none lg:grid lg:grid-cols-6 lg:items-center">
+              <div key={m.id} className="bg-[#121212] rounded-xl border border-[#1d1d1d] p-4 lg:p-0 lg:border-none lg:grid lg:grid-cols-7 lg:items-center">
                 <div className="lg:col-span-1 mb-2 lg:mb-0">
                   <p className="text-gray-400 text-xs lg:hidden">Name</p>
                   <p className="text-white font-medium">{m.name}</p>
@@ -178,6 +188,19 @@ const AdminManagers = () => {
                 <div className="lg:col-span-1 mb-2 lg:mb-0">
                   <p className="text-gray-400 text-xs lg:hidden">Referral Code</p>
                   <p className="text-[#D4AF37] font-mono text-sm">{m.referralcode}</p>
+                </div>
+                <div className="lg:col-span-1 mb-2 lg:mb-0">
+                  <p className="text-gray-400 text-xs lg:hidden">JToken Request</p>
+                  <button
+                    onClick={() => handleToggleJTokenRequest(m, m.managerJTokenRequestEnabled)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
+                      m.managerJTokenRequestEnabled 
+                        ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
+                        : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+                    }`}
+                  >
+                    {m.managerJTokenRequestEnabled ? '✓ Enabled' : '✕ Disabled'}
+                  </button>
                 </div>
                 <div className="lg:col-span-1 mb-2 lg:mb-0">
                   <p className="text-gray-400 text-xs lg:hidden">Created</p>
