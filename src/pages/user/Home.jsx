@@ -438,15 +438,18 @@ const Home = () => {
     if (item.entryType === 'exchange') return true;
     if ((item.method || '').toUpperCase().includes('USDT')) return true;
     if (item.type === 'USDT_DEPOSIT') return true;
+    if (item.type === 'DEPOSIT_DISCOUNT') return true;
+    if (item.entryType === 'deposit' && (item.method || '').toUpperCase().includes('USDT')) return true;
     return false;
   };
 
   const isINRTransaction = (item) => {
     if (item.entryType === 'exchange') return false;
+    if (item.entryType === 'deposit' && (item.method || '').toUpperCase().includes('USDT')) return false;
     if (item.type === 'DEPOSIT' || item.type === 'WITHDRAWAL') return true;
     if (item.type === 'REWARD' || item.type === 'COMMISSION') return true;
     if (item.type === 'SOLD_TOKENS' || item.type === 'TRANSFER') return true;
-    if (item.type === 'JTOKEN_PURCHASE' || item.type === 'DEPOSIT_DISCOUNT') return true;
+    if (item.type === 'JTOKEN_PURCHASE') return true;
     if (item.type === 'EXCHANGE') return true;
     if (item.entryType === 'deposit' || item.entryType === 'withdrawal') return true;
     return false;
