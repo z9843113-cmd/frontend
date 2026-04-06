@@ -214,7 +214,7 @@ const AdminDashboard = () => {
                 ₹{parseFloat((stats?.totalINRInWallets || 0).toFixed(2)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               </p>
               <p className="text-gray-400 text-sm mt-3 font-medium">
-                Total INR in all user wallets
+                {parseFloat((parseFloat(stats?.totalJTokenInWallets || 0) + parseFloat(stats?.totalJTokenRedeemed || 0)).toFixed(2)).toLocaleString('en-IN', { maximumFractionDigits: 2 })} JToken @ ₹{parseFloat(stats?.tokenRate || 0).toFixed(2)}/JToken
               </p>
             </div>
             <div className="flex items-center gap-4">
