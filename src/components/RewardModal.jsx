@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaWallet, FaUniversity, FaTelegramPlane, FaGift, FaTimes, FaCheckCircle, FaChevronRight, FaWhatsapp, FaHeadset } from 'react-icons/fa';
 
-const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
+const RewardModal = ({ onClose, userData, telegramSupportUrl, rewardSettings }) => {
   const navigate = useNavigate();
 
   const upiRewardAmount = parseFloat(rewardSettings?.upiRewardAmount) || 20;
@@ -63,9 +63,9 @@ const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
   };
 
   const handleTelegramSupport = () => {
-    const botUsername = telegramBotUrl?.replace('https://t.me/', '') || 'zcryptoauthbot';
-    const message = encodeURIComponent('Hello, I need to verify my mobile number.');
-    window.open(`https://t.me/${botUsername}?start=${message}`, '_blank');
+    if (telegramSupportUrl) {
+      window.open(telegramSupportUrl, '_blank');
+    }
   };
 
   const [showTelegramClaimModal, setShowTelegramClaimModal] = useState(false);

@@ -54,6 +54,7 @@ const Home = () => {
   });
   const [userAccountData, setUserAccountData] = useState({ hasUPI: false, hasBank: false, hasTelegram: false });
   const [rewardSettings, setRewardSettings] = useState({ upiRewardAmount: 20, bankRewardAmount: 20, telegramRewardAmount: 20 });
+  const [supportLinks, setSupportLinks] = useState({ telegramSupport: '' });
   const [paymentEnabled, setPaymentEnabled] = useState(true);
   const [togglingPayment, setTogglingPayment] = useState(false);
   const [banner, setBanner] = useState({
@@ -134,7 +135,7 @@ const Home = () => {
   useEffect(() => {
     const loadHome = async () => {
       try {
-        const [walletRes, depositsRes, withdrawalsRes, profileRes, upiRes, bankRes, ratesRes, adminSettingsRes, publicSettingsRes, statsRes, exchangeRes, transactionsRes] = await Promise.all([
+        const [walletRes, depositsRes, withdrawalsRes, profileRes, upiRes, bankRes, ratesRes, adminSettingsRes, publicSettingsRes, supportLinksRes, statsRes, exchangeRes, transactionsRes] = await Promise.all([
           walletAPI.getWallet(),
           depositAPI.getHistory(),
           withdrawalAPI.getHistory(),
@@ -144,6 +145,7 @@ const Home = () => {
           publicAPI.getCryptoRates(),
           adminAPI.getSettings().catch(() => ({})),
           publicAPI.getSettings().catch(() => ({})),
+          userAPI.getSupportLinks().catch(() => ({})),
           userAPI.getUserStats().catch(() => ({ data: {} })),
           userAPI.getMyExchangeRequests().catch(() => ({ data: [] })),
           userAPI.getTransactions().catch(() => [])
@@ -160,6 +162,7 @@ const Home = () => {
         const ratesData = ratesRes?.data || ratesRes || [];
         const adminSettingsData = adminSettingsRes?.data || adminSettingsRes || {};
         const publicSettingsData = publicSettingsRes?.data || publicSettingsRes || {};
+        const supportLinksData = supportLinksRes?.data || supportLinksRes || {};
         const settingsData = { ...adminSettingsData, ...publicSettingsData };
         console.log('Admin Settings Response:', adminSettingsRes);
         console.log('Public Settings Response:', publicSettingsRes);
@@ -210,6 +213,10 @@ const Home = () => {
           bankRewardAmount: parseFloat(settingsData?.bankrewardamount) || 20,
           telegramRewardAmount: parseFloat(settingsData?.telegramrewardamount) || 20,
           whatsappRewardAmount: parseFloat(settingsData?.whatsapprewardamount) || 20
+        });
+
+        setSupportLinks({
+          telegramSupport: supportLinksData.telegramsupport || ''
         });
         
         console.log('Settings Data:', settingsData);
@@ -898,7 +905,7 @@ const Home = () => {
       <BottomNav />
 
       {showRewardModal && (
-        <RewardModal onClose={() => setShowRewardModal(false)} userData={userAccountData} telegramBotUrl="https://t.me/zcryptoauthbot" rewardSettings={rewardSettings} />
+        <RewardModal onClose={() => setShowRewardModal(false)} userData={userAccountData} telegramSupportUrl={supportLinks.telegramSupport} rewardSettings={rewardSettings} />
       )}
 
       {/* UPI Warning Popup */}
