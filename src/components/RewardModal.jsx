@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaWallet, FaUniversity, FaTelegramPlane, FaGift, FaTimes, FaCheckCircle, FaChevronRight, FaKey, FaWhatsapp } from 'react-icons/fa';
+import { FaWallet, FaUniversity, FaTelegramPlane, FaGift, FaTimes, FaCheckCircle, FaChevronRight, FaWhatsapp, FaHeadset } from 'react-icons/fa';
 
 const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
   const navigate = useNavigate();
-  const [showTelegramInput, setShowTelegramInput] = useState(false);
-  const [telegramKey, setTelegramKey] = useState('');
 
   const upiRewardAmount = parseFloat(rewardSettings?.upiRewardAmount) || 20;
   const bankRewardAmount = parseFloat(rewardSettings?.bankRewardAmount) || 20;
@@ -38,15 +36,15 @@ const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
       textColor: 'text-green-400'
     },
     {
-      id: 'telegram',
-      icon: <FaTelegramPlane className="w-8 h-8" />,
-      title: 'Connect Telegram',
-      description: 'Get instant notifications',
+      id: 'telegram_support',
+      icon: <FaHeadset className="w-8 h-8" />,
+      title: 'Telegram Support',
+      description: 'Message admin for mobile verification',
       reward: telegramRewardAmount,
-      completed: userData?.hasTelegram || false,
-      color: 'from-purple-500 to-pink-600',
-      bgColor: 'bg-purple-500/20',
-      textColor: 'text-purple-400'
+      completed: false,
+      color: 'from-blue-500 to-cyan-600',
+      bgColor: 'bg-blue-500/20',
+      textColor: 'text-blue-400'
     }
   ];
 
@@ -56,89 +54,65 @@ const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
   const earnedReward = completedTasks.reduce((sum, t) => sum + t.reward, 0);
 
   const handleComplete = (task) => {
-    if (task.id === 'telegram') {
-      handleOpenTelegram();
-    } else {
+    if (task.id === 'telegram_support') {
+      setShowTelegramClaimModal(true);
+    } else if (task.id === 'upi' || task.id === 'whatsapp') {
       onClose();
       navigate(task.path);
     }
   };
 
-  const handleOpenTelegram = () => {
+  const handleTelegramSupport = () => {
     const botUsername = telegramBotUrl?.replace('https://t.me/', '') || 'zcryptoauthbot';
-    window.open(`https://t.me/${botUsername}`, '_blank');
-    setShowTelegramInput(true);
+    const message = encodeURIComponent('Hello, I need to verify my mobile number.');
+    window.open(`https://t.me/${botUsername}?start=${message}`, '_blank');
   };
 
-  const handleBindTelegram = () => {
-    if (telegramKey.trim().length > 0) {
-      onClose();
-      navigate('/profile?telegram_key=' + encodeURIComponent(telegramKey.trim()));
-    }
-  };
+  const [showTelegramClaimModal, setShowTelegramClaimModal] = useState(false);
 
-  if (showTelegramInput) {
+  if (showTelegramClaimModal) {
     return (
       <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 w-full max-w-md border border-purple-500/30">
+        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 w-full max-w-md border border-blue-500/30">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                <FaTelegramPlane className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                <FaHeadset className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Connect Telegram</h2>
-                <p className="text-purple-400 text-sm">Enter your verification key</p>
+                <h2 className="text-xl font-bold text-white">Telegram Support</h2>
+                <p className="text-blue-400 text-sm">Reward: ₹{telegramRewardAmount}</p>
               </div>
             </div>
-            <button onClick={() => setShowTelegramInput(false)} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
+            <button onClick={() => setShowTelegramClaimModal(false)} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
               <FaTimes className="w-5 h-5 text-gray-400" />
             </button>
           </div>
 
           <div className="bg-[#0a0a0a] rounded-2xl p-4 border border-[#2a2a2a] mb-4">
-            <h3 className="text-white font-bold mb-2">How to bind Telegram:</h3>
+            <h3 className="text-white font-bold mb-2">Steps to claim reward:</h3>
             <ol className="text-gray-400 text-sm space-y-2">
-              <li>1. Click "Open Telegram Bot" below</li>
-              <li>2. Send /start to the bot</li>
-              <li>3. Enter your registered email</li>
-              <li>4. Bot will give you a verification key</li>
-              <li>5. Copy & paste that key here</li>
-              <li>6. Click "Bind Telegram" button</li>
+              <li>1. Click "Open Telegram" below</li>
+              <li>2. A message will auto-type</li>
+              <li>3. Send the message to admin</li>
+              <li>4. Wait for admin reply</li>
+              <li>5. Admin will credit reward manually</li>
             </ol>
           </div>
 
           <button
-            onClick={handleOpenTelegram}
-            className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 mb-4"
+            onClick={handleTelegramSupport}
+            className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 mb-4"
           >
             <FaTelegramPlane className="w-5 h-5" />
-            Open Telegram Bot
-            <FaChevronRight className="w-4 h-4" />
+            Open Telegram
           </button>
 
-          <div className="mb-4">
-            <label className="block text-gray-400 text-sm mb-2">Verification Key (from bot)</label>
-            <input
-              type="text"
-              value={telegramKey}
-              onChange={(e) => setTelegramKey(e.target.value.toUpperCase())}
-              placeholder="Paste key here (e.g., TGABC1234)"
-              className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:border-purple-500 focus:outline-none"
-            />
-          </div>
-
           <button
-            onClick={handleBindTelegram}
-            disabled={telegramKey.trim().length === 0}
-            className={`w-full py-3 font-bold rounded-xl flex items-center justify-center gap-2 ${
-              telegramKey.trim().length > 0
-                ? 'bg-gradient-to-r from-purple-500 to-pink-600 text-white'
-                : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-            }`}
+            onClick={() => setShowTelegramClaimModal(false)}
+            className="w-full py-3 bg-gray-600 text-white font-bold rounded-xl"
           >
-            <FaKey className="w-5 h-5" />
-            Bind Telegram (+₹20)
+            Close
           </button>
         </div>
       </div>
