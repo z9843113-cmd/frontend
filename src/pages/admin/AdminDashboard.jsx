@@ -281,10 +281,10 @@ const AdminDashboard = () => {
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
               </div>
-              <span className="text-gray-400 text-sm font-medium">Total USDT Deposits</span>
+              <span className="text-gray-400 text-sm font-medium">Current Crypto Portfolio </span>
             </div>
             <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-emerald-400">{parseFloat(stats?.totalUsdtDeposits || 0).toFixed(2)} USDT</p>
-            <p className="text-xs text-gray-500 mt-1">₹{parseFloat((stats?.totalUsdtDeposits || 0) * (stats?.tokenRate || 83)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+            <p className="text-xs text-gray-500 mt-1">${parseFloat((stats?.totalUsdtDeposits || 0) * (stats?.tokenRate || 83)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
           </div>
           <div className="bg-gradient-to-br from-[#1f1f1f] to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] hover:border-cyan-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10">
             <div className="flex items-center gap-3 mb-3">
@@ -294,7 +294,7 @@ const AdminDashboard = () => {
               <span className="text-gray-400 text-sm font-medium">Total Exchanges</span>
             </div>
             <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-cyan-400">{parseFloat(stats?.totalExchanges || 0).toFixed(2)} USDT</p>
-            <p className="text-xs text-gray-500 mt-1">₹{parseFloat((stats?.totalExchanges || 0) * (stats?.tokenRate || 83)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+            <p className="text-xs text-gray-500 mt-1">${parseFloat((stats?.totalExchanges || 0) * (stats?.tokenRate || 83)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
           </div>
         </div>
 
@@ -313,7 +313,7 @@ const AdminDashboard = () => {
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               </div>
-              <span className="text-gray-400 text-sm font-medium">Commission Earned</span>
+              <span className="text-gray-400 text-sm font-medium">Total Commission Payouts</span>
             </div>
             <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-400">₹{parseFloat(stats?.totalJTokenCommission || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
@@ -334,7 +334,7 @@ const AdminDashboard = () => {
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-pink-500/20 flex items-center justify-center">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               </div>
-              <span className="text-gray-400 text-sm font-medium">Total Rewards Given</span>
+              <span className="text-gray-400 text-sm font-medium">Total Rewards Payouts</span>
             </div>
             <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-pink-400">₹{parseFloat(stats?.totalRewardPayouts || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
             <p className="text-xs text-gray-500 mt-2">Today: ₹{parseFloat(stats?.todayRewardPayouts || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
