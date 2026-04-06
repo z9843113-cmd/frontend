@@ -317,6 +317,13 @@ const AdminDashboard = () => {
           </div>
         )}
 
+        <div className="w-full bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#D4AF37]/30 mb-4">
+          <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Current Company JToken Balance (Total Approved)</p>
+          <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#D4AF37] min-w-0 truncate">
+            {parseFloat((parseFloat(stats?.totalJTokenInWallets || 0) + parseFloat(stats?.totalJTokenRedeemed || 0)).toFixed(2)).toLocaleString('en-IN', { maximumFractionDigits: 2 })} JToken
+          </p>
+        </div>
+
         <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
             <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">J Token Balance</p>
