@@ -205,21 +205,21 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="p-5 space-y-5 max-w-2xl mx-auto lg:ml-80 pb-24">
-        <div className="w-full bg-gradient-to-br from-[#D4AF37]/20 via-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-[#D4AF37]/40 mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <p className="text-[#D4AF37] text-xs sm:text-sm font-semibold uppercase tracking-wider mb-1">Current Company JToken Balance (Total Approved)</p>
-              <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-white min-w-0 truncate">
+      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 w-full pb-28">
+        <div className="w-full bg-gradient-to-br from-[#D4AF37]/30 via-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-6 sm:p-10 border border-[#D4AF37]/50 shadow-lg shadow-[#D4AF37]/10">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div className="flex-1">
+              <p className="text-[#D4AF37] text-xs sm:text-sm font-bold uppercase tracking-widest mb-2">Current Company Balance</p>
+              <p className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white min-w-0 truncate tracking-tight">
                 ₹{parseFloat(((parseFloat(stats?.totalJTokenInWallets || 0) + parseFloat(stats?.totalJTokenRedeemed || 0)) * (stats?.tokenRate || 1)).toFixed(2)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               </p>
-              <p className="text-gray-500 text-xs mt-2">
+              <p className="text-gray-400 text-sm mt-3 font-medium">
                 {parseFloat((parseFloat(stats?.totalJTokenInWallets || 0) + parseFloat(stats?.totalJTokenRedeemed || 0)).toFixed(2)).toLocaleString('en-IN', { maximumFractionDigits: 2 })} JToken @ ₹{parseFloat(stats?.tokenRate || 0).toFixed(2)}/JToken
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-16 h-16 rounded-2xl bg-[#D4AF37]/20 flex items-center justify-center">
-                <svg className="w-8 h-8 text-[#D4AF37]" fill="currentColor" viewBox="0 0 24 24">
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-[#D4AF37]/30 to-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/30">
+                <svg className="w-10 h-10 sm:w-12 sm:h-12 text-[#D4AF37]" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/>
                 </svg>
               </div>
@@ -227,63 +227,115 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Users</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white min-w-0 truncate">{stats?.totalUsers || 0}</p>
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+          <div className="bg-gradient-to-br from-[#1f1f1f] to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] hover:border-[#3a3a3a] transition-all duration-300 hover:shadow-lg hover:shadow-black/20">
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+              </div>
+              <span className="text-gray-500 text-xs font-medium">Total Users</span>
+            </div>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">{stats?.totalUsers || 0}</p>
           </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Verified Users</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-400 min-w-0 truncate">{stats?.verifiedUsers || 0}</p>
+          <div className="bg-gradient-to-br from-[#1f1f1f] to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] hover:border-green-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/10">
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <span className="text-gray-500 text-xs font-medium">Verified</span>
+            </div>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-400">{stats?.verifiedUsers || 0}</p>
           </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Pending Deposits</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-400 min-w-0 truncate">{stats?.pendingDeposits || 0}</p>
+          <div className="bg-gradient-to-br from-[#1f1f1f] to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] hover:border-yellow-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/10">
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <span className="text-gray-500 text-xs font-medium">Pending Deposits</span>
+            </div>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-yellow-400">{stats?.pendingDeposits || 0}</p>
           </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Pending Withdrawals</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-400 min-w-0 truncate">{stats?.pendingWithdrawals || 0}</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Withdrawals</p>
-            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-red-400 min-w-0 truncate">₹{parseFloat(stats?.totalWithdrawals || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total USDT Deposits</p>
-            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-emerald-400 min-w-0 truncate">₹{parseFloat(stats?.totalUsdtDeposits || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
-          </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Exchanges</p>
-            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-cyan-400 min-w-0 truncate">${parseFloat(stats?.totalExchanges || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total INR Deposit / JToken Buy</p>
-            <p className="text-lg sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent min-w-0 truncate">₹{parseFloat(stats?.jTokenPurchaseAmount || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
-          </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Commission Earned</p>
-            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-orange-400 min-w-0 truncate">₹{parseFloat(stats?.totalJTokenCommission || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+          <div className="bg-gradient-to-br from-[#1f1f1f] to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] hover:border-orange-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10">
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" /></svg>
+              </div>
+              <span className="text-gray-500 text-xs font-medium">Pending Withdrawals</span>
+            </div>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-400">{stats?.pendingWithdrawals || 0}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Pending JToken Requests</p>
-            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-yellow-400 min-w-0 truncate">₹{parseFloat(stats?.pendingJTokenOrdersValue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+          <div className="bg-gradient-to-br from-[#1f1f1f] to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] hover:border-red-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/10">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+              </div>
+              <span className="text-gray-400 text-sm font-medium">Total Withdrawals</span>
+            </div>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-red-400">₹{parseFloat(stats?.totalWithdrawals || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
           </div>
-          <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-[#2a2a2a]">
-            <p className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2">Total Rewards Given</p>
-            <p className="text-lg sm:text-2xl md:text-3xl font-bold text-pink-400 min-w-0 truncate">₹{parseFloat(stats?.totalRewardPayouts || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
-            <p className="text-xs text-gray-500 mt-1">Today: ₹{parseFloat(stats?.todayRewardPayouts || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+          <div className="bg-gradient-to-br from-[#1f1f1f] to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] hover:border-emerald-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+              </div>
+              <span className="text-gray-400 text-sm font-medium">Total USDT Deposits</span>
+            </div>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-emerald-400">₹{parseFloat(stats?.totalUsdtDeposits || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+          </div>
+          <div className="bg-gradient-to-br from-[#1f1f1f] to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] hover:border-cyan-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+              </div>
+              <span className="text-gray-400 text-sm font-medium">Total Exchanges</span>
+            </div>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-cyan-400">₹{parseFloat(stats?.totalExchanges || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+          <div className="bg-gradient-to-br from-[#D4AF37]/10 to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#D4AF37]/30 hover:border-[#D4AF37]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#D4AF37]/10">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#D4AF37]/20 flex items-center justify-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#D4AF37]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+              </div>
+              <span className="text-gray-400 text-sm font-medium">INR Deposit / JToken Buy</span>
+            </div>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent">₹{parseFloat(stats?.jTokenPurchaseAmount || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+          </div>
+          <div className="bg-gradient-to-br from-[#1f1f1f] to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] hover:border-orange-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <span className="text-gray-400 text-sm font-medium">Commission Earned</span>
+            </div>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-orange-400">₹{parseFloat(stats?.totalJTokenCommission || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+          </div>
+          <div className="bg-gradient-to-br from-[#1f1f1f] to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] hover:border-yellow-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/10">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <span className="text-gray-400 text-sm font-medium">Pending JToken Orders</span>
+            </div>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-yellow-400">₹{parseFloat(stats?.pendingJTokenOrdersValue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+          <div className="bg-gradient-to-br from-[#1f1f1f] to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] hover:border-pink-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-pink-500/10">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-pink-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <span className="text-gray-400 text-sm font-medium">Total Rewards Given</span>
+            </div>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-pink-400">₹{parseFloat(stats?.totalRewardPayouts || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            <p className="text-xs text-gray-500 mt-2">Today: ₹{parseFloat(stats?.todayRewardPayouts || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
           </div>
         </div>
 
@@ -335,32 +387,11 @@ const AdminDashboard = () => {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-          </div>
-        )}
-
-        <div className="w-full bg-gradient-to-br from-[#D4AF37]/20 via-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-[#D4AF37]/40 mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <p className="text-[#D4AF37] text-xs sm:text-sm font-semibold uppercase tracking-wider mb-1">Current Company JToken Balance (Total Approved)</p>
-              <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-white min-w-0 truncate">
-                ₹{parseFloat(((parseFloat(stats?.totalJTokenInWallets || 0) + parseFloat(stats?.totalJTokenRedeemed || 0)) * (stats?.tokenRate || 1)).toFixed(2)).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
-              </p>
-              <p className="text-gray-500 text-xs mt-2">
-                {parseFloat((parseFloat(stats?.totalJTokenInWallets || 0) + parseFloat(stats?.totalJTokenRedeemed || 0)).toFixed(2)).toLocaleString('en-IN', { maximumFractionDigits: 2 })} JToken @ ₹{parseFloat(stats?.tokenRate || 0).toFixed(2)}/JToken
-              </p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-16 h-16 rounded-2xl bg-[#D4AF37]/20 flex items-center justify-center">
-                <svg className="w-8 h-8 text-[#D4AF37]" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/>
-                </svg>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
-      </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-[#0d0d0d]/95 backdrop-blur-2xl border-t border-[#1a1a1a] lg:hidden z-50">
+        <div className="fixed bottom-0 left-0 right-0 bg-[#0d0d0d]/95 backdrop-blur-2xl border-t border-[#1a1a1a] lg:hidden z-50">
         <div className="flex items-center justify-around py-2 px-1">
           <button onClick={() => navigate('/admin/dashboard')} className="flex flex-col items-center gap-1.5 p-2 text-[#D4AF37]">
             <div className="w-10 h-10 rounded-2xl bg-[#D4AF37]/20 flex items-center justify-center">
