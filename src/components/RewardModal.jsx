@@ -63,8 +63,13 @@ const RewardModal = ({ onClose, userData, telegramSupportUrl, rewardSettings }) 
   };
 
   const handleTelegramSupport = () => {
-    if (telegramSupportUrl) {
-      window.open(telegramSupportUrl, '_blank');
+    console.log('Telegram Support URL:', telegramSupportUrl);
+    let url = telegramSupportUrl;
+    if (url && !url.startsWith('http')) {
+      url = 'https://' + url;
+    }
+    if (url) {
+      window.open(url, '_blank');
     }
   };
 
