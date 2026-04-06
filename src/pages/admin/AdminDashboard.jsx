@@ -283,7 +283,8 @@ const AdminDashboard = () => {
               </div>
               <span className="text-gray-400 text-sm font-medium">Total USDT Deposits</span>
             </div>
-            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-emerald-400">₹{parseFloat(stats?.totalUsdtDeposits || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-emerald-400">{parseFloat(stats?.totalUsdtDeposits || 0).toFixed(2)} USDT</p>
+            <p className="text-xs text-gray-500 mt-1">₹{parseFloat((stats?.totalUsdtDeposits || 0) * (stats?.tokenRate || 83)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
           </div>
           <div className="bg-gradient-to-br from-[#1f1f1f] to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] hover:border-cyan-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10">
             <div className="flex items-center gap-3 mb-3">
@@ -292,7 +293,8 @@ const AdminDashboard = () => {
               </div>
               <span className="text-gray-400 text-sm font-medium">Total Exchanges</span>
             </div>
-            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-cyan-400">₹{parseFloat(stats?.totalExchanges || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-cyan-400">{parseFloat(stats?.totalExchanges || 0).toFixed(2)} USDT</p>
+            <p className="text-xs text-gray-500 mt-1">₹{parseFloat((stats?.totalExchanges || 0) * (stats?.tokenRate || 83)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
           </div>
         </div>
 
