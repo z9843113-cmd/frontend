@@ -145,6 +145,29 @@ const AdminUsers = () => {
                       </p>
                       {!userDetails.paymentEnabled && <p className="text-red-400/70 text-xs mt-1">User has disabled payments</p>}
                     </div>
+                    <div className={`rounded-xl p-3 ${userDetails.jtokenCreditEnabled ? 'bg-green-500/10 border border-green-500/30' : 'bg-red-500/10 border border-red-500/30'}`}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-gray-500 text-xs">JToken Credit/Debit</p>
+                          <p className={`font-bold text-sm ${userDetails.jtokenCreditEnabled ? 'text-green-400' : 'text-red-400'}`}>
+                            {userDetails.jtokenCreditEnabled ? '✓ Enabled' : '✕ Disabled'}
+                          </p>
+                        </div>
+                        <button
+                          onClick={async () => {
+                            try {
+                              await adminAPI.toggleJTokenCredit(selectedUser, !userDetails.jtokenCreditEnabled);
+                              setUserDetails({ ...userDetails, jtokenCreditEnabled: !userDetails.jtokenCreditEnabled });
+                            } catch (err) {
+                              alert(err.response?.data?.error || 'Failed to update');
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-medium ${userDetails.jtokenCreditEnabled ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'}`}
+                        >
+                          {userDetails.jtokenCreditEnabled ? 'Disable' : 'Enable'}
+                        </button>
+                      </div>
+                    </div>
                     <div className="bg-[#0a0a0a] rounded-xl p-3">
                       <p className="text-gray-500 text-xs">Telegram Name</p>
                       <p className="text-white font-medium">{userDetails.user?.telegramname || 'N/A'}</p>
