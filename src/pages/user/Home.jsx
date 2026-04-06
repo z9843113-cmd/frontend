@@ -400,7 +400,6 @@ const Home = () => {
       method: item.ratetype === 'GAMING' ? 'Sell USDT' : 'Sell USDT'
     }));
     
-    // Only add non-USDT transactions to avoid duplicates
     const transactionItems = recentTransactions
       .filter(item => item.type !== 'USDT_DEPOSIT')
       .map((item) => ({ 
@@ -411,7 +410,7 @@ const Home = () => {
     
     return [...depositItems, ...withdrawalItems, ...exchangeItems, ...transactionItems]
       .sort((a, b) => new Date(b.createdat || 0) - new Date(a.createdat || 0))
-      .slice(0, 6);
+      .slice(0, 50);
   };
 
   const isPositiveTransaction = (item) => {
@@ -443,6 +442,7 @@ const Home = () => {
   };
 
   const isINRTransaction = (item) => {
+    if (item.entryType === 'exchange') return false;
     if (item.type === 'DEPOSIT' || item.type === 'WITHDRAWAL') return true;
     if (item.type === 'REWARD' || item.type === 'COMMISSION') return true;
     if (item.type === 'SOLD_TOKENS' || item.type === 'TRANSFER') return true;
