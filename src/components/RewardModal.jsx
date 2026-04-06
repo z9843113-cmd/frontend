@@ -94,13 +94,10 @@ const RewardModal = ({ onClose, userData, telegramSupportUrl, rewardSettings }) 
             </button>
           </div>
 
-          <div className="bg-[#0a0a0a] rounded-2xl p-4 border border-[#2a2a2a] mb-4">
-            <h3 className="text-white font-bold mb-2">Steps to claim reward:</h3>
-            <ol className="text-gray-400 text-sm space-y-2">
-              <li>1. Click "Open Telegram" below</li>
-              <li>2. Send A message will auto-type</li>
-            
-            </ol>
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-4 mb-4">
+            <p className="text-yellow-400 text-sm font-medium">
+              ⚠️ Please complete number verification otherwise you can't listed on verified user company never help to cover any losses
+            </p>
           </div>
 
           <button
