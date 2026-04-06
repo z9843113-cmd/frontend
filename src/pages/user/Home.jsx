@@ -439,7 +439,6 @@ const Home = () => {
     if ((item.method || '').toUpperCase().includes('USDT')) return true;
     if (item.type === 'USDT_DEPOSIT') return true;
     if (item.type === 'DEPOSIT_DISCOUNT') return true;
-    if (item.type === 'EXCHANGE') return true;
     if (item.entryType === 'deposit' && (item.method || '').toUpperCase().includes('USDT')) return true;
     return false;
   };
@@ -447,7 +446,7 @@ const Home = () => {
   const isINRTransaction = (item) => {
     if (item.entryType === 'exchange') return false;
     if (item.entryType === 'deposit' && (item.method || '').toUpperCase().includes('USDT')) return false;
-    if (item.type === 'EXCHANGE') return false;
+    if (item.type === 'EXCHANGE') return true;
     if (item.type === 'DEPOSIT' || item.type === 'WITHDRAWAL') return true;
     if (item.type === 'REWARD' || item.type === 'COMMISSION') return true;
     if (item.type === 'SOLD_TOKENS' || item.type === 'TRANSFER') return true;
