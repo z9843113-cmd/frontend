@@ -222,6 +222,7 @@ const adminAPI = {
   deleteCryptoAddress: (id) => authFetch(`${API_BASE}/admin/crypto/${id}`, { method: 'DELETE' }),
   getSettings: () => authFetch(`${API_BASE}/admin/settings`),
   updateSettings: (data) => authFetch(`${API_BASE}/admin/settings`, { method: 'PUT', body: JSON.stringify(data) }),
+  changePassword: (data) => authFetch(`${API_BASE}/admin/change-password`, { method: 'POST', body: JSON.stringify(data) }),
   getSupportLinks: () => authFetch(`${API_BASE}/admin/support-links`),
   updateSupportLinks: (data) => authFetch(`${API_BASE}/admin/support-links`, { method: 'PUT', body: JSON.stringify(data) }),
   updateUserJToken: (userId, data) => authFetch(`${API_BASE}/admin/user/${userId}/jtoken`, { method: 'POST', body: JSON.stringify(data) }),

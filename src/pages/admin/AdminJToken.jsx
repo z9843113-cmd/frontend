@@ -11,7 +11,7 @@ const AdminJToken = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [amount, setAmount] = useState('');
   const [action, setAction] = useState('CREDIT');
-  const [statusType, setStatusType] = useState('REWARD');
+  const [statusType, setStatusType] = useState('SOLD_TOKENS');
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
   const [limitSaving, setLimitSaving] = useState(false);
@@ -289,10 +289,11 @@ const AdminJToken = () => {
                   <div>
                     <label className="block text-sm text-gray-400 mb-2">Status Type</label>
                     <select value={statusType} onChange={(e) => setStatusType(e.target.value)} className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white focus:border-[#D4AF37] focus:outline-none">
+                      <option value="SOLD_TOKENS">Sold Tokens</option>
                       <option value="REWARD">Reward</option>
                       <option value="COMMISSION">Commission</option>
-                      <option value="SOLD_TOKENS">Sold Tokens</option>
                       <option value="TRANSFER">Transfer</option>
+                      <option value="EXCHANGE">Exchange</option>
                     </select>
                   </div>
                   <input type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="INR amount" className="w-full rounded-2xl border border-[#2a2a2a] bg-[#0a0a0a] px-4 py-4 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none" />

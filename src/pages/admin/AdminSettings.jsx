@@ -45,6 +45,9 @@ const AdminSettings = () => {
   const [passwordInput, setPasswordInput] = useState('');
   const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [passwordMessage, setPasswordMessage] = useState('');
+  const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [savingPassword, setSavingPassword] = useState(false);
   const { logout } = useAuthStore();
   const navigate = useNavigate();
 
@@ -165,6 +168,32 @@ const AdminSettings = () => {
     setConfirmPasswordInput('');
     setPasswordError('');
     setShowPasswordModal(true);
+  };
+
+  const handlePasswordChange = async () => {
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      setPasswordMessage('Please fill all fields');
+      return;
+    }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordMessage('New passwords do not match');
+      return;
+    }
+    if (passwordData.newPassword.length < 6) {
+      setPasswordMessage('New password must be at least 6 characters');
+      return;
+    }
+    setSavingPassword(true);
+    setPasswordMessage('');
+    try {
+      await adminAPI.changePassword({ currentPassword: passwordData.currentPassword, newPassword: passwordData.newPassword });
+      setPasswordMessage('Password changed successfully!');
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (err) {
+      setPasswordMessage(err.response?.data?.error || 'Failed to change password');
+    } finally {
+      setSavingPassword(false);
+    }
   };
 
   const handleConfirmDelete = async () => {
@@ -312,6 +341,52 @@ const AdminSettings = () => {
             </div>
             <button type="submit" disabled={savingSupport} className="w-full py-4 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold rounded-2xl disabled:opacity-50">{savingSupport ? 'Saving...' : 'Save Support Links'}</button>
           </form>
+        </div>
+
+        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
+          <h3 className="text-lg font-semibold text-white mb-6">Change Admin Password</h3>
+          
+          {passwordMessage && <div className={`mb-4 px-4 py-2 rounded-xl ${passwordMessage.includes('success') ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>{passwordMessage}</div>}
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-gray-400 text-sm mb-2">Current Password</label>
+              <input 
+                type="password" 
+                value={passwordData.currentPassword}
+                onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+                placeholder="Enter current password"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 text-sm mb-2">New Password</label>
+              <input 
+                type="password" 
+                value={passwordData.newPassword}
+                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+                placeholder="Enter new password"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 text-sm mb-2">Confirm New Password</label>
+              <input 
+                type="password" 
+                value={passwordData.confirmPassword}
+                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none"
+                placeholder="Confirm new password"
+              />
+            </div>
+            <button 
+              onClick={handlePasswordChange}
+              disabled={savingPassword}
+              className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50"
+            >
+              {savingPassword ? 'Changing...' : 'Change Password'}
+            </button>
+          </div>
         </div>
 
         <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 border border-[#2a2a2a]">
