@@ -164,11 +164,21 @@ const Home = () => {
         const publicSettingsData = publicSettingsRes?.data || publicSettingsRes || {};
         const supportLinksData = supportLinksRes?.data || supportLinksRes || {};
         const settingsData = { ...adminSettingsData, ...publicSettingsData };
+        console.log('Support Links Response:', supportLinksRes);
+        console.log('Support Links Data:', supportLinksData);
         console.log('Admin Settings Response:', adminSettingsRes);
         console.log('Public Settings Response:', publicSettingsRes);
-        console.log('Settings Data for banner:', settingsData);
-        console.log('Banner enabled value:', settingsData.bannerenabled);
-        console.log('Banner title value:', settingsData.bannertitle);
+        
+        // Use telegramSupport from either support links OR admin settings
+        const telegramSupportLink = supportLinksData.telegramSupport || settingsData.telegramsupport || '';
+        setSupportLinks({
+          telegramSupport: telegramSupportLink
+        });
+        console.log('=== Support Links Debug ===');
+        console.log('supportLinksRes:', supportLinksRes);
+        console.log('supportLinksData:', supportLinksData);
+        console.log('settingsData.telegramsupport:', settingsData.telegramsupport);
+        console.log('Final telegramSupportLink:', telegramSupportLink);
         const statsData = statsRes?.data || statsRes || {};
         console.log('STATS Response:', statsRes);
         console.log('STATS Data:', statsData);
@@ -216,9 +226,11 @@ const Home = () => {
         });
 
         setSupportLinks({
-          telegramSupport: supportLinksData.telegramsupport || ''
+          telegramSupport: supportLinksData.telegramSupport || ''
         });
-        
+        console.log('=== Support Links Debug ===');
+        console.log('supportLinksRes:', supportLinksRes);
+        console.log('supportLinksData:', supportLinksData);
         console.log('Settings Data:', settingsData);
         console.log('JToken Commission from settings:', settingsData?.jtokencommissionpercent);
 
