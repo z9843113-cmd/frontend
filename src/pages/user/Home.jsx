@@ -436,12 +436,25 @@ const Home = () => {
   };
 
   const isUSDTTransaction = (item) => {
-    return (item.method || '').toUpperCase().includes('USDT') || 
-           (item.type || '').toUpperCase().includes('USDT') ||
-           item.type === 'USDT_DEPOSIT' ||
-           item.type === 'DEPOSIT_DISCOUNT' ||
-           item.type === 'EXCHANGE' ||
-           item.entryType === 'exchange';
+    if (item.entryType === 'exchange') return true;
+    if ((item.method || '').toUpperCase().includes('USDT')) return true;
+    if ((item.type || '').toUpperCase().includes('USDT')) return true;
+    if (item.type === 'USDT_DEPOSIT') return true;
+    return false;
+  };
+
+  const isINRTransaction = (item) => {
+    if (item.type === 'DEPOSIT' || item.type === 'WITHDRAWAL') return true;
+    if (item.type === 'REWARD' || item.type === 'COMMISSION') return true;
+    if (item.type === 'SOLD_TOKENS' || item.type === 'TRANSFER') return true;
+    if (item.type === 'JTOKEN_PURCHASE' || item.type === 'DEPOSIT_DISCOUNT') return true;
+    if (item.type === 'EXCHANGE') return true;
+    if (item.entryType === 'deposit' || item.entryType === 'withdrawal') return true;
+    return false;
+  };
+  
+  const isUserExchange = (item) => {
+    return item.entryType === 'exchange';
   };
 
   console.log('Recent Deposits:', recentDeposits);
@@ -786,9 +799,9 @@ const Home = () => {
           </div>
 
           <div className="space-y-3">
-            {recentActivity.filter(item => isUSDTTransaction(item)).slice(0, 5).map((item, index) => {
+            {recentActivity.filter(item => isUSDTTransaction(item) && item.id).slice(0, 5).map((item, index) => {
               const isUSDT = true;
-              const isExchange = item.entryType === 'exchange' || item.type === 'EXCHANGE';
+              const isExchange = item.entryType === 'exchange';
               const isDeposit = item.entryType === 'deposit';
               const isPositive = isPositiveTransaction(item);
               const isNegative = !isPositive || isExchange;
@@ -832,7 +845,7 @@ const Home = () => {
           </div>
 
           <div className="space-y-3">
-            {recentActivity.filter(item => !isUSDTTransaction(item) && item.id).slice(0, 10).map((item, index) => {
+            {recentActivity.filter(item => isINRTransaction(item) && item.id).slice(0, 10).map((item, index) => {
               const isUSDT = false;
               const isExchange = item.entryType === 'exchange';
               const isDeposit = item.entryType === 'deposit';
