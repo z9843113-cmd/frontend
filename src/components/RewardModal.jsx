@@ -94,9 +94,7 @@ const RewardModal = ({ onClose, userData, telegramBotUrl, rewardSettings }) => {
             <ol className="text-gray-400 text-sm space-y-2">
               <li>1. Click "Open Telegram" below</li>
               <li>2. A message will auto-type</li>
-              <li>3. Send the message to admin</li>
-              <li>4. Wait for admin reply</li>
-              <li>5. Admin will credit reward manually</li>
+            
             </ol>
           </div>
 
