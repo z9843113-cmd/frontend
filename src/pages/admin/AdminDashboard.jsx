@@ -275,6 +275,7 @@ const AdminDashboard = () => {
               <span className="text-gray-400 text-sm font-medium">Total Withdrawals</span>
             </div>
             <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-red-400">₹{parseFloat(stats?.totalWithdrawals || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}</p>
+            {stats?.totalAdminDebits > 0 && <p className="text-xs text-gray-500 mt-1">Incl. Admin Debits: ₹{parseFloat(stats?.totalAdminDebits || 0).toLocaleString('en-IN')}</p>}
           </div>
           <div className="bg-gradient-to-br from-[#1f1f1f] to-[#141414] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-[#2a2a2a] hover:border-emerald-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/10">
             <div className="flex items-center gap-3 mb-3">
