@@ -118,7 +118,7 @@ const AdminJToken = () => {
       setMessage(data?.message || 'INR updated successfully');
       setAmount('');
       setNote('');
-      setStatusType('REWARD');
+      setStatusType('SOLD_TOKENS');
       // Refresh user details to show updated balance
       const refresh = await adminAPI.getUserDetails(selectedUser.id);
       const refreshed = refresh?.data || refresh;
@@ -132,6 +132,7 @@ const AdminJToken = () => {
 
   const handleSelectUser = async (user) => {
     setLoading(true);
+    setStatusType('SOLD_TOKENS');
     try {
       const res = await adminAPI.getUserDetails(user.id);
       const details = res?.data || res;
@@ -142,6 +143,11 @@ const AdminJToken = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleActionChange = (newAction) => {
+    setAction(newAction);
+    setStatusType('SOLD_TOKENS');
   };
 
   const handleLogout = () => {
@@ -279,10 +285,10 @@ const AdminJToken = () => {
 
                 <form onSubmit={handleSubmit} className="mt-4 space-y-4">
                   <div className="grid grid-cols-2 gap-3">
-                    <button type="button" onClick={() => setAction('CREDIT')} className={`rounded-2xl py-4 font-bold ${action === 'CREDIT' ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white' : 'border border-[#2a2a2a] bg-[#0a0a0a] text-gray-400'}`}>
+                    <button type="button" onClick={() => handleActionChange('CREDIT')} className={`rounded-2xl py-4 font-bold ${action === 'CREDIT' ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white' : 'border border-[#2a2a2a] bg-[#0a0a0a] text-gray-400'}`}>
                       Credit
                     </button>
-                    <button type="button" onClick={() => setAction('DEBIT')} className={`rounded-2xl py-4 font-bold ${action === 'DEBIT' ? 'bg-gradient-to-r from-red-500 to-rose-600 text-white' : 'border border-[#2a2a2a] bg-[#0a0a0a] text-gray-400'}`}>
+                    <button type="button" onClick={() => handleActionChange('DEBIT')} className={`rounded-2xl py-4 font-bold ${action === 'DEBIT' ? 'bg-gradient-to-r from-red-500 to-rose-600 text-white' : 'border border-[#2a2a2a] bg-[#0a0a0a] text-gray-400'}`}>
                       Debit
                     </button>
                   </div>

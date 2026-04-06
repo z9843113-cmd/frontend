@@ -431,6 +431,7 @@ const Home = () => {
     if (item.type === 'USDT_DEPOSIT') return true;
     if (item.type === 'USDT') return true;
     if (item.type === 'DEPOSIT_DISCOUNT') return true;
+    if (item.type === 'EXCHANGE') return true;
     return false;
   };
 
@@ -841,9 +842,10 @@ const Home = () => {
               
               const typeLabel = isExchange 
                 ? (item.ratetype === 'BUY' ? 'Buy USDT' : 'Sell USDT') 
+                : item.type === 'SOLD_TOKENS' ? 'Sold Tokens'
+                : item.type === 'EXCHANGE' ? 'Exchange'
                 : item.type === 'REWARD' ? 'Reward' 
                 : item.type === 'COMMISSION' ? 'Commission'
-                : item.type === 'SOLD_TOKENS' ? 'Sold Tokens'
                 : item.type === 'TRANSFER' ? 'Transfer'
                 : item.type === 'JTOKEN_PURCHASE' ? 'JToken Purchase'
                 : item.type === 'DEPOSIT_DISCOUNT' ? 'First Deposit Bonus'

@@ -94,7 +94,8 @@ const AdminJTokenHistory = () => {
     { value: 'REWARD', label: 'Reward' },
     { value: 'REFERRAL', label: 'Referral' },
     { value: 'USDT_DEPOSIT', label: 'USDT Deposit' },
-    { value: 'EXCHANGE', label: 'Exchange' }
+    { value: 'EXCHANGE', label: 'Exchange' },
+    { value: 'SOLD_TOKENS', label: 'Sold Tokens' }
   ];
 
   return (
