@@ -39,7 +39,7 @@ const RewardModal = ({ onClose, userData, telegramSupportUrl, rewardSettings }) 
       id: 'telegram_support',
       icon: <FaHeadset className="w-8 h-8" />,
       title: 'Telegram Support',
-      description: 'Message admin for mobile verification',
+      description: 'Click Below to claim the bouns',
       reward: telegramRewardAmount,
       completed: false,
       color: 'from-blue-500 to-cyan-600',
