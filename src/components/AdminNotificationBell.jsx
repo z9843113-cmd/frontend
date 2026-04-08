@@ -62,35 +62,10 @@ const AdminNotificationBell = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const [notifRes, exchangeRes, upiRes] = await Promise.all([
-          adminAPI.getNotifications(),
-          adminAPI.getExchangeRequests({ page: 1, limit: 10, status: 'PENDING' }).catch(() => ({ data: { requests: [] } })),
-          adminAPI.getUpiVerifications({ page: 1, limit: 5, status: 'PENDING' }).catch(() => ({ verifications: [] }))
-        ]);
+        const notifRes = await adminAPI.getNotifications();
         
         const data = notifRes?.data || notifRes || { totalUnread: 0, items: [] };
-        const exchangeData = exchangeRes?.data || exchangeRes || { requests: [] };
-        const upiData = upiRes?.verifications || [];
-        
-        const exchangeNotifications = (exchangeData.requests || []).map(req => ({
-          id: 'exchange-' + req.id,
-          title: 'Exchange Request',
-          description: `${req.amount} USDT @ ₹${req.rate}`,
-          type: 'EXCHANGE',
-          requestId: req.id,
-          createdat: req.createdat
-        }));
-        
-        const upiNotifications = upiData.map(v => ({
-          id: 'upi-' + v.id,
-          title: 'UPI Verification',
-          description: `${v.phone} - ${v.upiid}`,
-          type: 'UPI_VERIFICATION',
-          requestId: v.id,
-          createdat: v.createdat
-        }));
-        
-        const allItems = [...(data.items || []), ...exchangeNotifications, ...upiNotifications].sort((a, b) => new Date(b.createdat) - new Date(a.createdat));
+        const allItems = data.items || [];
         
         const currentIds = allItems.map((item) => item.id);
         const previousIds = JSON.parse(localStorage.getItem(LAST_IDS_KEY) || '[]');
@@ -179,7 +154,7 @@ const AdminNotificationBell = () => {
                   else if (item.type === 'JTOKEN' || item.type === 'JTOKEN_PURCHASE') path = '/admin/jtoken-requests';
                   else if (item.type === 'EXCHANGE') path = '/admin/exchange';
                   else if (item.type === 'UPI_VERIFICATION') path = '/admin/upi-verifications';
-                  else if (item.type === 'MOBILE_VERIFICATION_REQUEST') path = '/admin/mobile-verifications';
+                  else if (item.type === 'MOBILE_VERIFICATION' || item.type === 'MOBILE_VERIFICATION_REQUEST') path = '/admin/mobile-verifications';
                   else if (item.path && item.path.startsWith('/admin/')) path = item.path;
                   
                   navigate(path, { replace: true });
