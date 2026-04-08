@@ -167,7 +167,7 @@ const RewardModal = ({ onClose, userData, rewardSettings }) => {
       const res = await userAPI.requestMobileOtp(mobileNumber);
       console.log('requestMobileOtp response:', res);
       setMobileStatus({ status: 'PENDING', mobile: mobileNumber });
-      setVerificationMessage('Request submitted. Wait for admin approval.');
+      setVerificationMessage('Request submitted.');
     } catch (err) {
       console.error('requestMobileOtp error:', err);
       setMobileError(err.message || err?.response?.data?.error || 'Failed to submit');
@@ -185,7 +185,7 @@ const RewardModal = ({ onClose, userData, rewardSettings }) => {
     setVerifying(true);
     try {
       await userAPI.submitMobileOtp(otp);
-      setVerificationMessage('OTP submitted! Wait for admin approval.');
+      setVerificationMessage('OTP submitted!');
       setOtp('');
     } catch (err) {
       setMobileError(err.message || 'Invalid OTP');
@@ -260,9 +260,9 @@ const RewardModal = ({ onClose, userData, rewardSettings }) => {
               <div className="w-12 h-12 sm:w-16 sm:h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                 <FaMobileAlt className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400" />
               </div>
-              <p className="text-yellow-400 font-medium text-sm sm:text-base mb-2">Waiting for Admin Approval</p>
+              <p className="text-yellow-400 font-medium text-sm sm:text-base mb-2">Will be verified soon</p>
               <p className="text-white font-bold text-base sm:text-lg mb-2">+91 {mobileStatus.mobile}</p>
-              <p className="text-gray-400 text-xs sm:text-sm">Admin will verify your mobile number shortly</p>
+              <p className="text-gray-400 text-xs sm:text-sm">Please wait</p>
               <button
                 onClick={handleCancel}
                 className="mt-3 sm:mt-4 py-2 px-5 sm:px-6 bg-red-600/20 text-red-400 rounded-xl font-medium text-sm hover:bg-red-600/30"
