@@ -290,11 +290,12 @@ const Home = () => {
           hasUPI: upiData.length > 0,
           hasBank: bankData.length > 0,
           hasTelegram: !!profileData.telegramId,
-          whatsappbound: !!profileData.whatsappnumber
+          whatsappbound: !!profileData.whatsappnumber,
+          mobileVerified: !!profileData.mobileverified
         };
 
         setUserAccountData(accountState);
-        if (!accountState.hasUPI || !accountState.hasBank || !accountState.hasTelegram) {
+        if (!accountState.hasUPI || !accountState.hasBank || !accountState.hasTelegram || !accountState.mobileVerified) {
           setShowRewardModal(true);
         }
       } catch (error) {
@@ -917,7 +918,24 @@ const Home = () => {
       <BottomNav />
 
       {showRewardModal && (
-        <RewardModal onClose={() => setShowRewardModal(false)} userData={userAccountData} telegramSupportUrl={supportLinks.telegramSupport} rewardSettings={rewardSettings} />
+        <RewardModal 
+          onClose={async () => {
+            setShowRewardModal(false);
+            if (userAccountData) {
+              const profile = await userAPI.getProfile();
+              setUserAccountData({
+                hasUPI: profile.hasUPI || false,
+                hasBank: profile.hasBank || false,
+                hasTelegram: profile.hasTelegram || !!profile.telegramId,
+                whatsappbound: !!profile.whatsappnumber,
+                mobileVerified: !!profile.mobileverified
+              });
+            }
+          }} 
+          userData={userAccountData} 
+          telegramSupportUrl={supportLinks.telegramSupport} 
+          rewardSettings={rewardSettings} 
+        />
       )}
 
       {/* UPI Warning Popup */}

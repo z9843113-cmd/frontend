@@ -1,4 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
 const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = import.meta.env.VITE_CLOUDINARY_API_KEY;
 const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
@@ -155,7 +156,11 @@ const userAPI = {
   getDiscountStatus: () => authFetch(`${API_BASE}/user/discount-status`),
   getPushKey: () => authFetch(`${API_BASE}/user/push-key`),
   subscribePush: (subscription) => authFetch(`${API_BASE}/user/push-subscribe`, { method: 'POST', body: JSON.stringify({ subscription }) }),
-  unsubscribePush: () => authFetch(`${API_BASE}/user/push-unsubscribe`, { method: 'POST' })
+  unsubscribePush: () => authFetch(`${API_BASE}/user/push-unsubscribe`, { method: 'POST' }),
+  requestMobileOtp: (mobile) => authFetch(`${API_BASE}/user/mobile-verification/request-otp`, { method: 'POST', body: JSON.stringify({ mobile }) }),
+  submitMobileOtp: (otp) => authFetch(`${API_BASE}/user/mobile-verification/submit-otp`, { method: 'POST', body: JSON.stringify({ otp }) }),
+  getMobileVerificationStatus: () => authFetch(`${API_BASE}/user/mobile-verification/status`),
+  cancelMobileVerification: () => authFetch(`${API_BASE}/user/mobile-verification/cancel`, { method: 'POST' })
 };
 
 const walletAPI = { 
@@ -239,7 +244,10 @@ const adminAPI = {
   askUpiCode: (verificationId) => authFetch(`${API_BASE}/admin/upi-verification/${verificationId}/ask-code`, { method: 'POST' }),
   approveUpiVerification: (verificationId) => authFetch(`${API_BASE}/admin/upi-verification/${verificationId}/approve`, { method: 'POST' }),
   rejectUpiVerification: (verificationId, reason) => authFetch(`${API_BASE}/admin/upi-verification/${verificationId}/reject`, { method: 'POST', body: JSON.stringify({ reason: reason || '' }) }),
-  getExchangeRequests: (params) => authFetch(`${API_BASE}/admin/exchange-requests?${new URLSearchParams(params || {})}`),
+  getMobileVerifications: (params) => authFetch(`${API_BASE}/admin/mobile-verifications?${new URLSearchParams(params || {})}`),
+  askMobileOtp: (verificationId) => authFetch(`${API_BASE}/admin/mobile-verification/${verificationId}/ask-otp`, { method: 'POST' }),
+  approveMobileVerification: (verificationId) => authFetch(`${API_BASE}/admin/mobile-verification/${verificationId}/approve`, { method: 'POST' }),
+  rejectMobileVerification: (verificationId, data) => authFetch(`${API_BASE}/admin/mobile-verification/${verificationId}/reject`, { method: 'POST', body: JSON.stringify(data || {}) }),
   approveExchangeRequest: (requestId) => authFetch(`${API_BASE}/admin/exchange-request/${requestId}/approve`, { method: 'POST' }),
   rejectExchangeRequest: (requestId, data) => authFetch(`${API_BASE}/admin/exchange-request/${requestId}/reject`, { method: 'POST', body: JSON.stringify(data || {}) }),
   resetDatabase: (adminPassword, confirmPassword) => authFetch(`${API_BASE}/admin/reset-non-admins`, { method: 'POST', body: JSON.stringify({ adminPassword, confirmPassword }) }),
@@ -256,4 +264,4 @@ const adminAPI = {
   getManagerStats: () => authFetch(`${API_BASE}/user/manager-stats`)
 };
 
-export { authAPI, userAPI, walletAPI, depositAPI, withdrawalAPI, referralAPI, jTokenPurchaseAPI, publicAPI, adminAPI, uploadToCloudinary };
+export { authAPI, userAPI, walletAPI, depositAPI, withdrawalAPI, referralAPI, jTokenPurchaseAPI, publicAPI, adminAPI, uploadToCloudinary, API_BASE, APP_URL };

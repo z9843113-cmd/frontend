@@ -32,6 +32,7 @@ import AdminJToken from './pages/admin/AdminJToken';
 import AdminJTokenHistory from './pages/admin/AdminJTokenHistory';
 import AdminJTokenRequests from './pages/admin/AdminJTokenRequests';
 import AdminUpiVerifications from './pages/admin/AdminUpiVerifications';
+import AdminMobileVerifications from './pages/admin/AdminMobileVerifications';
 
 const Layout = ({ children }) => {
   return (
@@ -142,6 +143,11 @@ function App() {
         <Route path="/admin/upi-verifications" element={
           <ProtectedRoute roles={['ADMIN', 'MANAGER']}>
             <Layout><AdminUpiVerifications /></Layout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/mobile-verifications" element={
+          <ProtectedRoute roles={['ADMIN', 'MANAGER']}>
+            <Layout><AdminMobileVerifications /></Layout>
           </ProtectedRoute>
         } />
         <Route path="/admin/crypto" element={

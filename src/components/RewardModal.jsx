@@ -1,14 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaWallet, FaUniversity, FaTelegramPlane, FaGift, FaTimes, FaCheckCircle, FaChevronRight, FaWhatsapp, FaHeadset } from 'react-icons/fa';
+import { FaWallet, FaGift, FaTimes, FaCheckCircle, FaChevronRight, FaWhatsapp, FaMobileAlt } from 'react-icons/fa';
+import { userAPI } from '../services/api';
 
-const RewardModal = ({ onClose, userData, telegramSupportUrl, rewardSettings }) => {
+const RewardModal = ({ onClose, userData, rewardSettings }) => {
   const navigate = useNavigate();
+  const [localUserData, setLocalUserData] = useState(userData);
+
+  // Sync local state with props
+  useEffect(() => {
+    setLocalUserData(userData);
+  }, [userData]);
 
   const upiRewardAmount = parseFloat(rewardSettings?.upiRewardAmount) || 20;
   const bankRewardAmount = parseFloat(rewardSettings?.bankRewardAmount) || 20;
   const telegramRewardAmount = parseFloat(rewardSettings?.telegramRewardAmount) || 20;
   const whatsappRewardAmount = parseFloat(rewardSettings?.whatsappRewardAmount) || 20;
+
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [showMobileModal, setShowMobileModal] = useState(false);
+  const [mobileError, setMobileError] = useState('');
+  const [requestingOtp, setRequestingOtp] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState('');
+  const [mobileStatus, setMobileStatus] = useState(null);
+  const initialLoadRef = useRef(true);
+  const [userClosedPopup, setUserClosedPopup] = useState(false);
+
+  const { mobileVerified } = localUserData || {};
 
   const tasks = [
     {
@@ -17,7 +38,7 @@ const RewardModal = ({ onClose, userData, telegramSupportUrl, rewardSettings }) 
       title: 'Add UPI Account',
       description: 'Link your UPI for instant deposits',
       reward: upiRewardAmount,
-      completed: userData?.hasUPI || false,
+      completed: localUserData?.hasUPI || false,
       path: '/manage-account',
       color: 'from-green-500 to-emerald-600',
       bgColor: 'bg-green-500/20',
@@ -29,24 +50,95 @@ const RewardModal = ({ onClose, userData, telegramSupportUrl, rewardSettings }) 
       title: 'Bind WhatsApp',
       description: 'Enter your WhatsApp number',
       reward: whatsappRewardAmount,
-      completed: userData?.whatsappbound || false,
+      completed: localUserData?.whatsappbound || false,
       path: '/profile',
       color: 'from-green-400 to-emerald-500',
       bgColor: 'bg-green-400/20',
       textColor: 'text-green-400'
     },
     {
-      id: 'telegram_support',
-      icon: <FaHeadset className="w-8 h-8" />,
-      title: 'Telegram Support',
-      description: 'Click Below to claim the bouns',
+      id: 'mobile_verification',
+      icon: <FaMobileAlt className="w-8 h-8" />,
+      title: 'Mobile Verification',
+      description: 'Verify your mobile number',
       reward: telegramRewardAmount,
-      completed: false,
+      completed: mobileVerified || false,
       color: 'from-blue-500 to-cyan-600',
       bgColor: 'bg-blue-500/20',
       textColor: 'text-blue-400'
     }
   ];
+
+  // Refresh user data and check mobile verification when modal opens
+  useEffect(() => {
+    if (showMobileModal) {
+      // First try to get fresh profile data
+      userAPI.getProfile().then(profile => {
+        if (profile?.mobileverified) {
+          setLocalUserData(prev => ({ ...prev, mobileVerified: true }));
+        }
+      }).catch(() => {});
+      
+      // Also check from mobile verification status
+      userAPI.getMobileVerificationStatus().then(res => {
+        const status = res?.verification || res?.data?.verification || null;
+        if (status && status.status === 'APPROVED') {
+          // User is verified, update the completed status
+          setLocalUserData(prev => ({ ...prev, mobileVerified: true }));
+        }
+      }).catch(() => {});
+    }
+  }, [showMobileModal]);
+
+  // Poll for status changes when modal is open
+  useEffect(() => {
+    if (!showMobileModal) return;
+    
+    let lastStatus = null;
+    
+    const fetchStatus = () => {
+      userAPI.getMobileVerificationStatus().then(res => {
+        const status = res?.verification || res?.data?.verification || null;
+        
+        if (initialLoadRef.current) {
+          lastStatus = status?.status || null;
+          initialLoadRef.current = false;
+          if (status?.mobile) setMobileNumber(status.mobile);
+          if (status && ['PENDING', 'OTP_SENT', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
+            setMobileStatus(status);
+          }
+          return;
+        }
+        
+        if (userClosedPopup) return;
+        
+        console.log('Status check - current:', status?.status, 'last:', lastStatus);
+        
+        // Mark mobile as verified when approved
+        if (status && status.status === 'APPROVED') {
+          console.log('Status is APPROVED, closing modal...');
+          setLocalUserData(prev => ({ ...prev, mobileVerified: true }));
+          setMobileStatus(null);
+          setUserClosedPopup(false);
+          setShowMobileModal(false);
+          onClose();
+          return;
+        }
+        
+        // Show pending statuses
+        if (status && ['PENDING', 'OTP_SENT', 'OTP_REQUESTED', 'OTP_SUBMITTED'].includes(status.status)) {
+          setMobileStatus(status);
+          if (status.mobile) setMobileNumber(status.mobile);
+        }
+        
+        lastStatus = status?.status || null;
+      }).catch(() => {});
+    };
+    
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 2000);
+    return () => clearInterval(interval);
+  }, [showMobileModal, userClosedPopup, onClose]);
 
   const incompleteTasks = tasks.filter(t => !t.completed);
   const completedTasks = tasks.filter(t => t.completed);
@@ -54,66 +146,168 @@ const RewardModal = ({ onClose, userData, telegramSupportUrl, rewardSettings }) 
   const earnedReward = completedTasks.reduce((sum, t) => sum + t.reward, 0);
 
   const handleComplete = (task) => {
-    if (task.id === 'telegram_support') {
-      setShowTelegramClaimModal(true);
+    if (task.id === 'mobile_verification') {
+      setShowMobileModal(true);
     } else if (task.id === 'upi' || task.id === 'whatsapp') {
       onClose();
       navigate(task.path);
     }
   };
 
-  const handleTelegramSupport = () => {
-    console.log('Telegram Support URL:', telegramSupportUrl);
-    let url = telegramSupportUrl;
-    if (url && !url.startsWith('http')) {
-      url = 'https://' + url;
+  const handleRequestOtp = async () => {
+    console.log('handleRequestOtp called, mobileNumber:', mobileNumber);
+    if (!mobileNumber || mobileNumber.length !== 10) {
+      setMobileError('Please enter valid 10-digit mobile number');
+      return;
     }
-    if (url) {
-      window.open(url, '_blank');
+    setMobileError('');
+    setRequestingOtp(true);
+    try {
+      console.log('Calling requestMobileOtp API with:', mobileNumber);
+      const res = await userAPI.requestMobileOtp(mobileNumber);
+      console.log('requestMobileOtp response:', res);
+      setMobileStatus({ status: 'PENDING', mobile: mobileNumber });
+      setVerificationMessage('Request submitted. Wait for admin approval.');
+    } catch (err) {
+      console.error('requestMobileOtp error:', err);
+      setMobileError(err.message || err?.response?.data?.error || 'Failed to submit');
+    } finally {
+      setRequestingOtp(false);
     }
   };
 
-  const [showTelegramClaimModal, setShowTelegramClaimModal] = useState(false);
+  const handleVerifyOtp = async () => {
+    if (!otp || otp.length !== 6) {
+      setMobileError('Please enter 6-digit OTP');
+      return;
+    }
+    setMobileError('');
+    setVerifying(true);
+    try {
+      await userAPI.submitMobileOtp(otp);
+      setVerificationMessage('OTP submitted! Wait for admin approval.');
+      setOtp('');
+    } catch (err) {
+      setMobileError(err.message || 'Invalid OTP');
+    } finally {
+      setVerifying(false);
+    }
+  };
 
-  if (showTelegramClaimModal) {
+  const handleCancel = async () => {
+    try {
+      await userAPI.cancelMobileVerification();
+    } catch (e) {}
+    setShowMobileModal(false);
+    setMobileNumber('');
+    setOtp('');
+    setOtpSent(false);
+    setMobileStatus(null);
+    setVerificationMessage('');
+    setUserClosedPopup(false);
+  };
+
+  if (showMobileModal) {
     return (
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-3xl p-6 w-full max-w-md border border-blue-500/30">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
-                <FaHeadset className="w-6 h-6 text-white" />
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-4 sm:p-6 w-full max-w-md border border-blue-500/30">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                <FaMobileAlt className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Telegram Support</h2>
-                <p className="text-blue-400 text-sm">Reward: ₹{telegramRewardAmount}</p>
+                <h2 className="text-lg sm:text-xl font-bold text-white">Mobile Verification</h2>
+                <p className="text-blue-400 text-xs sm:text-sm">Reward: ₹{telegramRewardAmount}</p>
               </div>
             </div>
-            <button onClick={() => setShowTelegramClaimModal(false)} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
+            <button onClick={handleCancel} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
               <FaTimes className="w-5 h-5 text-gray-400" />
             </button>
           </div>
 
-          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-4 mb-4">
-            <p className="text-yellow-400 text-sm font-medium">
-              ⚠️ Please complete number verification otherwise you can't listed on verified user company never help to cover any losses
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-3 sm:mb-4">
+            <p className="text-yellow-400 text-xs sm:text-sm font-medium">
+              ⚠️ Please complete mobile verification to become a verified user
             </p>
           </div>
 
-          <button
-            onClick={handleTelegramSupport}
-            className="w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 mb-4"
-          >
-            <FaTelegramPlane className="w-5 h-5" />
-            Open Telegram
-          </button>
+          {!mobileStatus ? (
+            <>
+              <div className="mb-3 sm:mb-4">
+                <label className="block text-gray-400 text-xs sm:text-sm mb-2">Mobile Number</label>
+                <input
+                  type="tel"
+                  value={mobileNumber}
+                  onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  placeholder="Enter 10-digit mobile number"
+                  className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl sm:rounded-2xl text-white text-sm sm:text-base focus:border-blue-500 focus:outline-none"
+                  maxLength={10}
+                  disabled={requestingOtp}
+                />
+              </div>
+              {mobileError && <p className="text-red-400 text-xs sm:text-sm mb-3 sm:mb-4">{mobileError}</p>}
+              <button
+                onClick={handleRequestOtp}
+                disabled={requestingOtp || !mobileNumber}
+                className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold rounded-xl text-sm sm:text-base disabled:opacity-50"
+              >
+                {requestingOtp ? 'Submitting...' : 'Submit for Verification'}
+              </button>
+            </>
+          ) : (mobileStatus.status === 'PENDING' || mobileStatus.status === 'OTP_SENT') ? (
+            <div className="text-center py-4 sm:py-6">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <FaMobileAlt className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-400" />
+              </div>
+              <p className="text-yellow-400 font-medium text-sm sm:text-base mb-2">Waiting for Admin Approval</p>
+              <p className="text-white font-bold text-base sm:text-lg mb-2">+91 {mobileStatus.mobile}</p>
+              <p className="text-gray-400 text-xs sm:text-sm">Admin will verify your mobile number shortly</p>
+              <button
+                onClick={handleCancel}
+                className="mt-3 sm:mt-4 py-2 px-5 sm:px-6 bg-red-600/20 text-red-400 rounded-xl font-medium text-sm hover:bg-red-600/30"
+              >
+                Cancel Request
+              </button>
+            </div>
+          ) : mobileStatus.status === 'OTP_REQUESTED' ? (
+            <>
+              <div className="mb-3 sm:mb-4">
+                <label className="block text-gray-400 text-xs sm:text-sm mb-2">Enter OTP</label>
+                <input
+                  type="tel"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="Enter 6-digit OTP"
+                  className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl sm:rounded-2xl text-white text-sm sm:text-base focus:border-blue-500 focus:outline-none"
+                  maxLength={6}
+                />
+              </div>
+              {mobileError && <p className="text-red-400 text-xs sm:text-sm mb-3 sm:mb-4">{mobileError}</p>}
+              {verificationMessage && <p className="text-green-400 text-xs sm:text-sm mb-3 sm:mb-4">{verificationMessage}</p>}
+              <button
+                onClick={handleVerifyOtp}
+                disabled={verifying || !otp}
+                className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold rounded-xl text-sm sm:text-base disabled:opacity-50"
+              >
+                {verifying ? 'Submitting...' : 'Submit OTP'}
+              </button>
+            </>
+          ) : mobileStatus.status === 'OTP_SUBMITTED' ? (
+            <div className="text-center py-4 sm:py-6">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <FaCheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
+              </div>
+              <p className="text-blue-400 font-medium text-sm sm:text-base mb-2">OTP Submitted</p>
+              <p className="text-gray-400 text-xs sm:text-sm">Waiting for admin approval</p>
+            </div>
+          ) : null}
 
-          <button
-            onClick={() => setShowTelegramClaimModal(false)}
-            className="w-full py-3 bg-gray-600 text-white font-bold rounded-xl"
-          >
-            Close
-          </button>
+          <div className="flex gap-2 sm:gap-3 mt-3 sm:mt-4">
+            <button onClick={handleCancel} className="flex-1 py-2 sm:py-2.5 bg-[#1a1a1a] text-gray-400 rounded-xl font-medium text-sm sm:text-base">
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     );

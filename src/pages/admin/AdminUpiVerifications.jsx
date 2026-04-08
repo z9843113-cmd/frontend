@@ -227,6 +227,12 @@ const AdminUpiVerifications = () => {
                   <p className="text-white font-medium">{userDetails.user?.mobile || 'N/A'}</p>
                 </div>
                 <div className="rounded-lg bg-[#0a0a0a] p-3">
+                  <p className="text-xs text-gray-500">Mobile Verified</p>
+                  <span className={`inline-block px-2 py-1 rounded-lg text-xs ${userDetails.user?.mobileverified ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                    {userDetails.user?.mobileverified ? '✓ Verified' : 'Not Verified'}
+                  </span>
+                </div>
+                <div className="rounded-lg bg-[#0a0a0a] p-3">
                   <p className="text-xs text-gray-500">Referral Code</p>
                   <p className="text-[#D4AF37] font-mono font-bold">{userDetails.user?.referralcode}</p>
                 </div>

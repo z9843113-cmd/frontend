@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../store';
-import { userAPI, referralAPI, walletAPI } from '../../services/api';
+import { userAPI, referralAPI, walletAPI, APP_URL } from '../../services/api';
 import BottomNav from '../../components/BottomNav';
 import { FaUsers, FaCopy, FaCheck, FaLink, FaWhatsapp, FaTelegram, FaWallet, FaPercentage, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 
@@ -16,7 +16,7 @@ const Team = () => {
   const [withdrawing, setWithdrawing] = useState(false);
   const [withdrawMessage, setWithdrawMessage] = useState('');
 
-  const referralLink = `https://zcyrpto.netlify.app/register?ref=${user?.referralCode}`;
+  const referralLink = `${APP_URL}/register?ref=${user?.referralCode}`;
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);

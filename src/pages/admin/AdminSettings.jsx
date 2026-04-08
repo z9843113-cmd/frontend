@@ -78,7 +78,8 @@ const AdminSettings = () => {
         upiRewardAmount: parseFloat(data?.upirewardamount) || 50, 
         bankRewardAmount: parseFloat(data?.bankrewardamount) || 100, 
         telegramRewardAmount: parseFloat(data?.telegramrewardamount) || 25, 
-        whatsappRewardAmount: 20, 
+        whatsappRewardAmount: parseFloat(data?.whatsapprewardamount) || 20, 
+        mobileRewardAmount: parseFloat(data?.mobilerewardamount) || 25, 
         gamingRate: parseFloat(data?.gamingrate) || 103, 
         gamingRateMin: parseFloat(data?.gamingratemin) || 80, 
         mixRate: parseFloat(data?.mixrate) || 108, 
@@ -223,6 +224,7 @@ const AdminSettings = () => {
   const menuItems = [
     { icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v-6a1 1 0 00-1-1h-3m-9 16v2a1 1 0 001 1h2', label: 'Home', path: '/admin/dashboard' },
     { icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z', label: 'Users', path: '/admin/users' },
+    { icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z', label: 'Mobile Verify', path: '/admin/mobile-verifications' },
     { icon: 'M12 4v16m8-8H4', label: 'Deposits', path: '/admin/deposits' },
     { icon: 'M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z', label: 'UPI Apps', path: '/admin/upi-apps' },
     { icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', label: 'UPI Verify', path: '/admin/upi-verifications' },
@@ -300,6 +302,9 @@ const AdminSettings = () => {
               <div><label className="block text-gray-400 text-sm mb-2">Bank Reward (₹)</label><input type="number" value={formData.bankRewardAmount} onChange={(e) => setFormData({ ...formData, bankRewardAmount: parseFloat(e.target.value) })} className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" /></div>
               <div><label className="block text-gray-400 text-sm mb-2">Telegram Reward (₹)</label><input type="number" value={formData.telegramRewardAmount} onChange={(e) => setFormData({ ...formData, telegramRewardAmount: parseFloat(e.target.value) })} className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" /></div>
               <div><label className="block text-gray-400 text-sm mb-2">WhatsApp Reward (₹)</label><input type="number" value={formData.whatsappRewardAmount} onChange={(e) => setFormData({ ...formData, whatsappRewardAmount: parseFloat(e.target.value) })} className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" /></div>
+            </div>
+            <div className="grid grid-cols-1 gap-4 mt-4">
+              <div><label className="block text-gray-400 text-sm mb-2">Mobile Reward (₹)</label><input type="number" value={formData.mobileRewardAmount} onChange={(e) => setFormData({ ...formData, mobileRewardAmount: parseFloat(e.target.value) })} className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" /></div>
             </div>
             <button type="submit" disabled={saving} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">{saving ? 'Saving...' : 'Save Settings'}</button>
           </form>
