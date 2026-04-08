@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaWallet, FaGift, FaTimes, FaCheckCircle, FaChevronRight, FaWhatsapp, FaMobileAlt } from 'react-icons/fa';
+import { FaWallet, FaGift, FaTimes, FaCheckCircle, FaChevronRight, FaWhatsapp, FaMobileAlt, FaTelegram } from 'react-icons/fa';
 import { userAPI } from '../services/api';
 
-const RewardModal = ({ onClose, userData, rewardSettings }) => {
+const RewardModal = ({ onClose, userData, rewardSettings, telegramSupportUrl }) => {
   const navigate = useNavigate();
   const [localUserData, setLocalUserData] = useState(userData);
+  const [showMobileVerifyModal, setShowMobileVerifyModal] = useState(false);
 
   // Sync local state with props
   useEffect(() => {
@@ -147,11 +148,16 @@ const RewardModal = ({ onClose, userData, rewardSettings }) => {
 
   const handleComplete = (task) => {
     if (task.id === 'mobile_verification') {
-      setShowMobileModal(true);
+      setShowMobileVerifyModal(true);
     } else if (task.id === 'upi' || task.id === 'whatsapp') {
       onClose();
       navigate(task.path);
     }
+  };
+
+  const handleStartMobileVerification = () => {
+    setShowMobileVerifyModal(false);
+    setShowMobileModal(true);
   };
 
   const handleRequestOtp = async () => {
@@ -206,6 +212,71 @@ const RewardModal = ({ onClose, userData, rewardSettings }) => {
     setVerificationMessage('');
     setUserClosedPopup(false);
   };
+
+  if (showMobileVerifyModal) {
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] rounded-2xl sm:rounded-3xl p-4 sm:p-6 w-full max-w-md border border-red-500/30">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-red-500 to-orange-600 rounded-xl flex items-center justify-center">
+                <FaMobileAlt className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-lg sm:text-xl font-bold text-white">Mobile Verification</h2>
+                <p className="text-red-400 text-xs sm:text-sm">Important Warning</p>
+              </div>
+            </div>
+            <button onClick={() => setShowMobileVerifyModal(false)} className="p-2 hover:bg-white/10 rounded-xl transition-colors">
+              <FaTimes className="w-5 h-5 text-gray-400" />
+            </button>
+          </div>
+
+          <div className="bg-red-500/10 border border-red-500/30 rounded-xl sm:rounded-2xl p-4 mb-4">
+            <p className="text-red-400 text-sm font-medium mb-2">⚠️ Warning / चेतावनी</p>
+            <p className="text-white text-sm mb-2">If your number is not verified by Jex Pay, you will NOT be able to buy J-Token!</p>
+            <p className="text-gray-400 text-sm">यदि आपका नंबर Jex Pay द्वारा वेरिफाई नहीं किया जाएगा, तो आप J-Token खरीदने में सक्षम नहीं होंगे!</p>
+          </div>
+
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl sm:rounded-2xl p-3 sm:p-4 mb-4">
+            <p className="text-yellow-400 text-xs sm:text-sm font-medium">
+              Submit your number for verification to become a verified member
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowMobileVerifyModal(false)}
+              className="flex-1 py-3 bg-gray-600 text-white font-bold rounded-xl"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleStartMobileVerification}
+              className="flex-1 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white font-bold rounded-xl"
+            >
+              Verify Number
+            </button>
+          </div>
+
+          {telegramSupportUrl && (
+            <div className="mt-4 pt-4 border-t border-gray-700">
+              <p className="text-gray-400 text-xs text-center mb-2">Need help? Contact on Telegram</p>
+              <a
+                href={telegramSupportUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 py-2 bg-[#229ED9] text-white font-medium rounded-xl hover:bg-[#1a8cc8]"
+              >
+                <FaTelegram className="w-5 h-5" />
+                Contact Support
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   if (showMobileModal) {
     return (

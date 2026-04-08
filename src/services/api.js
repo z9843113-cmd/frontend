@@ -1,5 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:5173';
+const APP_URL = import.meta.env.VITE_APP_URL || 'https://jexpay.in';
 const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = import.meta.env.VITE_CLOUDINARY_API_KEY;
 const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
