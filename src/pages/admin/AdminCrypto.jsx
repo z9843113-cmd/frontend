@@ -15,6 +15,7 @@ const AdminCrypto = () => {
   const { logout } = useAuthStore();
   const navigate = useNavigate();
 
+  
   useEffect(() => { fetchAddresses(); }, []);
   const fetchAddresses = async () => { try { const res = await adminAPI.getCryptoAddresses(); setAddresses(res?.data || res || []); } catch { console.error('Failed to fetch crypto addresses'); } finally { setLoading(false); } };
 
