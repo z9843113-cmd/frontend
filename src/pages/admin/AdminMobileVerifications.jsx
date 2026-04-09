@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../../services/api';
 import AdminNotificationBell from '../../components/AdminNotificationBell';
+import { FaSearch, FaMobileAlt, FaCheck, FaTimes, FaRedo } from 'react-icons/fa';
 
 const AdminMobileVerifications = () => {
   const [verifications, setVerifications] = useState([]);
@@ -12,6 +13,7 @@ const AdminMobileVerifications = () => {
   const [total, setTotal] = useState(0);
   const [processingId, setProcessingId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [search, setSearch] = useState('');
   const navigate = useNavigate();
 
   const fetchVerifications = async (statusFilter = status) => {
@@ -21,6 +23,9 @@ const AdminMobileVerifications = () => {
       const params = { page, limit: 10 };
       if (statusFilter && statusFilter !== 'ALL') {
         params.status = statusFilter;
+      }
+      if (search && search.trim()) {
+        params.search = search.trim();
       }
       const res = await adminAPI.getMobileVerifications(params);
       setVerifications(res.verifications || []);
@@ -41,13 +46,37 @@ const AdminMobileVerifications = () => {
       if (status && status !== 'ALL') {
         params.status = status;
       }
+      if (search && search.trim()) {
+        params.search = search.trim();
+      }
       adminAPI.getMobileVerifications(params).then(res => {
         setVerifications(res.verifications || []);
         setTotal(res.total || 0);
       }).catch(() => {});
     }, 3000);
     return () => clearInterval(interval);
-  }, [page, status]);
+  }, [page, status, search]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setPage(1);
+    fetchVerifications();
+  };
+
+  const handleReverify = async (id) => {
+    if (!confirm('Re-verify this number? User will be able to submit OTP again.')) return;
+    setProcessingId(id);
+    try {
+      await adminAPI.reverifyMobileOtp(id);
+      alert('User can now submit OTP for reverification');
+      fetchVerifications();
+    } catch (err) {
+      console.error('Reverify error:', err);
+      alert(err?.message || err?.response?.data?.error || 'Failed to reverify');
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
   const handleAskOtp = async (id) => {
     if (!confirm('Ask user to enter OTP?')) return;
@@ -122,6 +151,24 @@ const AdminMobileVerifications = () => {
       </div>
 
       <div className="pt-20 px-3 sm:px-4 pb-8">
+        <div className="mb-3 sm:mb-4">
+          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by mobile or user ID..."
+                className="w-full rounded-xl bg-[#1a1a1a] px-4 py-2 pl-10 text-white text-sm sm:text-base border border-[#2a2a2a]"
+              />
+              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            </div>
+            <button type="submit" className="px-4 py-2 bg-[#D4AF37] text-black font-medium rounded-xl hover:bg-[#c9a030]">
+              Search
+            </button>
+          </form>
+        </div>
+
         <div className="mb-3 sm:mb-4 flex flex-col sm:flex-row gap-2 sm:gap-4">
           <select 
             value={status} 
@@ -255,13 +302,33 @@ const AdminMobileVerifications = () => {
                       </div>
                     )}
                     {v.status === 'APPROVED' && (
-                      <div className="mt-2 p-3 bg-green-500/20 rounded-xl text-green-400 text-sm text-center font-medium">
-                        ✓ Successfully Approved
+                      <div className="space-y-2">
+                        <div className="mt-2 p-3 bg-green-500/20 rounded-xl text-green-400 text-sm text-center font-medium">
+                          ✓ Successfully Approved
+                        </div>
+                        <button
+                          onClick={() => handleReverify(v.id)}
+                          disabled={processingId === v.id}
+                          className="w-full py-2 sm:py-2.5 bg-orange-600 hover:bg-orange-700 rounded-lg font-medium text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          <FaRedo className="w-4 h-4" />
+                          Re-Verify
+                        </button>
                       </div>
                     )}
                     {v.status === 'REJECTED' && (
-                      <div className="mt-2 p-3 bg-red-500/20 rounded-xl text-red-400 text-sm text-center font-medium">
-                        ✗ Rejected
+                      <div className="space-y-2">
+                        <div className="mt-2 p-3 bg-red-500/20 rounded-xl text-red-400 text-sm text-center font-medium">
+                          ✗ Rejected
+                        </div>
+                        <button
+                          onClick={() => handleReverify(v.id)}
+                          disabled={processingId === v.id}
+                          className="w-full py-2 sm:py-2.5 bg-orange-600 hover:bg-orange-700 rounded-lg font-medium text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          <FaRedo className="w-4 h-4" />
+                          Re-Verify
+                        </button>
                       </div>
                     )}
                   </div>

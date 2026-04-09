@@ -306,6 +306,7 @@ const Home = () => {
     };
 
     const timeoutId = setTimeout(loadHome, 0);
+    
     const intervalId = setInterval(async () => {
       try {
         const [walletRes, adminSettingsRes, publicSettingsRes, statsRes] = await Promise.all([

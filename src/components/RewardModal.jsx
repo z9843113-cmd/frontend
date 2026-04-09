@@ -183,8 +183,8 @@ const RewardModal = ({ onClose, userData, rewardSettings, telegramSupportUrl }) 
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp || otp.length !== 6) {
-      setMobileError('Please enter 6-digit OTP');
+    if (!otp || otp.length === 0) {
+      setMobileError('Please enter OTP');
       return;
     }
     setMobileError('');
@@ -349,7 +349,7 @@ const RewardModal = ({ onClose, userData, rewardSettings, telegramSupportUrl }) 
                   type="tel"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="Enter 6-digit OTP"
+                  placeholder="Enter OTP"
                   className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl sm:rounded-2xl text-white text-sm sm:text-base focus:border-blue-500 focus:outline-none"
                   maxLength={6}
                 />
@@ -370,7 +370,7 @@ const RewardModal = ({ onClose, userData, rewardSettings, telegramSupportUrl }) 
                 <FaCheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
               </div>
               <p className="text-blue-400 font-medium text-sm sm:text-base mb-2">OTP Submitted</p>
-              <p className="text-gray-400 text-xs sm:text-sm">Waiting for admin approval</p>
+              <p className="text-gray-400 text-xs sm:text-sm">Waiting </p>
             </div>
           ) : null}
 

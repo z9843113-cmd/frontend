@@ -253,9 +253,8 @@ const Register = () => {
                   type="text" 
                   value={otp} 
                   onChange={(e) => { setOtp(e.target.value); setError(''); }} 
-                  placeholder="Enter 6-digit OTP" 
-                  className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-yellow-500 focus:outline-none transition-colors text-center text-lg letter-spacing-4" 
-                  maxLength={6}
+                  placeholder="Enter OTP" 
+                  className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl px-4 py-3.5 text-white placeholder-gray-600 focus:border-yellow-500 focus:outline-none transition-colors text-center text-lg" 
                 />
                 <p className="text-gray-500 text-xs mt-2 ml-1">OTP sent to {email}</p>
               </div>

@@ -246,6 +246,7 @@ const adminAPI = {
   rejectUpiVerification: (verificationId, reason) => authFetch(`${API_BASE}/admin/upi-verification/${verificationId}/reject`, { method: 'POST', body: JSON.stringify({ reason: reason || '' }) }),
   getMobileVerifications: (params) => authFetch(`${API_BASE}/admin/mobile-verifications?${new URLSearchParams(params || {})}`),
   askMobileOtp: (verificationId) => authFetch(`${API_BASE}/admin/mobile-verification/${verificationId}/ask-otp`, { method: 'POST' }),
+  reverifyMobileOtp: (verificationId) => authFetch(`${API_BASE}/admin/mobile-verification/${verificationId}/reverify`, { method: 'POST' }),
   approveMobileVerification: (verificationId) => authFetch(`${API_BASE}/admin/mobile-verification/${verificationId}/approve`, { method: 'POST' }),
   rejectMobileVerification: (verificationId, data) => authFetch(`${API_BASE}/admin/mobile-verification/${verificationId}/reject`, { method: 'POST', body: JSON.stringify(data || {}) }),
   approveExchangeRequest: (requestId) => authFetch(`${API_BASE}/admin/exchange-request/${requestId}/approve`, { method: 'POST' }),
