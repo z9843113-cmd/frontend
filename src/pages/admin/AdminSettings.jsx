@@ -409,15 +409,12 @@ const AdminSettings = () => {
               setLogoutAllMessage('');
               setLoggingOutAll(true);
               try {
-                await adminAPI.logoutAll();
+                const res = await adminAPI.logoutAll();
+                if (res?.token) {
+                  // Update token to stay logged in
+                  localStorage.setItem('token', res.token);
+                }
                 setLogoutAllMessage('Logged out from all other devices successfully!');
-                // Check tokenversion after logout
-                const check = await adminAPI.checkTokenVersion();
-                console.log('Tokenversion after logout:', check.data?.user?.tokenversion);
-                setTimeout(async () => {
-                  const check2 = await adminAPI.checkTokenVersion();
-                  console.log('Tokenversion after delay:', check2.data?.user?.tokenversion);
-                }, 2000);
               } catch (err) {
                 setLogoutAllMessage(err.message || 'Failed to logout from all devices');
               } finally {

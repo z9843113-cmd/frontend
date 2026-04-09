@@ -399,6 +399,20 @@ const AdminUsers = () => {
                   <button onClick={() => handleBlockToggle(userDetails.user.id, userDetails.user.isblocked)} className={`flex-1 py-3 rounded-xl font-semibold ${userDetails.user.isblocked ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
                     {userDetails.user.isblocked ? 'Unblock User' : 'Block User'}
                   </button>
+                  <button 
+                    onClick={async () => {
+                      if (!window.confirm(`Logout ${userDetails.user.email} from all devices?`)) return;
+                      try {
+                        await adminAPI.logoutAll(userDetails.user.id);
+                        alert('User logged out from all devices');
+                      } catch (err) {
+                        alert(err.message || 'Failed to logout user');
+                      }
+                    }} 
+                    className="flex-1 py-3 rounded-xl font-semibold bg-orange-500 text-white"
+                  >
+                    Logout User
+                  </button>
                 </div>
               </div>
             ) : null}

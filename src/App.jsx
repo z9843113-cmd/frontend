@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import PushNotificationInit from './components/PushNotificationInit';
+import ForcedLogoutCheck from './components/ForcedLogoutCheck';
 
 import Login from './pages/user/Login';
 import Register from './pages/user/Register';
@@ -50,6 +51,7 @@ function App() {
   return (
     <BrowserRouter>
       <PushNotificationInit />
+      <ForcedLogoutCheck />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
