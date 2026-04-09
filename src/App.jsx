@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import PushNotificationInit from './components/PushNotificationInit';
 import ForcedLogoutCheck from './components/ForcedLogoutCheck';
+import MobileVerificationPopup from './components/MobileVerificationPopup';
 
 import Login from './pages/user/Login';
 import Register from './pages/user/Register';
@@ -35,6 +36,19 @@ import AdminJTokenRequests from './pages/admin/AdminJTokenRequests';
 import AdminUpiVerifications from './pages/admin/AdminUpiVerifications';
 import AdminMobileVerifications from './pages/admin/AdminMobileVerifications';
 
+const UserLayout = ({ children }) => {
+  return (
+    <div className="min-h-screen bg-[#0a0a0a]">
+      <main>
+        <div className="p-0 lg:p-8 max-w-7xl mx-auto">
+          {children}
+        </div>
+      </main>
+      <MobileVerificationPopup />
+    </div>
+  );
+};
+
 const Layout = ({ children }) => {
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
@@ -61,53 +75,53 @@ function App() {
         {/* USER ROUTES */}
         <Route path="/home" element={
           <ProtectedRoute>
-            <Layout><Home /></Layout>
+            <UserLayout><Home /></UserLayout>
           </ProtectedRoute>
         } />
         <Route path="/dashboard" element={<Navigate to="/home" replace />} />
         <Route path="/exchange" element={
           <ProtectedRoute>
-            <Layout><Exchange /></Layout>
+            <UserLayout><Exchange /></UserLayout>
           </ProtectedRoute>
         } />
         <Route path="/manage-account" element={
           <ProtectedRoute>
-            <Layout><ManageAccount /></Layout>
+            <UserLayout><ManageAccount /></UserLayout>
           </ProtectedRoute>
         } />
         <Route path="/team" element={
           <ProtectedRoute>
-            <Layout><Team /></Layout>
+            <UserLayout><Team /></UserLayout>
           </ProtectedRoute>
         } />
         <Route path="/profile" element={
           <ProtectedRoute>
-            <Layout><Profile /></Layout>
+            <UserLayout><Profile /></UserLayout>
           </ProtectedRoute>
         } />
         <Route path="/withdraw" element={
           <ProtectedRoute>
-            <Layout><Withdraw /></Layout>
+            <UserLayout><Withdraw /></UserLayout>
           </ProtectedRoute>
         } />
         <Route path="/deposit" element={
           <ProtectedRoute>
-            <Layout><Deposit /></Layout>
+            <UserLayout><Deposit /></UserLayout>
           </ProtectedRoute>
         } />
         <Route path="/wallet" element={
           <ProtectedRoute>
-            <Layout><Wallet /></Layout>
+            <UserLayout><Wallet /></UserLayout>
           </ProtectedRoute>
         } />
         <Route path="/buy-jtoken" element={
           <ProtectedRoute>
-            <Layout><BuyJToken /></Layout>
+            <UserLayout><BuyJToken /></UserLayout>
           </ProtectedRoute>
         } />
         <Route path="/crypto-rates" element={
           <ProtectedRoute>
-            <Layout><CryptoRates /></Layout>
+            <UserLayout><CryptoRates /></UserLayout>
           </ProtectedRoute>
         } />
 

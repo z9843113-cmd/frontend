@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../../components/BottomNav';
 import { jTokenPurchaseAPI, walletAPI, uploadToCloudinary, userAPI, adminAPI, publicAPI } from '../../services/api';
-import { FaArrowLeft, FaCopy, FaTimes, FaMobileAlt } from 'react-icons/fa';
+import { FaArrowLeft, FaCopy, FaTimes } from 'react-icons/fa';
 
 const BuyJToken = () => {
   const navigate = useNavigate();
@@ -25,35 +25,6 @@ const BuyJToken = () => {
   const [timerInitialized, setTimerInitialized] = useState(false);
   const [lastRequestId, setLastRequestId] = useState(() => localStorage.getItem('jtoken_timer_request_id'));
   const [userClosedPopup, setUserClosedPopup] = useState(false);
-  const [mobileVerified, setMobileVerified] = useState(null);
-  const [mobileOtp, setMobileOtp] = useState('');
-  const [mobileSubmitting, setMobileSubmitting] = useState(false);
-  const [mobileError, setMobileError] = useState('');
-  const [mobileOtpSubmitted, setMobileOtpSubmitted] = useState(false);
-  
-  // Poll mobile verification status
-  useEffect(() => {
-    const checkStatus = () => {
-      userAPI.getMobileVerificationStatus().then(res => {
-        const status = res?.verification || res?.data?.verification || null;
-        if (status?.status === 'APPROVED') {
-          setMobileVerified(true);
-          setMobileOtpSubmitted(false);
-          setMobileOtp('');
-        } else if (status?.status === 'OTP_REQUESTED' || status?.status === 'OTP_SUBMITTED' || status?.status === 'PENDING') {
-          setMobileVerified('OTP_REQUESTED');
-        } else if (status?.status === 'REJECTED') {
-          setMobileVerified('REJECTED');
-          setMobileOtpSubmitted(false);
-        } else if (status === null || status === undefined) {
-          setMobileVerified(false);
-        }
-      }).catch(() => { setMobileVerified(false); });
-    };
-    checkStatus();
-    const interval = setInterval(checkStatus, 3000);
-    return () => clearInterval(interval);
-  }, []);
   
   // Initialize timer from localStorage only once on mount
   useEffect(() => {
@@ -406,121 +377,6 @@ const BuyJToken = () => {
           </div>
         )}
 
-        {mobileVerified === false || mobileVerified === 'OTP_REQUESTED' || mobileVerified === 'REJECTED' ? (
-          <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-gradient-to-br from-[#1f1f1f] to-[#0a0a0a] rounded-3xl p-6 border border-[#D4AF37]/30 w-full max-w-sm">
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4">
-                  <FaMobileAlt className="w-8 h-8 text-red-400" />
-                </div>
-                <h3 className="text-white font-bold text-xl">Your account is disabled</h3>
-                <p className="text-gray-400 text-sm mt-2">Please verify your phone number to continue buying with JexPay</p>
-              </div>
-              
-              <div className="space-y-4">
-                {mobileVerified === 'REJECTED' ? (
-                  <div className="text-center py-4">
-                    <p className="text-red-400 font-medium mb-2">OTP Rejected!</p>
-                    <p className="text-gray-400 text-sm">Please request new OTP</p>
-                  </div>
-                ) : mobileVerified !== 'OTP_REQUESTED' ? (
-                  <p className="text-gray-400 text-sm text-center">Click below to request OTP for verification</p>
-                ) : mobileOtpSubmitted ? (
-                  <div className="text-center py-4">
-                    <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <p className="text-green-400 font-medium">OTP Submitted!</p>
-                    <p className="text-gray-400 text-sm mt-2">Waiting</p>
-                  </div>
-                ) : (
-                  <>
-                    <p className="text-green-400 text-sm text-center">OTP sent! Enter the OTP below</p>
-                    <div>
-                      <input
-                        type="text"
-                        value={mobileOtp}
-                        onChange={(e) => setMobileOtp(e.target.value.replace(/\D/g, ''))}
-                        placeholder="Enter OTP"
-                        className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none text-center text-lg tracking-widest"
-                      />
-                    </div>
-                    
-                    {mobileError && (
-                      <p className="text-red-400 text-sm text-center">{mobileError}</p>
-                    )}
-                    
-                    <button
-                      onClick={async () => {
-                        if (!mobileOtp) {
-                          setMobileError('Please enter OTP');
-                          return;
-                        }
-                        setMobileSubmitting(true);
-                        setMobileError('');
-                        try {
-                          const res = await userAPI.submitMobileOtp(mobileOtp);
-                          if (res?.success) {
-                            setMobileOtpSubmitted(true);
-                            setMobileError('OTP submitted. ');
-                          } else {
-                            setMobileError(res?.error || 'Failed to submit OTP');
-                          }
-                        } catch (err) {
-                          setMobileError(err?.response?.data?.error || err?.message || 'Submission failed');
-                        } finally {
-                          setMobileSubmitting(false);
-                        }
-                      }}
-                      disabled={mobileSubmitting || mobileOtpSubmitted}
-                      className="w-full py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-xl disabled:opacity-50"
-                    >
-                      {mobileSubmitting ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                          </svg>
-                          Submitting...
-                        </span>
-                      ) : mobileOtpSubmitted ? 'OTP Submitted ✓' : 'Submit OTP'}
-                    </button>
-                  </>
-                )}
-                
-                {mobileVerified !== 'OTP_REQUESTED' && (
-                  <button
-                    onClick={async () => {
-                      setMobileSubmitting(true);
-                      setMobileError('');
-                      try {
-                        await userAPI.requestMobileOtp('9999999999');
-                        setMobileVerified('OTP_REQUESTED');
-                        setMobileError('');
-                      } catch (err) {
-                        setMobileError(err?.message || err?.response?.data?.error || 'Failed to request OTP');
-                      } finally {
-                        setMobileSubmitting(false);
-                      }
-                    }}
-                    disabled={mobileSubmitting}
-                    className="w-full py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-xl disabled:opacity-50"
-                  >
-                    {mobileSubmitting ? 'Requesting...' : 'Request OTP'}
-                  </button>
-                )}
-                
-                <a
-                  href="https://t.me/JexpaySupport"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block text-center text-[#D4AF37] text-sm hover:underline"
-                >
-                  Contact Support on Telegram
-                </a>
-              </div>
-            </div>
-          </div>
-        ) : null}
-
         <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4">
           <p className="text-yellow-400 font-bold text-sm mb-2">⚠️ NOTE..</p>
           <p className="text-white text-sm">Cancel the order if the payment details do not match ❗️</p>
@@ -620,8 +476,8 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               })()}
             </div>
 
-            <button onClick={handleCreate} disabled={submitting || !selectedApp || !amount || availableApps.length === 0 || !mobileVerified} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">
-              {mobileVerified === true ? (submitting ? 'Creating...' : 'Create Request') : 'Mobile Verification Required'}
+            <button onClick={handleCreate} disabled={submitting || !selectedApp || !amount || availableApps.length === 0} className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-2xl disabled:opacity-50">
+              {submitting ? 'Creating...' : 'Create Request'}
             </button>
           </div>
         ) : (
