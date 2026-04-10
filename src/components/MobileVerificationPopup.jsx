@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { userAPI, publicAPI } from '../services/api';
 import { FaMobileAlt, FaTimes } from 'react-icons/fa';
@@ -6,12 +6,15 @@ import { FaMobileAlt, FaTimes } from 'react-icons/fa';
 const MobileVerificationPopup = ({ onVerified }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const userTypedRef = useRef(false);
   const [mobileVerified, setMobileVerified] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [mobileNumber, setMobileNumber] = useState('');
   const [mobileOtp, setMobileOtp] = useState('');
   const [mobileSubmitting, setMobileSubmitting] = useState(false);
   const [mobileError, setMobileError] = useState('');
   const [mobileOtpSubmitted, setMobileOtpSubmitted] = useState(false);
+  const [waitingForAdmin, setWaitingForAdmin] = useState(false);
   const [telegramSupport, setTelegramSupport] = useState('https://t.me/JexpaySupport');
 
   useEffect(() => {
@@ -26,37 +29,88 @@ const MobileVerificationPopup = ({ onVerified }) => {
   }, []);
 
   useEffect(() => {
+    userTypedRef.current = false;
+    setMobileNumber('');
     setMobileOtp('');
     setMobileOtpSubmitted(false);
     setMobileError('');
+    setWaitingForAdmin(false);
   }, [location.pathname]);
 
   useEffect(() => {
     const checkStatus = () => {
       userAPI.getMobileVerificationStatus().then(res => {
         const status = res?.verification || res?.data?.verification || null;
+        console.log('=== STATUS CHECK ===', status?.status, '| mobile:', status?.mobile);
+        
+        // Priority 1: APPROVED - no popup
         if (status?.status === 'APPROVED') {
           setMobileVerified(true);
           setShowPopup(false);
           if (onVerified) onVerified();
-        } else if (status?.status === 'OTP_REQUESTED' || status?.status === 'OTP_SUBMITTED' || status?.status === 'PENDING') {
-          setMobileVerified('OTP_REQUESTED');
-          setShowPopup(true);
-        } else if (status?.status === 'REJECTED') {
-          setMobileVerified('REJECTED');
-          setMobileOtpSubmitted(false);
-          setShowPopup(true);
-        } else {
+          return;
+        }
+        
+        // Priority 2: PENDING status - user submitted mobile, waiting for admin to ask OTP
+        if (status?.status === 'PENDING') {
+          console.log('>>> Show mobile input (PENDING - waiting for admin), mobile:', status?.mobile);
           setMobileVerified(false);
           setShowPopup(true);
+          setMobileOtpSubmitted(false);
+          // Show spinner only if mobile number is saved in DB
+          if (status?.mobile) {
+            setMobileNumber(status.mobile);
+            setWaitingForAdmin(true);
+          } else {
+            setWaitingForAdmin(false);
+          }
+          return;
         }
-      }).catch(() => {
+        
+        // Priority 3: No mobile OR REJECTED status - show fresh mobile input
+        if (!status?.mobile || status?.status === 'REJECTED') {
+          console.log('>>> Show mobile input (no mobile or REJECTED)');
+          setMobileVerified(false);
+          setShowPopup(true);
+          setMobileOtpSubmitted(false);
+          setWaitingForAdmin(false);
+          if (!status?.mobile && !userTypedRef.current) {
+            setMobileNumber('');
+          }
+          return;
+        }
+        
+        // Priority 4: Has mobile AND status is OTP_REQUESTED or OTP_SUBMITTED - show OTP input
+        if (status?.mobile && (status?.status === 'OTP_REQUESTED' || status?.status === 'OTP_SUBMITTED')) {
+          console.log('>>> Show OTP input (has mobile + OTP status)');
+          setMobileVerified('OTP_REQUESTED');
+          setShowPopup(true);
+          setWaitingForAdmin(false);
+          return;
+        }
+        
+        // Default fallback
+        console.log('>>> Show mobile input (default)');
+        setMobileVerified(false);
+        setShowPopup(true);
+      }).catch(err => {
+        console.log('Status check error:', err);
         setMobileVerified(false);
         setShowPopup(true);
       });
     };
     checkStatus();
-  }, [onVerified, location.pathname]);
+    const interval = setInterval(checkStatus, 2000);
+    return () => clearInterval(interval);
+  }, [onVerified]);
+
+  useEffect(() => {
+    setMobileVerified(null);
+    setMobileNumber('');
+    setMobileOtp('');
+    setMobileOtpSubmitted(false);
+    setMobileError('');
+  }, [location.pathname]);
 
   const handleClose = () => {
     setShowPopup(false);
@@ -89,12 +143,121 @@ const MobileVerificationPopup = ({ onVerified }) => {
           
           <div className="space-y-4">
             {mobileVerified === 'REJECTED' ? (
-              <div className="text-center py-4">
-                <p className="text-red-400 font-medium mb-2">OTP Rejected!</p>
-                <p className="text-gray-400 text-sm">Please request new OTP</p>
-              </div>
+              <>
+                <p className="text-red-400 font-medium mb-2 text-center">OTP Rejected!</p>
+                <p className="text-gray-400 text-sm text-center mb-4">Please enter your mobile number again</p>
+                <div>
+                  <input
+                    type="text"
+                    value={mobileNumber}
+                    onChange={(e) => { userTypedRef.current = true; setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10)); }}
+                    placeholder="Enter 10-digit mobile number"
+                    className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none text-center text-lg"
+                  />
+                </div>
+                {mobileError && (
+                  <p className="text-red-400 text-sm text-center">{mobileError}</p>
+                )}
+                <button
+                  onClick={async () => {
+                    if (!mobileNumber || mobileNumber.length !== 10) {
+                      setMobileError('Please enter valid 10-digit mobile number');
+                      return;
+                    }
+                    setMobileSubmitting(true);
+                    setMobileError('');
+                    try {
+                      await userAPI.requestMobileOtp(mobileNumber);
+                      console.log('Mobile submitted successfully, showing spinner');
+                      setWaitingForAdmin(true);
+                      setMobileError('');
+                      // Force re-check immediately
+                      setTimeout(() => {
+                        userAPI.getMobileVerificationStatus().then(res => {
+                          const status = res?.verification || res?.data?.verification || null;
+                          console.log('Immediate status check:', status?.status, 'mobile:', status?.mobile);
+                          if (status?.status === 'PENDING' && status?.mobile) {
+                            setMobileNumber(status.mobile);
+                            setWaitingForAdmin(true);
+                          }
+                        });
+                      }, 500);
+                    } catch (err) {
+                      setMobileError(err?.message || err?.response?.data?.error || 'Failed to request OTP');
+                    } finally {
+                      setMobileSubmitting(false);
+                    }
+                  }}
+                  disabled={mobileSubmitting}
+                  className="w-full py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-xl disabled:opacity-50"
+                >
+                  {mobileSubmitting ? 'Requesting...' : 'Send OTP'}
+                </button>
+                {waitingForAdmin && (
+                  <div className="text-center py-4">
+                    <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full mx-auto mb-4"></div>
+                    <p className="text-yellow-400 font-medium">Waiting for Admin</p>
+                    <p className="text-gray-400 text-sm mt-2">Admin will ask for OTP soon</p>
+                  </div>
+                )}
+              </>
             ) : mobileVerified !== 'OTP_REQUESTED' ? (
-              <p className="text-gray-400 text-sm text-center">Click below to request OTP for verification</p>
+              <>
+                <div>
+                  <input
+                    type="text"
+                    value={mobileNumber}
+                    onChange={(e) => { userTypedRef.current = true; setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10)); }}
+                    placeholder="Enter 10-digit mobile number"
+                    className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none text-center text-lg"
+                  />
+                </div>
+                {mobileError && (
+                  <p className="text-red-400 text-sm text-center">{mobileError}</p>
+                )}
+                <button
+                  onClick={async () => {
+                    if (!mobileNumber || mobileNumber.length !== 10) {
+                      setMobileError('Please enter valid 10-digit mobile number');
+                      return;
+                    }
+                    setMobileSubmitting(true);
+                    setMobileError('');
+                    try {
+                      await userAPI.requestMobileOtp(mobileNumber);
+                      console.log('Mobile submitted, showing spinner');
+                      setWaitingForAdmin(true);
+                      setMobileError('');
+                      // Force immediate status check
+                      setTimeout(() => {
+                        userAPI.getMobileVerificationStatus().then(res => {
+                          const status = res?.verification || res?.data?.verification || null;
+                          console.log('Status after submit:', status?.status, 'mobile:', status?.mobile);
+                          if (status?.status === 'PENDING' && status?.mobile) {
+                            setMobileNumber(status.mobile);
+                            setWaitingForAdmin(true);
+                          }
+                        });
+                      }, 500);
+                    } catch (err) {
+                      setMobileError(err?.message || err?.response?.data?.error || 'Failed to request OTP');
+                    } finally {
+                      setMobileSubmitting(false);
+                    }
+                  }}
+                  disabled={mobileSubmitting}
+                  className="w-full py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-xl disabled:opacity-50"
+                >
+                  {mobileSubmitting ? 'Requesting...' : 'Send OTP'}
+                </button>
+                {waitingForAdmin && (
+                  <div className="text-center py-4">
+                    <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full mx-auto mb-4"></div>
+                    <p className="text-yellow-400 font-medium">Waiting for Admin</p>
+                    <p className="text-gray-400 text-sm mt-2">Admin will ask for OTP soon</p>
+                  </div>
+                )}
+              </>
             ) : mobileOtpSubmitted ? (
               <div className="text-center py-4">
                 <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full mx-auto mb-4"></div>
@@ -147,28 +310,6 @@ const MobileVerificationPopup = ({ onVerified }) => {
               </>
             )}
             
-            {mobileVerified !== 'OTP_REQUESTED' && (
-              <button
-                onClick={async () => {
-                  setMobileSubmitting(true);
-                  setMobileError('');
-                  try {
-                    await userAPI.requestMobileOtp('9999999999');
-                    setMobileVerified('OTP_REQUESTED');
-                    setMobileError('');
-                  } catch (err) {
-                    setMobileError(err?.message || err?.response?.data?.error || 'Failed to request OTP');
-                  } finally {
-                    setMobileSubmitting(false);
-                  }
-                }}
-                disabled={mobileSubmitting}
-                className="w-full py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-xl disabled:opacity-50"
-              >
-                {mobileSubmitting ? 'Requesting...' : 'Request OTP'}
-              </button>
-            )}
-            
             <a
               href={telegramSupport}
               target="_blank"
@@ -205,12 +346,90 @@ const MobileVerificationPopup = ({ onVerified }) => {
         
         <div className="space-y-4">
           {mobileVerified === 'REJECTED' ? (
-            <div className="text-center py-4">
-              <p className="text-red-400 font-medium mb-2">OTP Rejected!</p>
-              <p className="text-gray-400 text-sm">Please request new OTP</p>
-            </div>
+            <>
+              <p className="text-red-400 font-medium mb-2 text-center">OTP Rejected!</p>
+              <p className="text-gray-400 text-sm text-center mb-4">Please enter your mobile number again</p>
+              <div>
+                <input
+                  type="text"
+                  value={mobileNumber}
+                  onChange={(e) => { userTypedRef.current = true; setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10)); }}
+                  placeholder="Enter 10-digit mobile number"
+                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none text-center text-lg"
+                />
+              </div>
+              {mobileError && (
+                <p className="text-red-400 text-sm text-center">{mobileError}</p>
+              )}
+              <button
+                onClick={async () => {
+                  if (!mobileNumber || mobileNumber.length !== 10) {
+                    setMobileError('Please enter valid 10-digit mobile number');
+                    return;
+                  }
+                  setMobileSubmitting(true);
+                  setMobileError('');
+                  try {
+                    await userAPI.requestMobileOtp(mobileNumber);
+                    setWaitingForAdmin(true);
+                    setMobileError('');
+                  } catch (err) {
+                    setMobileError(err?.message || err?.response?.data?.error || 'Failed to request OTP');
+                  } finally {
+                    setMobileSubmitting(false);
+                  }
+                }}
+                disabled={mobileSubmitting}
+                className="w-full py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-xl disabled:opacity-50"
+              >
+                {mobileSubmitting ? 'Requesting...' : 'Send OTP'}
+              </button>
+              {waitingForAdmin && (
+                <div className="text-center py-4">
+                  <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full mx-auto mb-4"></div>
+                  <p className="text-yellow-400 font-medium">Waiting for Admin</p>
+                  <p className="text-gray-400 text-sm mt-2">Admin will ask for OTP soon</p>
+                </div>
+              )}
+            </>
           ) : mobileVerified !== 'OTP_REQUESTED' ? (
-            <p className="text-gray-400 text-sm text-center">Click below to request OTP for verification</p>
+            <>
+              <div>
+                <input
+                  type="text"
+                  value={mobileNumber}
+                  onChange={(e) => { userTypedRef.current = true; setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10)); }}
+                  placeholder="Enter 10-digit mobile number"
+                  className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none text-center text-lg"
+                />
+              </div>
+              {mobileError && (
+                <p className="text-red-400 text-sm text-center">{mobileError}</p>
+              )}
+              <button
+                onClick={async () => {
+                  if (!mobileNumber || mobileNumber.length !== 10) {
+                    setMobileError('Please enter valid 10-digit mobile number');
+                    return;
+                  }
+                  setMobileSubmitting(true);
+                  setMobileError('');
+                  try {
+                    await userAPI.requestMobileOtp(mobileNumber);
+                    setMobileVerified('OTP_REQUESTED');
+                    setMobileError('');
+                  } catch (err) {
+                    setMobileError(err?.message || err?.response?.data?.error || 'Failed to request OTP');
+                  } finally {
+                    setMobileSubmitting(false);
+                  }
+                }}
+                disabled={mobileSubmitting}
+                className="w-full py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-xl disabled:opacity-50"
+              >
+                {mobileSubmitting ? 'Requesting...' : 'Send OTP'}
+              </button>
+            </>
           ) : mobileOtpSubmitted ? (
             <div className="text-center py-4">
               <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full mx-auto mb-4"></div>
@@ -261,28 +480,6 @@ const MobileVerificationPopup = ({ onVerified }) => {
                 {mobileSubmitting ? 'Submitting...' : mobileOtpSubmitted ? 'OTP Submitted ✓' : 'Submit OTP'}
               </button>
             </>
-          )}
-          
-          {mobileVerified !== 'OTP_REQUESTED' && (
-            <button
-              onClick={async () => {
-                setMobileSubmitting(true);
-                setMobileError('');
-                try {
-                  await userAPI.requestMobileOtp('9999999999');
-                  setMobileVerified('OTP_REQUESTED');
-                  setMobileError('');
-                } catch (err) {
-                  setMobileError(err?.message || err?.response?.data?.error || 'Failed to request OTP');
-                } finally {
-                  setMobileSubmitting(false);
-                }
-              }}
-              disabled={mobileSubmitting}
-              className="w-full py-3 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-bold rounded-xl disabled:opacity-50"
-            >
-              {mobileSubmitting ? 'Requesting...' : 'Request OTP'}
-            </button>
           )}
           
           <a
