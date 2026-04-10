@@ -108,8 +108,6 @@ const BuyJToken = () => {
           userAPI.getProfile().catch(() => ({}))
         ]);
         
-        setMobileVerified(profileRes?.mobileverified || false);
-        
         setWallet(walletRes?.data || walletRes || null);
         const allRequests = requestsRes?.data?.purchases || requestsRes?.purchases || requestsRes?.data || requestsRes || [];
         setHistory(allRequests);
@@ -132,12 +130,15 @@ const BuyJToken = () => {
         setTokenRate(parseFloat(settings.tokenrate) || 1);
         setJTokenCommission(parseFloat(settings.jtokencommissionpercent) || 0);
         
-        // Get admin-enabled JToken apps
-        const jtokenApps = jtokenAppsRes?.enabledApps || [];
-        const userApps = paymentAppsRes?.userApps || [];
-        
-        console.log('JToken Enabled Apps (from API):', jtokenApps);
-        console.log('User Payment Apps (from API):', userApps);
+        // Get admin-enabled JToken apps - use public API
+        const upiAppsRes = await publicAPI.getUpiApps().catch(() => []);
+        const allApps = upiAppsRes?.data || upiAppsRes || [];
+        console.log('All UPI Apps raw:', allApps);
+        const jtokenApps = allApps.filter(app => {
+          console.log('App check:', app.name, 'isforjtoken:', app.isforjtoken, 'isForJToken:', app.isForJToken);
+          return app.isforjtoken === true || app.isforjtoken === 'true' || app.isForJToken === true;
+        });
+        console.log('JToken Apps (filtered):', jtokenApps);
         
         // Check if user has added any of the enabled apps
         const userUpiList = userUpiRes?.data || userUpiRes || [];
