@@ -49,7 +49,7 @@ export const showNotification = (title, options = {}) => {
 
 export const playNotificationSound = () => {
   try {
-    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleS8YMpnm44pWFBMkf9/idj0cGmKf5NaYdiQWSKPk2pBlHhxWpebYm3MkFkuW49mNbR0cT6Hk2ZRyJBhFmOPamXIlGEGV4dmQcCMWQp7j2JJ0JRZBl+PXkXIlFUCV4tmPcyMUQJbi2I9zIxRAleLYj3MjFECV4tiPcyMUQJXi2I9zIxRAleLYj3MjFE=...');
+    const audio = new Audio('/aabeyaar.mp3');
     audio.play().catch(() => {});
   } catch (e) {
     console.log('Audio play error:', e);

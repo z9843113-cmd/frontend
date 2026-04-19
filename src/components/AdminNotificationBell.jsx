@@ -15,28 +15,31 @@ const playNotificationSound = async () => {
       await Notification.requestPermission();
     }
     
-    // Play sound
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) {
-      console.log('AudioContext not available');
-      return;
-    }
-    const context = new AudioContext();
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(880, context.currentTime);
-    oscillator.frequency.setValueAtTime(660, context.currentTime + 0.12);
-    gain.gain.setValueAtTime(0.001, context.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.14, context.currentTime + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.35);
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start();
-    oscillator.stop(context.currentTime + 0.35);
-    console.log('✅ Sound played');
+    // Use custom sound from public folder
+    const audio = new Audio('/aabeyaar.mp3');
+    audio.volume = 0.7;
+    await audio.play();
+    console.log('✅ Custom sound played: aabeyaar.mp3');
   } catch (e) {
-    console.log('❌ Sound error:', e.message);
+    console.log('❌ Custom sound error, trying fallback:', e.message);
+    // Fallback to simple beep if custom sound fails
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
+      const context = new AudioContext();
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, context.currentTime);
+      gain.gain.setValueAtTime(0.1, context.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.3);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start();
+      oscillator.stop(context.currentTime + 0.3);
+    } catch (fallback) {
+      console.log('Fallback also failed:', fallback.message);
+    }
   }
 };
 

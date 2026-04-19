@@ -1,13 +1,15 @@
 {
-  "name": "JexPay",
+  "name": "Jex Pay - Crypto Trading",
   "short_name": "JexPay",
-  "description": "Crypto Trading Platform",
+  "description": "Jex Pay - Crypto Trading Platform",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#D4AF37",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
+  "categories": ["finance", "business"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/jexpaylogo.png",
@@ -21,5 +23,7 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "screenshots": [],
+  "shortcuts": []
 }
