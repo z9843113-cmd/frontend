@@ -7,10 +7,20 @@ const LAST_IDS_KEY = 'admin_notification_ids';
 const READ_IDS_KEY = 'admin_notification_read_ids';
 const DISMISSED_IDS_KEY = 'admin_notification_dismissed_ids';
 
-const playNotificationSound = () => {
+const playNotificationSound = async () => {
+  console.log('🔔 Playing notification sound...');
   try {
+    // Request notification permission first
+    if ('Notification' in window && Notification.permission === 'default') {
+      await Notification.requestPermission();
+    }
+    
+    // Play sound
     const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
+    if (!AudioContext) {
+      console.log('AudioContext not available');
+      return;
+    }
     const context = new AudioContext();
     const oscillator = context.createOscillator();
     const gain = context.createGain();
@@ -24,8 +34,9 @@ const playNotificationSound = () => {
     gain.connect(context.destination);
     oscillator.start();
     oscillator.stop(context.currentTime + 0.35);
-  } catch {
-    // ignore audio issues
+    console.log('✅ Sound played');
+  } catch (e) {
+    console.log('❌ Sound error:', e.message);
   }
 };
 
