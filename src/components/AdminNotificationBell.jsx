@@ -64,8 +64,15 @@ const AdminNotificationBell = () => {
       try {
         const notifRes = await adminAPI.getNotifications();
         
-        const data = notifRes?.data || notifRes || { totalUnread: 0, items: [] };
+        const data = notifRes?.data || notifRes || { totalUnread: 0, items: [], counts: {} };
+        const counts = data.counts || {};
         const allItems = data.items || [];
+        
+        // Use backend counts.totalUnread for badge count
+        const backendTotal = data.totalUnread || 
+          (counts.deposits || 0) + (counts.withdrawals || 0) + 
+          (counts.jtoken || 0) + (counts.upiverification || 0) + 
+          (counts.exchange || 0) + (counts.mobileverification || 0);
         
         const currentIds = allItems.map((item) => item.id);
         const previousIds = JSON.parse(localStorage.getItem(LAST_IDS_KEY) || '[]');
@@ -92,9 +99,10 @@ const AdminNotificationBell = () => {
         }
 
         localStorage.setItem(LAST_IDS_KEY, JSON.stringify(currentIds));
-        setNotifications({ totalUnread: unreadIds.length, items: visibleItems, unreadIds });
+        // Use backend count for badge
+        setNotifications({ totalUnread: backendTotal, items: visibleItems, unreadIds });
       } catch {
-        // keep silent in UI header
+        setNotifications({ totalUnread: 0, items: [], unreadIds: [] });
       }
     };
 
