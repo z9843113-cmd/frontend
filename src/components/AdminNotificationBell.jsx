@@ -64,7 +64,7 @@ const AdminNotificationBell = () => {
     const allIds = notifications.items.map((item) => item.id);
     if (allIds.length === 0) return;
     try {
-      localStorage.setItem(DISMISSED_IDS_KEY, JSON.stringify(allIds));
+      localStorage.setItem(DISMISSED_IDS_KEY, JSON.stringify({ ids: allIds, _timestamp: Date.now() }));
     } catch {
       // ignore storage issue
     }
@@ -73,9 +73,29 @@ const AdminNotificationBell = () => {
     setOpen(false);
   };
 
+  const handleRefresh = async () => {
+    try {
+      localStorage.removeItem(DISMISSED_IDS_KEY);
+      localStorage.removeItem(READ_IDS_KEY);
+      localStorage.removeItem(LAST_IDS_KEY);
+    } catch {}
+    setNotifications({ totalUnread: 0, items: [], unreadIds: [] });
+  };
+
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
+        // Auto-clear dismissed IDs older than 30 seconds
+        try {
+          const dismissedData = localStorage.getItem(DISMISSED_IDS_KEY);
+          if (dismissedData) {
+            const parsed = JSON.parse(dismissedData);
+            if (parsed._timestamp && Date.now() - parsed._timestamp > 30000) {
+              localStorage.removeItem(DISMISSED_IDS_KEY);
+            }
+          }
+        } catch {}
+
         const notifRes = await adminAPI.getNotifications();
         
         const data = notifRes?.data || notifRes || { totalUnread: 0, items: [], counts: {} };
@@ -91,7 +111,14 @@ const AdminNotificationBell = () => {
         const currentIds = allItems.map((item) => item.id);
         const previousIds = JSON.parse(localStorage.getItem(LAST_IDS_KEY) || '[]');
         const readIds = JSON.parse(localStorage.getItem(READ_IDS_KEY) || '[]');
-        const dismissedIds = JSON.parse(localStorage.getItem(DISMISSED_IDS_KEY) || '[]');
+        let dismissedIds = [];
+        const dismissedData = localStorage.getItem(DISMISSED_IDS_KEY);
+        if (dismissedData) {
+          try {
+            const parsed = JSON.parse(dismissedData);
+            dismissedIds = parsed.ids || parsed || [];
+          } catch {}
+        }
         const visibleItems = allItems.filter((item) => !dismissedIds.includes(item.id));
         const visibleIds = visibleItems.map((item) => item.id);
         const unreadIds = visibleIds.filter((id) => !readIds.includes(id));
@@ -151,6 +178,9 @@ const AdminNotificationBell = () => {
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-sm font-bold text-white">Notifications</h3>
             <div className="flex items-center gap-2">
+              <button onClick={handleRefresh} className="rounded-lg bg-[#1a1a1a] px-2 py-1 text-xs text-gray-400 hover:bg-[#252525] hover:text-white" title="Refresh notifications">
+                ↻
+              </button>
               {notifications.items.length > 0 && (
                 <button onClick={handleClearAll} className="rounded-lg bg-[#1a1a1a] px-2 py-1 text-xs text-[#D4AF37] hover:bg-[#252525]">
                   Clear All
