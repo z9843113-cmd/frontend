@@ -89,7 +89,7 @@ const AdminNotificationBell = () => {
 
         const currentIds = allItems.map((item) => item.id);
         const prevIds = prevNotificationIds.current;
-        const hasNew = currentIds.some((id) => !prevIds.includes(id));
+        const hasNew = prevIds.length > 0 && currentIds.some((id) => !prevIds.includes(id));
         
         if (hasNew && allItems.length > 0) {
           playNotificationSound();
@@ -99,7 +99,9 @@ const AdminNotificationBell = () => {
           }
         }
         
-        prevNotificationIds.current = currentIds;
+        if (currentIds.length > 0) {
+          prevNotificationIds.current = currentIds;
+        }
         setNotifications({ totalUnread: backendTotal, items: allItems, unreadIds: currentIds });
       } catch {
         setNotifications({ totalUnread: 0, items: [], unreadIds: [] });
@@ -127,7 +129,7 @@ const AdminNotificationBell = () => {
         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
         </svg>
-        {notifications.totalUnread > 0 && <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">{notifications.totalUnread > 99 ? '99+' : notifications.totalUnread}</span>}
+        <span style={{ display: notifications.totalUnread > 0 ? 'flex' : 'none' }} className="absolute -right-1 -top-1 h-5 min-w-[20px] items-center justify-center rounded-full bg-red-600 px-1 text-xs font-bold text-white shadow-lg">{notifications.totalUnread > 99 ? '99+' : notifications.totalUnread}</span>
       </button>
 
       {open && (
