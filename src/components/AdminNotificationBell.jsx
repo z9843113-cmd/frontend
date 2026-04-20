@@ -61,14 +61,13 @@ const AdminNotificationBell = () => {
   };
 
   const handleClearAll = () => {
-    const allIds = notifications.items.map((item) => item.id);
-    if (allIds.length === 0) return;
     try {
-      localStorage.setItem(DISMISSED_IDS_KEY, JSON.stringify({ ids: allIds, _timestamp: Date.now() }));
-    } catch {
-      // ignore storage issue
-    }
-    markAsRead(allIds);
+      localStorage.removeItem(DISMISSED_IDS_KEY);
+      const allIds = notifications.items.map((item) => item.id);
+      const prevRead = JSON.parse(localStorage.getItem(READ_IDS_KEY) || '[]');
+      localStorage.setItem(READ_IDS_KEY, JSON.stringify([...prevRead, ...allIds]));
+    } catch {}
+    markAsRead([]);
     setNotifications({ totalUnread: 0, items: [], unreadIds: [] });
     setOpen(false);
   };
@@ -111,15 +110,7 @@ const AdminNotificationBell = () => {
         const currentIds = allItems.map((item) => item.id);
         const previousIds = JSON.parse(localStorage.getItem(LAST_IDS_KEY) || '[]');
         const readIds = JSON.parse(localStorage.getItem(READ_IDS_KEY) || '[]');
-        let dismissedIds = [];
-        const dismissedData = localStorage.getItem(DISMISSED_IDS_KEY);
-        if (dismissedData) {
-          try {
-            const parsed = JSON.parse(dismissedData);
-            dismissedIds = parsed.ids || parsed || [];
-          } catch {}
-        }
-        const visibleItems = allItems.filter((item) => !dismissedIds.includes(item.id));
+        const visibleItems = allItems;
         const visibleIds = visibleItems.map((item) => item.id);
         const unreadIds = visibleIds.filter((id) => !readIds.includes(id));
 
