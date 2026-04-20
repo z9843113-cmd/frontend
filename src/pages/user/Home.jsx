@@ -639,7 +639,7 @@ const Home = () => {
 
         <div className="grid grid-cols-2 gap-3">
           {[
-            { label: 'Buy J Token', icon: <FaCoins className="h-5 w-5" />, path: '/buy-jtoken', tone: 'text-[#D4AF37] bg-[#D4AF37]/15' },
+            { label: 'Add INR', icon: <FaCoins className="h-5 w-5" />, path: '/buy-jtoken', tone: 'text-[#D4AF37] bg-[#D4AF37]/15' },
             { label: 'Add USDT', icon: <FaArrowCircleDown className="h-5 w-5" />, path: '/deposit', tone: 'text-emerald-400 bg-emerald-400/15' }
           ].map((action) => (
             <button

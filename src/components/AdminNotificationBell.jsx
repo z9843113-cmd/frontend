@@ -3,10 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../services/api';
 import { requestNotificationPermission, getNotificationPermission, showNotification } from '../services/notification';
 
-const LAST_IDS_KEY = 'admin_notification_ids';
-const READ_IDS_KEY = 'admin_notification_read_ids';
-const DISMISSED_IDS_KEY = 'admin_notification_dismissed_ids';
-
 const playNotificationSound = () => {
   console.log('🔔 Playing notification sound...');
   try {
@@ -41,25 +37,7 @@ const AdminNotificationBell = () => {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState({ totalUnread: 0, items: [], unreadIds: [] });
 
-  const markAsRead = (ids) => {
-    try {
-      const previousRead = JSON.parse(localStorage.getItem(READ_IDS_KEY) || '[]');
-      const nextRead = [...new Set([...previousRead, ...ids])];
-      localStorage.setItem(READ_IDS_KEY, JSON.stringify(nextRead));
-      setNotifications((prev) => ({ ...prev, unreadIds: [] }));
-    } catch {
-      setNotifications((prev) => ({ ...prev, unreadIds: [] }));
-    }
-  };
-
   const handleClearAll = () => {
-    try {
-      localStorage.removeItem(DISMISSED_IDS_KEY);
-      const allIds = notifications.items.map((item) => item.id);
-      const prevRead = JSON.parse(localStorage.getItem(READ_IDS_KEY) || '[]');
-      localStorage.setItem(READ_IDS_KEY, JSON.stringify([...prevRead, ...allIds]));
-    } catch {}
-    markAsRead([]);
     setNotifications({ totalUnread: 0, items: [], unreadIds: [] });
     setOpen(false);
   };
@@ -110,8 +88,8 @@ const AdminNotificationBell = () => {
   const handleToggleOpen = () => {
     setOpen((prev) => {
       const next = !prev;
-      if (next && notifications.unreadIds.length > 0) {
-        markAsRead(notifications.unreadIds);
+      if (next && notifications.totalUnread > 0) {
+        setNotifications(prev => ({ ...prev, totalUnread: 0 }));
       }
       return next;
     });
