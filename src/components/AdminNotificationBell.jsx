@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminAPI } from '../services/api';
 import { requestNotificationPermission, getNotificationPermission, showNotification } from '../services/notification';
@@ -40,7 +40,6 @@ const AdminNotificationBell = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState({ totalUnread: 0, items: [], unreadIds: [] });
-  const prevNotificationIds = useRef([]);
 
   const markAsRead = (ids) => {
     try {
@@ -75,34 +74,29 @@ const AdminNotificationBell = () => {
   };
 
   useEffect(() => {
+    let prevCount = 0;
+    
     const fetchNotifications = async () => {
       try {
         const notifRes = await adminAPI.getNotifications();
         const data = notifRes?.data || notifRes || { totalUnread: 0, items: [], counts: {} };
-        const counts = data.counts || {};
-        const allItems = data.items || [];
         
         const backendTotal = data.totalUnread || 
-          (counts.deposits || 0) + (counts.withdrawals || 0) + 
-          (counts.jtoken || 0) + (counts.upiverification || 0) + 
-          (counts.exchange || 0) + (counts.mobileverification || 0);
+          ((data.counts?.deposits || 0) + (data.counts?.withdrawals || 0) + 
+          (data.counts?.jtoken || 0) + (data.counts?.upiverification || 0) + 
+          (data.counts?.exchange || 0) + (data.counts?.mobileverification || 0));
 
-        const currentIds = allItems.map((item) => item.id);
-        const prevIds = prevNotificationIds.current;
-        const hasNew = prevIds.length > 0 && currentIds.some((id) => !prevIds.includes(id));
-        
-        if (hasNew && allItems.length > 0) {
+        // Only play sound if count increased
+        if (backendTotal > prevCount && prevCount > 0) {
           playNotificationSound();
-          if ('Notification' in window && Notification.permission === 'granted') {
-            const latest = allItems[0];
-            new Notification(latest.title, { body: latest.description });
-          }
         }
-        
-        if (currentIds.length > 0) {
-          prevNotificationIds.current = currentIds;
-        }
-        setNotifications({ totalUnread: backendTotal, items: allItems, unreadIds: currentIds });
+        prevCount = backendTotal;
+
+        setNotifications({ 
+          totalUnread: backendTotal, 
+          items: data.items || [], 
+          unreadIds: (data.items || []).map(item => item.id) 
+        });
       } catch {
         setNotifications({ totalUnread: 0, items: [], unreadIds: [] });
       }
