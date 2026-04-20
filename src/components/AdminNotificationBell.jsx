@@ -7,39 +7,32 @@ const LAST_IDS_KEY = 'admin_notification_ids';
 const READ_IDS_KEY = 'admin_notification_read_ids';
 const DISMISSED_IDS_KEY = 'admin_notification_dismissed_ids';
 
-const playNotificationSound = async () => {
+const playNotificationSound = () => {
   console.log('🔔 Playing notification sound...');
   try {
-    // Request notification permission first
-    if ('Notification' in window && Notification.permission === 'default') {
-      await Notification.requestPermission();
-    }
-    
-    // Use custom sound from public folder
     const audio = new Audio('/aabeyaar.mp3');
     audio.volume = 0.7;
-    await audio.play();
-    console.log('✅ Custom sound played: aabeyaar.mp3');
-  } catch (e) {
-    console.log('❌ Custom sound error, trying fallback:', e.message);
-    // Fallback to simple beep if custom sound fails
-    try {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
-      const context = new AudioContext();
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(880, context.currentTime);
-      gain.gain.setValueAtTime(0.1, context.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.3);
-      oscillator.connect(gain);
-      gain.connect(context.destination);
-      oscillator.start();
-      oscillator.stop(context.currentTime + 0.3);
-    } catch (fallback) {
-      console.log('Fallback also failed:', fallback.message);
+    audio.muted = false;
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        console.log('✅ Sound played');
+      }).catch(e => {
+        console.log('❌ Play failed:', e.message);
+        const ac = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ac.createOscillator();
+        const gain = ac.createGain();
+        osc.connect(gain);
+        gain.connect(ac.destination);
+        osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.3, ac.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ac.currentTime + 0.3);
+        osc.start();
+        osc.stop(ac.currentTime + 0.3);
+      });
     }
+  } catch (e) {
+    console.log('❌ Error:', e.message);
   }
 };
 
@@ -47,7 +40,7 @@ const AdminNotificationBell = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState({ totalUnread: 0, items: [], unreadIds: [] });
-  const initialized = useRef(false);
+  const prevNotificationIds = useRef([]);
 
   const markAsRead = (ids) => {
     try {
@@ -84,55 +77,30 @@ const AdminNotificationBell = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        // Auto-clear dismissed IDs older than 30 seconds
-        try {
-          const dismissedData = localStorage.getItem(DISMISSED_IDS_KEY);
-          if (dismissedData) {
-            const parsed = JSON.parse(dismissedData);
-            if (parsed._timestamp && Date.now() - parsed._timestamp > 30000) {
-              localStorage.removeItem(DISMISSED_IDS_KEY);
-            }
-          }
-        } catch {}
-
         const notifRes = await adminAPI.getNotifications();
-        
         const data = notifRes?.data || notifRes || { totalUnread: 0, items: [], counts: {} };
         const counts = data.counts || {};
         const allItems = data.items || [];
         
-        // Use backend counts.totalUnread for badge count
         const backendTotal = data.totalUnread || 
           (counts.deposits || 0) + (counts.withdrawals || 0) + 
           (counts.jtoken || 0) + (counts.upiverification || 0) + 
           (counts.exchange || 0) + (counts.mobileverification || 0);
-        
-        const currentIds = allItems.map((item) => item.id);
-        const previousIds = JSON.parse(localStorage.getItem(LAST_IDS_KEY) || '[]');
-        const readIds = JSON.parse(localStorage.getItem(READ_IDS_KEY) || '[]');
-        const visibleItems = allItems;
-        const visibleIds = visibleItems.map((item) => item.id);
-        const unreadIds = visibleIds.filter((id) => !readIds.includes(id));
 
-        if (initialized.current) {
-          const hasNew = currentIds.some((id) => !previousIds.includes(id));
-          if (hasNew && visibleIds.length > 0) {
-            playNotificationSound();
-            if ('Notification' in window && Notification.permission === 'granted') {
-              const latest = visibleItems[0];
-              new Notification(latest.title, { body: latest.description });
-            }
-          }
-        } else {
-          initialized.current = true;
-          if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission().catch(() => {});
+        const currentIds = allItems.map((item) => item.id);
+        const prevIds = prevNotificationIds.current;
+        const hasNew = currentIds.some((id) => !prevIds.includes(id));
+        
+        if (hasNew && allItems.length > 0) {
+          playNotificationSound();
+          if ('Notification' in window && Notification.permission === 'granted') {
+            const latest = allItems[0];
+            new Notification(latest.title, { body: latest.description });
           }
         }
-
-        localStorage.setItem(LAST_IDS_KEY, JSON.stringify(currentIds));
-        // Use backend count for badge
-        setNotifications({ totalUnread: backendTotal, items: visibleItems, unreadIds });
+        
+        prevNotificationIds.current = currentIds;
+        setNotifications({ totalUnread: backendTotal, items: allItems, unreadIds: currentIds });
       } catch {
         setNotifications({ totalUnread: 0, items: [], unreadIds: [] });
       }
