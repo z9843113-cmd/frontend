@@ -57,6 +57,8 @@ const Home = () => {
   const [supportLinks, setSupportLinks] = useState({ telegramSupport: '' });
   const [paymentEnabled, setPaymentEnabled] = useState(true);
   const [togglingPayment, setTogglingPayment] = useState(false);
+  const [paymentAutoDisabled, setPaymentAutoDisabled] = useState(false);
+  const [minBalance, setMinBalance] = useState(0);
   const [banner, setBanner] = useState({
     enabled: true,
     title: 'Welcome Bonus',
@@ -193,6 +195,11 @@ const Home = () => {
         });
 
         setWallet(walletData);
+        if (walletData?.paymentAutoDisabled) {
+          setPaymentAutoDisabled(true);
+          setPaymentEnabled(false);
+        }
+        setMinBalance(parseFloat(walletData?.minBalance || walletData?.minbalance || 0));
         setRecentDeposits(Array.isArray(depositsData) ? depositsData : []);
         setRecentWithdrawals(Array.isArray(withdrawalsData) ? withdrawalsData : []);
         setRecentExchanges(Array.isArray(exchangeData) ? exchangeData : []);
@@ -317,6 +324,13 @@ const Home = () => {
         ]);
         const walletData = walletRes?.data || walletRes || null;
         setWallet(walletData);
+        if (walletData?.paymentAutoDisabled) {
+          setPaymentAutoDisabled(true);
+          setPaymentEnabled(false);
+        } else {
+          setPaymentAutoDisabled(false);
+        }
+        setMinBalance(parseFloat(walletData?.minBalance || walletData?.minbalance || 0));
         if (walletData?.usdtRate) {
           setUsdtRate(parseFloat(walletData.usdtRate));
         } else if (walletData?.usdtrate) {
@@ -604,11 +618,14 @@ const Home = () => {
               <div>
                 <p className="text-sm font-semibold text-white">Receive Payments</p>
                 <p className="text-xs text-gray-500">{paymentEnabled ? 'Start selling' : 'Payments disabled'}</p>
+                {paymentAutoDisabled && (
+                  <p className="text-xs text-amber-400 mt-1">Balance below minimum ₹{minBalance} required</p>
+                )}
               </div>
               <button
                 onClick={handleTogglePayment}
-                disabled={togglingPayment}
-                className={`text-3xl ${paymentEnabled ? 'text-emerald-400' : 'text-gray-500'}`}
+                disabled={togglingPayment || paymentAutoDisabled}
+                className={`text-3xl ${paymentEnabled ? 'text-emerald-400' : paymentAutoDisabled ? 'text-amber-500' : 'text-gray-500'}`}
               >
                 {paymentEnabled ? <FaToggleOn /> : <FaToggleOff />}
               </button>

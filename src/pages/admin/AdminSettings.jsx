@@ -85,7 +85,8 @@ const AdminSettings = () => {
         mixRate: parseFloat(data?.mixrate) || 108, 
         mixRateMin: parseFloat(data?.mixratemin) || 80, 
         exchangeMinAmount: parseFloat(data?.exchangeminamount) || 100, 
-        exchangeMaxAmount: parseFloat(data?.exchangemaxamount) || 50000 
+        exchangeMaxAmount: parseFloat(data?.exchangemaxamount) || 50000,
+        minBalance: parseFloat(data?.minbalance) || 0
       }); setBannerData({ 
         bannerEnabled: data.bannerenabled !== false, 
         bannerTitle: data.bannertitle || 'Welcome Bonus', 
@@ -297,6 +298,7 @@ const AdminSettings = () => {
               <div><label className="block text-gray-400 text-sm mb-2">Exchange Min Amount ($)</label><input type="number" step="0.01" value={formData.exchangeMinAmount} onChange={(e) => setFormData({ ...formData, exchangeMinAmount: parseFloat(e.target.value) })} className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" /></div>
               <div><label className="block text-gray-400 text-sm mb-2">Exchange Max Amount ($)</label><input type="number" step="0.01" value={formData.exchangeMaxAmount} onChange={(e) => setFormData({ ...formData, exchangeMaxAmount: parseFloat(e.target.value) })} className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" /></div>
             </div>
+            <div><label className="block text-gray-400 text-sm mb-2">Minimum Balance for Receive Payment (₹)</label><input type="number" step="0.01" value={formData.minBalance} onChange={(e) => setFormData({ ...formData, minBalance: parseFloat(e.target.value) })} className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" /></div>
             <div className="grid grid-cols-4 gap-4">
               <div><label className="block text-gray-400 text-sm mb-2">UPI Reward (₹)</label><input type="number" value={formData.upiRewardAmount} onChange={(e) => setFormData({ ...formData, upiRewardAmount: parseFloat(e.target.value) })} className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" /></div>
               <div><label className="block text-gray-400 text-sm mb-2">Bank Reward (₹)</label><input type="number" value={formData.bankRewardAmount} onChange={(e) => setFormData({ ...formData, bankRewardAmount: parseFloat(e.target.value) })} className="w-full px-5 py-4 bg-[#0a0a0a] border border-[#2a2a2a] rounded-2xl text-white focus:border-[#D4AF37] focus:outline-none" /></div>

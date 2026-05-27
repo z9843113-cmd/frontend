@@ -171,7 +171,7 @@ const MobileVerificationPopup = ({ onVerified }) => {
                       console.log('Mobile submitted successfully, showing spinner');
                       setWaitingForAdmin(true);
                       setMobileError('');
-                      // Force re-check immediately
+                      
                       setTimeout(() => {
                         userAPI.getMobileVerificationStatus().then(res => {
                           const status = res?.verification || res?.data?.verification || null;

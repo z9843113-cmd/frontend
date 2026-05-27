@@ -457,21 +457,12 @@ request.status === 'WAITING_ADMIN' || request.status === 'WAITING_ORDER' ? 'PROC
               />
               {amount && (() => {
                 const inrValue = parseFloat(amount);
-                const commissionAmount = inrValue * (jTokenCommission / 100);
-                const afterCommission = inrValue + commissionAmount;
-                const tokens = afterCommission / tokenRate;
+                const tokens = inrValue / tokenRate;
                 return (
                   <div className="mt-2 space-y-1 bg-[#0a0a0a] p-3 rounded-xl border border-[#2a2a2a]">
                     <p className="text-gray-400 text-xs">Token Rate: ₹{tokenRate}/JToken</p>
                     <p className="text-green-400 text-sm font-medium">Total: ₹{inrValue.toFixed(2)}</p>
-                    {jTokenCommission > 0 ? (
-                      <>
-                        <p className="text-yellow-400 text-xs">Commission ({jTokenCommission}%): +₹{commissionAmount.toFixed(2)}</p>
-                        <p className="text-white text-sm font-bold">You will get: ₹{afterCommission.toFixed(2)} = {tokens.toFixed(2)} JToken</p>
-                      </>
-                    ) : (
-                      <p className="text-white text-sm font-bold">You will get: ₹{inrValue.toFixed(2)} = {(inrValue/tokenRate).toFixed(2)} JToken</p>
-                    )}
+                    <p className="text-white text-sm font-bold">You will get: {tokens.toFixed(2)} JToken</p>
                   </div>
                 );
               })()}
